@@ -1,4 +1,4 @@
-//#include "UTBetrayal.h"
+#include "UTBetrayal.h"
 
 #include "ModuleManager.h"
 #include "ModuleInterface.h"
