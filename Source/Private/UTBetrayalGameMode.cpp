@@ -1,4 +1,5 @@
 #include "UTBetrayal.h"
+#include "UTBetrayalGameState.h"
 #include "UTBetrayalPlayerState.h"
 #include "UTBetrayalMessage.h"
 
@@ -12,7 +13,7 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 {
 	DisplayName = NSLOCTEXT("UTGameMode", "BET", "Betrayal");
 
-	//GameStateClass = AUTBetrayal_::StaticClass();
+	GameStateClass = AUTBetrayalGameState::StaticClass();
 	PlayerStateClass = AUTBetrayalPlayerState::StaticClass();
 	TeamClass = AUTBetrayalTeam::StaticClass();
 	AnnouncerMessageClass = UUTBetrayalMessage::StaticClass();

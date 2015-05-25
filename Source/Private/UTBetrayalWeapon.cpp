@@ -47,7 +47,7 @@ void AUTBetrayalWeapon::FireInstantHit(bool bDealDamage, FHitResult* OutHit)
 								Game->ShotTeammate(InstigatorPRI, HitPRI, Instigator, HitPawn);
 							}
 
-							CurrentFireMode = 0;
+							CurrentFireMode = 0; // TODO: Check if pending fire needs to be cleared and re-set
 							Super::FireInstantHit(bDealDamage, OutHit);
 						}
 					}
