@@ -17,7 +17,8 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 	TeamClass = AUTBetrayalTeam::StaticClass();
 	AnnouncerMessageClass = UUTBetrayalMessage::StaticClass();
 
-	static ConstructorHelpers::FObjectFinder<UClass> InstagibRifle(TEXT("Class'/Game/RestrictedAssets/Weapons/ShockRifle/BP_InstagibRifle.BP_InstagibRifle_C'"));
+	//static ConstructorHelpers::FObjectFinder<UClass> InstagibRifle(TEXT("Class'/Game/RestrictedAssets/Weapons/ShockRifle/BP_InstagibRifle.BP_InstagibRifle_C'"));
+	static ConstructorHelpers::FObjectFinder<UClass> InstagibRifle(TEXT("Class'/UTBetrayal/BP_InstagibRifle_Betrayal.BP_InstagibRifle_Betrayal_C'"));
 	InstagibRifleClass = InstagibRifle.Object;
 
 	bForceRespawn = true;
@@ -94,9 +95,10 @@ bool AUTBetrayalGameMode::CheckRelevance_Implementation(AActor* Other)
 	return Super::CheckRelevance_Implementation(Other);
 }
 
-void AUTBetrayalGameMode::ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AUTBetrayalPlayerState* HitPRI, AUTCharacter* ShotInstigator, AUTCharacter* HitPawn)
+void AUTBetrayalGameMode::ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AUTBetrayalPlayerState* HitPRI, APawn* ShotInstigator, APawn* HitPawn)
 {
-	if (HitPawn != NULL && HitPawn->IsSpawnProtected())
+	AUTCharacter* HitChar = Cast<AUTCharacter>(HitPawn);
+	if (HitChar != NULL && HitChar->IsSpawnProtected())
 	{
 		return;
 	}

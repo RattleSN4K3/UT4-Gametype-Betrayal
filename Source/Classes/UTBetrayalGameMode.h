@@ -54,7 +54,7 @@ public:
 	*/
 	virtual bool CheckRelevance_Implementation(AActor* Other) override;
 
-	virtual void ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AUTBetrayalPlayerState* HitPRI, AUTCharacter* ShotInstigator, AUTCharacter* HitPawn);
+	virtual void ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AUTBetrayalPlayerState* HitPRI, APawn* ShotInstigator, APawn* HitPawn);
 	virtual void RemoveFromTeam(AUTBetrayalPlayerState* PRI);
 	virtual void RemoveTeam(AUTBetrayalTeam* Team);
 	virtual void MaybeStartTeam();
