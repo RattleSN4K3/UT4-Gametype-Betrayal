@@ -127,8 +127,8 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 
 				//Just sanity clamp
 				TempCount = FMath::Clamp<int32>(BPRI->CurrentTeam->Teammates[i]->BetrayalCount, 0, 100);
-				aTeammate.NumGoldDaggers = 0;
-				aTeammate.NumSilverDaggers = 0;
+				aTeammate.NumGoldDaggers = TempCount / 5;
+				aTeammate.NumSilverDaggers = TempCount % 5;
 
 				HudTeammates.Add(aTeammate);
 			}
@@ -150,8 +150,8 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 
 		//Just sanity clamp
 		TempCount = FMath::Clamp<int32>(BPRI->Betrayer->BetrayalCount, 0, 100);
-		aTeammate.NumGoldDaggers = 0;
-		aTeammate.NumSilverDaggers = 0;
+		aTeammate.NumGoldDaggers = TempCount / 5;
+		aTeammate.NumSilverDaggers = TempCount % 5;
 
 		HudTeammates.Add(aTeammate);
 	}
