@@ -116,7 +116,55 @@ class UUTBetrayalMessage : public UUTLocalMessage
 		}
 	}
 
-	//AnnouncementSound
+	virtual void PrecacheAnnouncements_Implementation(class UUTAnnouncer* Announcer) const
+	{
+		if (Announcer == NULL) return;
+
+		// hack/workaround.
+		// Announcer is not allowing to use a direct USound, we need to  cache these first mapped to names. 
+		// For convenience, using reflection to map names to sounds and add these to announcers CachedAudio mapping
+
+		// FIXMESTEVE: Allow custom sounds (with custom path) being played by Announcer
+
+		UObject* CDO = GetClass()->GetDefaultObject();
+		for (TFieldIterator<UObjectProperty> Prop(GetClass()); Prop; ++Prop)
+		{
+			if (Prop->PropertyClass->IsChildOf<USoundBase>())
+			{
+				if (USoundBase* Sound = Cast<USoundBase>(Prop->GetObjectPropertyValue(Prop->ContainerPtrToValuePtr<UObject>(CDO))))
+				{
+					FName SoundName = ToAnnouncementName(Prop->GetName());
+					if (!Announcer->CachedAudio.Contains(SoundName))
+					{
+						Announcer->CachedAudio.Add(SoundName, Sound);
+					}
+				}
+			}
+		}
+	}
+
+	// TODO: Remove once Announcer can play Sounds from custom path
+	virtual FName ToAnnouncementName(FString PropName) const
+	{
+		return FName(*(GetClass()->GetName() + TEXT("_") + PropName));
+	}
+
+	virtual FName GetAnnouncementName_Implementation(int32 Switch, const UObject* OptionalObject) const override
+	{
+		// TODO: use sound instead of Names.
+		// FIXMESTEVE: Allow custom sounds (with custom path) being played by Announcer
+
+		if (Switch == 1)
+			return ToAnnouncementName(TEXT("JoinTeamSound"));
+		else if (Switch == 2)
+			return ToAnnouncementName(TEXT("RetributionSound"));
+		else if (Switch == 3)
+			return ToAnnouncementName(TEXT("PaybackSound"));
+		else if (Switch == 5)
+			return ToAnnouncementName(TEXT("PaybackAvoidedSound"));
+
+		return ToAnnouncementName(TEXT("BetrayalKillSound"));
+	}
 	
 	virtual FLinearColor GetMessageColor(int32 MessageIndex) const override
 	{
@@ -128,5 +176,10 @@ class UUTBetrayalMessage : public UUTLocalMessage
 		return GetDefault<UUTBetrayalMessage>(GetClass())->DrawColor;
 	}
 
-	//GetFontSize
+	// TODO: Port GetFontSize
+	virtual bool UseLargeFont(int32 MessageIndex) const override
+	{
+		return (MessageIndex != 4);
+	}
+
 };
