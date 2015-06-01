@@ -61,19 +61,19 @@ bool AUTBetrayalGameMode::AllowMutator(TSubclassOf<AUTMutator> MutClass)
 {
 	if (MutClass != NULL)
 	{
-	//	if (/*(MutClass == AUTMutator_Handicap::StaticClass()) ||
-	//		(MutClass == AUTMutator_NoPowerups::StaticClass()) ||
-	//		(MutClass == AUTMutator_NoTranslocator::StaticClass()) ||
-	//		(MutClass == AUTMutator_NoOrbs::StaticClass()) ||
-	//		(MutClass == AUTMutator_Survival::StaticClass()) ||
-	//		(MutClass == AUTMutator_Instagib::StaticClass()) ||*/
-	//		(MutClass == AUTMutator_WeaponArena::StaticClass()) ||
-	//		(MutClass == AUTMutator_WeaponReplacement::StaticClass()) /*||
-	//		(MutClass == AUTMutator_WeaponsRespawn::StaticClass()) ||
-	//		(MutClass == AUTMutator_Hero::StaticClass()) */)
-	//	{
-	//		return false;
-	//	}
+		//	if (/*(MutClass == AUTMutator_Handicap::StaticClass()) ||
+		//		(MutClass == AUTMutator_NoPowerups::StaticClass()) ||
+		//		(MutClass == AUTMutator_NoTranslocator::StaticClass()) ||
+		//		(MutClass == AUTMutator_NoOrbs::StaticClass()) ||
+		//		(MutClass == AUTMutator_Survival::StaticClass()) ||
+		//		(MutClass == AUTMutator_Instagib::StaticClass()) ||*/
+		//		(MutClass == AUTMutator_WeaponArena::StaticClass()) ||
+		//		(MutClass == AUTMutator_WeaponReplacement::StaticClass()) /*||
+		//		(MutClass == AUTMutator_WeaponsRespawn::StaticClass()) ||
+		//		(MutClass == AUTMutator_Hero::StaticClass()) */)
+		//	{
+		//		return false;
+		//	}
 	}
 
 	return Super::AllowMutator(MutClass);
@@ -127,9 +127,7 @@ void AUTBetrayalGameMode::ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AU
 	InstigatorPRI->BetrayalCount++;
 	InstigatorPRI->BetrayedTeam = Team;
 	HitPRI->Betrayer = InstigatorPRI;
-	// TODO: Add play sound
-	//InstigatorPRI->PlaySound(BetrayingSound);
-	UUTGameplayStatics::UTPlaySound(GetWorld(), BetrayingSound, InstigatorPRI);
+	UUTGameplayStatics::UTPlaySound(GetWorld(), BetrayingSound, InstigatorPRI->GetOwner());
 
 	for (APlayerState* PS : GameState->PlayerArray)
 	{
@@ -187,7 +185,7 @@ void AUTBetrayalGameMode::RemoveFromTeam(AUTBetrayalPlayerState* PRI)
 	int32 NumTeammates = Team->LoseTeammate(PRI);
 	if (NumTeammates == 1)
 	{
-		for (int32 i=0; i<ARRAY_COUNT(Team->Teammates); i++)
+		for (int32 i = 0; i<ARRAY_COUNT(Team->Teammates); i++)
 		{
 			if (Team->Teammates[i] != NULL)
 			{
@@ -214,7 +212,7 @@ void AUTBetrayalGameMode::RemoveFromTeam(AUTBetrayalPlayerState* PRI)
 
 void AUTBetrayalGameMode::RemoveTeam(AUTBetrayalTeam* Team)
 {
-	for (int32 i=0; i<Teams.Num(); i++)
+	for (int32 i = 0; i<Teams.Num(); i++)
 	{
 		//Remove the team we're looking for
 		if (Teams[i] == Team)
@@ -250,16 +248,14 @@ void AUTBetrayalGameMode::MaybeStartTeam()
 		if ((PRI != NULL) && (PRI->CurrentTeam == NULL) && !PRI->bIsRogue && !PRI->bIsSpectator)
 		{
 			// first try to place on existing team - but not the one you've betrayed before, or one that has too big a pot
-			for (int32 j=0; j<Teams.Num(); j++)
+			for (int32 j = 0; j<Teams.Num(); j++)
 			{
 				if (Teams[j] != PRI->BetrayedTeam)
 				{
 					if (Teams[j]->AddTeammate(PRI, MaxTeamSize))
 					{
 						//Successfully added to a team
-						// TODO: Add play sound
-						//PRI->PlaySound(JoinTeamSound);
-						UUTGameplayStatics::UTPlaySound(GetWorld(), JoinTeamSound, PRI);
+						UUTGameplayStatics::UTPlaySound(GetWorld(), JoinTeamSound, PRI->GetOwner());
 						return;
 					}
 				}
@@ -286,9 +282,7 @@ void AUTBetrayalGameMode::MaybeStartTeam()
 					if (NewTeam->AddTeammate(PRI, MaxTeamSize))
 					{
 						//Successfully added to a team
-						// TODO: Add play sound
-						//PRI->PlaySound(JoinTeamSound);
-						UUTGameplayStatics::UTPlaySound(GetWorld(), JoinTeamSound, PRI);
+						UUTGameplayStatics::UTPlaySound(GetWorld(), JoinTeamSound, PRI->GetOwner());
 
 						AUTPlayerController* PC = Cast<AUTPlayerController>(PRI->GetOwner());
 						if (PC != NULL)
