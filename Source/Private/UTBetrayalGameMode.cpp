@@ -312,7 +312,7 @@ void AUTBetrayalGameMode::Logout(AController* Exiting)
 {
 	if (Exiting != NULL)
 	{
-		AUTBetrayalPlayerState* PRI = Cast<AUTBetrayalPlayerState>(Exiting);
+		AUTBetrayalPlayerState* PRI = Cast<AUTBetrayalPlayerState>(Exiting->PlayerState);
 		if (PRI != NULL && PRI->CurrentTeam != NULL)
 		{
 			RemoveFromTeam(PRI);
