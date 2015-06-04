@@ -14,4 +14,7 @@ class AUTBetrayalGameState : public AUTGameState
 	/** Returns the UTBetrayalPRI (if any) associated with Actor A */
 	UFUNCTION(BlueprintCallable, Category = Betrayal)
 	virtual class AUTBetrayalPlayerState* GetBetrayalPRIFor(const AActor* A) const;
+
+	// HACK: Workaround for UpdateTeamInfo of the Botclass to include teammembers as enemies
+	bool bSkipCheck;
 };

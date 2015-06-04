@@ -9,6 +9,10 @@ AUTBetrayalGameState::AUTBetrayalGameState(const FObjectInitializer& ObjectIniti
 
 bool AUTBetrayalGameState::OnSameTeam(const AActor* Actor1, const AActor* Actor2)
 {
+	// HACK: Workaround: always return as this is call is within UTBot::UpdateTeamInfo
+	// TODO: remove once UpdateTeamInfo allows to retrieve team members as enemies
+	if (bSkipCheck) return false;
+
 	const AUTBetrayalPlayerState* Actor1PRI = GetBetrayalPRIFor(Actor1);
 	const AUTBetrayalPlayerState* Actor2PRI = GetBetrayalPRIFor(Actor2);
 

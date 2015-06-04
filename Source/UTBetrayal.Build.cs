@@ -15,6 +15,7 @@ namespace UnrealBuildTool.Rules
 					"UnrealTournament",
 					"InputCore",
 					"SlateCore",
+					"AIModule", // For Bot subclassing
 				}
 			);
 		}

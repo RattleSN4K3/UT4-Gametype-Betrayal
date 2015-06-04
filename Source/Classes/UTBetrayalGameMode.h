@@ -62,5 +62,8 @@ public:
 	virtual void Logout(AController* Exiting) override;
 	virtual void ScoreKill(AController* Killer, AController* Other, APawn* KilledPawn, TSubclassOf<UDamageType> DamageType) override;
 
+	// TODO: TEMP. Remove once support for custom bot class is given
+	virtual class AUTBot* AddBot(uint8 TeamNum = 255) override;
+	virtual class AUTBot* AddNamedBot(const FString& BotName, uint8 TeamNum = 255) override;
 
 };

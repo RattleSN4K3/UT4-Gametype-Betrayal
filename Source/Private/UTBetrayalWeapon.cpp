@@ -2,6 +2,7 @@
 #include "UTBetrayalWeapon.h"
 #include "UTBetrayalPlayerState.h"
 #include "UTBetrayalGameMode.h"
+#include "UTBetrayalBot.h"
 #include "StatNames.h"
 
 AUTBetrayalWeapon::AUTBetrayalWeapon(const FObjectInitializer& ObjectInitializer)
@@ -58,26 +59,45 @@ void AUTBetrayalWeapon::FireInstantHit(bool bDealDamage, FHitResult* OutHit)
 				}
 				return;
 			}
-			else
+			else if (AUTPlayerController* PC = Cast<AUTPlayerController>(Instigator->Controller))
 			{
-				// TODO: add bot support
-				/*
 				// bots don't like being shot at by teammates
-				AUTGameState* GameState = GetWorld()->GetGameState<AUTGameState>();
-				AUTGameMode* Game = GetWorld()->GetAuthGameMode<AUTGameMode>();
-				if ((Cast<APlayerController>(Instigator->Controller) != NULL)
-					&& (Instigator->Controller->ShotTarget != NULL)
-					&& (Cast<AUTBot>(Instigator->Controller->ShotTarget->Controller) != NULL)
-					&& (GameState != NULL && GameState->OnSameTeam(Instigator, Instigator->Controller->ShotTarget))
-					&& (Game != NULL && Cast<AUTBetrayalPlayerState>(Instigator->PlayerState)->CurrentTeam->TeamPot >= FMath::Min(6, Game->GoalScore - FMath::Max(Instigator->PlayerState->Score, Instigator->Controller->ShotTarget->PlayerState->Score))))
+				
+				if (PC->LastShotTargetGuess != NULL && PC->LastShotTargetGuess->Controller != NULL)
 				{
-					//UE_LOG(UT, Verbose, TEXT("%s betray shooter"), *Instigator->Controller->ShotTarget->Controller->PlayerState->PlayerName);
-					Cast<AUTBot>(Instigator->Controller->ShotTarget->Controller).bBetrayTeam = true;
+					if (AUTBetrayalBot* Bot = Cast<AUTBetrayalBot>(PC->LastShotTargetGuess->Controller))
+					{
+						AUTBetrayalPlayerState* BotPRI = Cast<AUTBetrayalPlayerState>(Bot->PlayerState);
+
+						AUTGameState* GameState = GetWorld()->GetGameState<AUTGameState>();
+						AUTGameMode* Game = GetWorld()->GetAuthGameMode<AUTGameMode>();
+
+						if (BotPRI != NULL && GameState != NULL && Game != NULL && InstigatorPRI->CurrentTeam != NULL && GameState->OnSameTeam(Instigator, Bot) && 
+							InstigatorPRI->CurrentTeam->TeamPot >= FMath::Min<int32>(6, Game->GoalScore - FMath::Max<int32>(InstigatorPRI->Score, BotPRI->Score)))
+						{
+							UE_LOG(Betrayal, Log, TEXT("%s betray shooter"), *InstigatorPRI->PlayerName);
+							Bot->bBetrayTeam = true;
+						}
+					}
 				}
-				*/
 			}
 		}
 	}
 
 	Super::FireInstantHit(bDealDamage, OutHit);
+}
+
+bool AUTBetrayalWeapon::CanAttack_Implementation(AActor* Target, const FVector& TargetLoc, bool bDirectOnly, bool bPreferCurrentMode, UPARAM(ref) uint8& BestFireMode, UPARAM(ref) FVector& OptimalTargetLoc)
+{
+	if (Super::CanAttack_Implementation(Target, TargetLoc, bDirectOnly, bPreferCurrentMode, BestFireMode, OptimalTargetLoc))
+	{
+		AUTGameState* GameState = GetWorld()->GetGameState<AUTGameState>();
+		if (GameState != NULL)
+		{
+			BestFireMode = GameState->OnSameTeam(Target, UTOwner) ? 1 : 0;
+		}
+		return true;
+	}
+
+	return false;
 }

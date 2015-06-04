@@ -1,7 +1,8 @@
 #include "UTBetrayal.h"
+#include "UTBetrayalTeam.h"
 #include "UTBetrayalGameMode.h"
 #include "UTBetrayalPlayerState.h"
-#include "UTBetrayalTeam.h"
+#include "UTBetrayalBot.h"
 
 AUTBetrayalTeam::AUTBetrayalTeam(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -77,12 +78,11 @@ int32 AUTBetrayalTeam::LoseTeammate(AUTBetrayalPlayerState* OldTeammate)
 
 	OldTeammate->CurrentTeam = NULL;
 
-	// TODO: Add bot support
-	//AUTBot* B = Cast<AUTBot>(OldTeammate->GetOwner());
-	//if (B != NULL)
-	//{
-	//	B->bBetrayTeam = false;
-	//}
+	// TODO: store flag else where FIXME: do not use subclassed UTBot
+	if (AUTBetrayalBot* B = Cast<AUTBetrayalBot>(OldTeammate->GetOwner()))
+	{
+		B->bBetrayTeam = false;
+	}
 
 	ForceNetUpdate();
 	for (int32 i = 0; i< ARRAY_COUNT(Teammates); i++)

@@ -3,7 +3,9 @@
 #include "UTBetrayalPlayerState.h"
 #include "UTBetrayalHUD.h"
 #include "UTBetrayalMessage.h"
+#include "UTBetrayalBot.h"
 
+#include "UTBot.h"
 #include "UTMutator_WeaponArena.h"
 #include "UTMutator_WeaponReplacement.h"
 
@@ -20,6 +22,10 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 
 	TeamClass = AUTBetrayalTeam::StaticClass();
 	AnnouncerMessageClass = UUTBetrayalMessage::StaticClass();
+
+	// Workaround for bot decision to betray team members
+	// TODO: allow to have PickNewEnemy in Squad/BotDecisionComponent
+	//BotClass = AUTBetrayalBot::StaticClass();
 
 	//static ConstructorHelpers::FObjectFinder<UClass> InstagibRifle(TEXT("Class'/Game/RestrictedAssets/Weapons/ShockRifle/BP_InstagibRifle.BP_InstagibRifle_C'"));
 	static ConstructorHelpers::FObjectFinder<UClass> InstagibRifle(TEXT("Class'/UTBetrayal/BP_InstagibRifle_Betrayal.BP_InstagibRifle_Betrayal_C'"));
@@ -370,27 +376,31 @@ void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APa
 			{
 				KillerPRI->CurrentTeam->TeamPot++;
 
-				// TODO: add bot support
-				//if (KillerPRI->CurrentTeam->TeamPot > 2)
-				//{
-				//	for (int32 i = 0; i< ARRAY_COUNT(KillerPRI->CurrentTeam->Teammates); i++)
-				//	{
-				//		if (KillerPRI->CurrentTeam->Teammates[i] != NULL)
-				//		{
-				//			AUTBot* B = Cast<AUTBot>(KillerPRI->CurrentTeam->Teammates[i]->GetOwner());
-				//			if ((B != NULL) && !B->bBetrayTeam)
-				//			{
-				//				int32 BetrayalValue = KillerPRI->CurrentTeam->TeamPot + 0.3*Cast<AUTBetrayalPlayerState>(B->PlayerState)->ScoreValueFor(KillerPRI);
-				//				if ((BetrayalValue > 1.5 + RogueValue - B->CurrentAggression + Cast<AUTBetrayalPlayerState>(B->PlayerState)->GetTrustWorthiness()) && (FMath::FRand() < 0.2))
-				//				{
-				//					//UE_LOG(UT, Verbose, TEXT("Beacon %s lost connection. Attempting to recreate."), *GetNameSafe(this));
-				//					// `log(Instigator.Controller.ShotTarget.Controller->PlayerState.PlayerName$" betrayal value "$BetrayalValue$" vs "$(1.5 + RogueValue - B.Aggressiveness + Cast<AUTBetrayalPlayerState>(B->PlayerState).GetTrustWorthiness()));
-				//					B.bBetrayTeam = true;
-				//				}
-				//			}
-				//		}
-				//	}
-				//}
+				// TODO: add proper bot support
+				if (KillerPRI->CurrentTeam->TeamPot > 2)
+				{
+					for (int32 i = 0; i< ARRAY_COUNT(KillerPRI->CurrentTeam->Teammates); i++)
+					{
+						if (KillerPRI->CurrentTeam->Teammates[i] != NULL)
+						{
+							AUTBetrayalPlayerState* BotPRI = KillerPRI->CurrentTeam->Teammates[i];
+
+							// TODO: store flag else where FIXME: do not use subclassed UTBot
+							AUTBetrayalBot* B = Cast<AUTBetrayalBot>(KillerPRI->CurrentTeam->Teammates[i]->GetOwner());
+							if ((B != NULL) && !B->bBetrayTeam)
+							{
+								float BetrayalValue = (float)(KillerPRI->CurrentTeam->TeamPot) + 0.3f*(float)BotPRI->ScoreValueFor(KillerPRI);
+								float BetrayalRandomness = 1.5 + RogueValue - B->CurrentAggression + BotPRI->GetTrustWorthiness();
+
+								UE_LOG(Betrayal, Verbose, TEXT("%s betrayal value %d  vs. %d"), *KillerPRI->PlayerName, BetrayalValue, BetrayalRandomness);
+								if ((BetrayalValue > BetrayalRandomness) && (FMath::FRand() < 0.2))
+								{
+									B->bBetrayTeam = true;
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -406,3 +416,113 @@ void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APa
 		CheckScore(KillerPRI);
 	}
 }
+
+// Workaround for spawning custom bot
+// TODO: FIXME: Set bot class as class field (Pull Request?)
+
+// COPIED FROM UTGameMode
+AUTBot* AUTBetrayalGameMode::AddBot(uint8 TeamNum)
+{
+	AUTBot* NewBot = GetWorld()->SpawnActor<AUTBot>(AUTBetrayalBot::StaticClass());
+	if (NewBot != NULL)
+	{
+		if (BotConfig == NULL)
+		{
+			BotConfig = NewObject<UUTBotConfig>(this);
+		}
+		// pick bot character
+		if (BotConfig->BotCharacters.Num() == 0)
+		{
+			UE_LOG(Betrayal, Warning, TEXT("AddBot(): No BotCharacters defined"));
+			static int32 NameCount = 0;
+			NewBot->PlayerState->SetPlayerName(FString(TEXT("TestBot")) + ((NameCount > 0) ? FString::Printf(TEXT("_%i"), NameCount) : TEXT("")));
+			NameCount++;
+		}
+		else
+		{
+			int32 NumEligible = 0;
+			FBotCharacter* BestChar = NULL;
+			uint8 BestSelectCount = MAX_uint8;
+			for (FBotCharacter& Character : BotConfig->BotCharacters)
+			{
+				if (Character.SelectCount < BestSelectCount)
+				{
+					NumEligible = 1;
+					BestChar = &Character;
+					BestSelectCount = Character.SelectCount;
+				}
+				else if (Character.SelectCount == BestSelectCount)
+				{
+					NumEligible++;
+					if (FMath::FRand() < 1.0f / float(NumEligible))
+					{
+						BestChar = &Character;
+					}
+				}
+			}
+			BestChar->SelectCount++;
+			NewBot->Personality = *BestChar;
+			NewBot->PlayerState->SetPlayerName(BestChar->PlayerName);
+		}
+		AUTPlayerState* PS = Cast<AUTPlayerState>(NewBot->PlayerState);
+		if (PS != NULL)
+		{
+			PS->bReadyToPlay = true;
+		}
+
+		NewBot->InitializeSkill(GameDifficulty);
+		NumBots++;
+		ChangeTeam(NewBot, TeamNum);
+		GenericPlayerInitialization(NewBot);
+	}
+	return NewBot;
+}
+
+// COPIED FROM UTGameMode
+AUTBot* AUTBetrayalGameMode::AddNamedBot(const FString& BotName, uint8 TeamNum)
+{
+	if (BotConfig == NULL)
+	{
+		BotConfig = NewObject<UUTBotConfig>(this);
+	}
+	FBotCharacter* TheChar = NULL;
+	for (FBotCharacter& Character : BotConfig->BotCharacters)
+	{
+		if (Character.PlayerName == BotName)
+		{
+			TheChar = &Character;
+			break;
+		}
+	}
+
+	if (TheChar == NULL)
+	{
+		UE_LOG(Betrayal, Error, TEXT("Character data for bot '%s' not found"), *BotName);
+		return NULL;
+	}
+	else
+	{
+		AUTBot* NewBot = GetWorld()->SpawnActor<AUTBot>(AUTBetrayalBot::StaticClass());
+		if (NewBot != NULL)
+		{
+			TheChar->SelectCount++;
+			NewBot->Personality = *TheChar;
+			NewBot->PlayerState->SetPlayerName(TheChar->PlayerName);
+
+			AUTPlayerState* PS = Cast<AUTPlayerState>(NewBot->PlayerState);
+			if (PS != NULL)
+			{
+				PS->bReadyToPlay = true;
+			}
+
+			NewBot->InitializeSkill(GameDifficulty);
+			NumBots++;
+			ChangeTeam(NewBot, TeamNum);
+			GenericPlayerInitialization(NewBot);
+		}
+
+		return NewBot;
+	}
+}
+
+// END Workaround for spawning custom bot
