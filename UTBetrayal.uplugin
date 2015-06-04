@@ -9,7 +9,7 @@
 	"EngineVersion" : "",
 	"Description" : "Cooperate to get bonus points.  Betray your team to keep them.",
 	"Category" : "UnrealTournament.GameMode",
-	"EnabledByDefault" : false,
+	"EnabledByDefault" : true,
 	"CanContainContent" : true,
 	
 	"Modules" :
