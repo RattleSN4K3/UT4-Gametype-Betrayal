@@ -74,19 +74,22 @@ bool AUTBetrayalGameMode::AllowMutator(TSubclassOf<AUTMutator> MutClass)
 {
 	if (MutClass != NULL)
 	{
-		//	if (/*(MutClass == AUTMutator_Handicap::StaticClass()) ||
-		//		(MutClass == AUTMutator_NoPowerups::StaticClass()) ||
-		//		(MutClass == AUTMutator_NoTranslocator::StaticClass()) ||
-		//		(MutClass == AUTMutator_NoOrbs::StaticClass()) ||
-		//		(MutClass == AUTMutator_Survival::StaticClass()) ||
-		//		(MutClass == AUTMutator_Instagib::StaticClass()) ||*/
-		//		(MutClass == AUTMutator_WeaponArena::StaticClass()) ||
-		//		(MutClass == AUTMutator_WeaponReplacement::StaticClass()) /*||
-		//		(MutClass == AUTMutator_WeaponsRespawn::StaticClass()) ||
-		//		(MutClass == AUTMutator_Hero::StaticClass()) */)
-		//	{
-		//		return false;
-		//	}
+		// TODO: disallow some stock mutators
+		// TODO: disallow some custom/3rd-party mutators
+
+		if (/*(MutClass == AUTMutator_Handicap::StaticClass()) ||
+			(MutClass == AUTMutator_NoPowerups::StaticClass()) ||
+			(MutClass == AUTMutator_NoTranslocator::StaticClass()) ||
+			(MutClass == AUTMutator_NoOrbs::StaticClass()) ||
+			(MutClass == AUTMutator_Survival::StaticClass()) ||
+			(MutClass == AUTMutator_Instagib::StaticClass()) ||*/
+			(MutClass->IsChildOf<AUTMutator_WeaponArena>()) ||
+			(MutClass->IsChildOf<AUTMutator_WeaponReplacement>()) /*||
+			(MutClass == AUTMutator_WeaponsRespawn::StaticClass()) ||
+			(MutClass == AUTMutator_Hero::StaticClass()) */)
+		{
+			return false;
+		}
 	}
 
 	return Super::AllowMutator(MutClass);
