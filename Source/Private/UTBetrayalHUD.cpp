@@ -3,6 +3,9 @@
 #include "UTBetrayalPlayerState.h"
 #include "UTHUD_DM.h"
 
+// TODO: Use FUTCanvasTextItem to draw beacon
+// TODO: Add opacity to Beacons near crosshair
+
 AUTBetrayalHUD::AUTBetrayalHUD(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
@@ -27,6 +30,9 @@ AUTBetrayalHUD::AUTBetrayalHUD(const FObjectInitializer& ObjectInitializer)
 	TextDefaultColor = FLinearColor(FColor(255, 255, 128, 255));
 	BackgroundDefaultColor = FLinearColor(1.0f, 1.0f, 1.0f, 0.5f);
 	BackgroundTeamColor = FLinearColor(0.5f, 0.8f, 10.f, 0.8f);
+
+	static ConstructorHelpers::FObjectFinder<UFont> BeaconFontObj(TEXT("Font'/Engine/EngineFonts/Roboto.Roboto'"));
+	BeaconFont = BeaconFontObj.Object != NULL ? BeaconFontObj.Object : MediumFont;
 }
 
 void AUTBetrayalHUD::DrawPlayerBeacon(AUTCharacter* P, UCanvas* Canvas, FVector CameraPosition, FVector CameraDir, FVector ScreenLoc)
@@ -40,8 +46,13 @@ void AUTBetrayalHUD::DrawPlayerBeacon(AUTCharacter* P, UCanvas* Canvas, FVector 
 	if (GS == NULL || PRI == NULL || ViewerPRI == NULL)
 		return;
 
-	UFont* NameFont = TinyFont;
-	UFont* NumFont = MediumFont;
+	FFontRenderInfo TextRenderInfo = FFontRenderInfo();
+	TextRenderInfo.bClipText = true;
+
+	float NameFontScale = 0.8;
+	float NumFontScale = 3.0;
+	UFont* NameFont = BeaconFont; // TinyFont;
+	UFont* NumFont = BeaconFont; // GetFontFromSizeIndex(3); //MediumFont;
 
 	float TextXL, TextYL;
 	bool bSameTeam = GS->OnSameTeam(P, PlayerOwner);
@@ -49,6 +60,8 @@ void AUTBetrayalHUD::DrawPlayerBeacon(AUTCharacter* P, UCanvas* Canvas, FVector 
 	FLinearColor BeaconColor = bSameTeam ? BackgroundTeamColor : BackgroundDefaultColor;
 	FString ScreenName = PRI->PlayerName; // TODO: use player alias instead of PlayerName
 	Canvas->TextSize(NameFont, ScreenName, TextXL, TextYL);
+	TextXL *= NameFontScale;
+	TextYL *= NameFontScale;
 
 	float NumXL, NumYL;
 	float Dist = (CameraPosition - P->GetActorLocation()).Size();
@@ -57,6 +70,7 @@ void AUTBetrayalHUD::DrawPlayerBeacon(AUTCharacter* P, UCanvas* Canvas, FVector 
 
 	Canvas->TextSize(NumFont, NumString, NumXL, NumYL);
 	float FontScale = FMath::Clamp<float>(800.0f / (Dist + 1.0f), 0.65f, 1.0f);
+	FontScale *= NumFontScale;
 	NumXL *= FontScale;
 	NumYL *= FontScale;
 
@@ -72,10 +86,12 @@ void AUTBetrayalHUD::DrawPlayerBeacon(AUTCharacter* P, UCanvas* Canvas, FVector 
 	//}
 	
 	// Draw Beacon Background
-	float BeaconPosX = ScreenLoc.X - 0.7*XL;
-	float BeaconPosY = ScreenLoc.Y - 1.7*YL;
-	float BeaconW = 1.4*XL;
-	float BeaconH = YL; // 1.9*YL;
+	float BeaconPaddingX = 0.1f * XL;
+	float BeaconPaddingY = BeaconPaddingX;
+	float BeaconW = XL + 2.0f * BeaconPaddingX;
+	float BeaconH = YL + 2.0f * BeaconPaddingY;
+	float BeaconPosX = ScreenLoc.X - 0.5f * BeaconW;
+	float BeaconPosY = ScreenLoc.Y - BeaconH;
 	Canvas->SetLinearDrawColor(BeaconColor);
 	Canvas->DrawTile(Canvas->DefaultTexture, BeaconPosX, BeaconPosY, BeaconW, BeaconH, 0, 0, 1, 1);
 
@@ -100,7 +116,7 @@ void AUTBetrayalHUD::DrawPlayerBeacon(AUTCharacter* P, UCanvas* Canvas, FVector 
 	//Canvas->DrawItem(TextItem);
 
 	Canvas->SetLinearDrawColor(TextColor);
-	Canvas->DrawText(NameFont, ScreenName, ScreenLoc.X - 0.5*TextXL, ScreenLoc.Y - 2.5*TextYL*FontScale);
+	Canvas->DrawText(NameFont, ScreenName, ScreenLoc.X - 0.5f*TextXL, ScreenLoc.Y - BeaconPaddingY - TextYL, NameFontScale, NameFontScale, TextRenderInfo);
 
 	FLinearColor BonusTextColor = TextColor;
 	if (!bSameTeam)
@@ -118,8 +134,11 @@ void AUTBetrayalHUD::DrawPlayerBeacon(AUTCharacter* P, UCanvas* Canvas, FVector 
 	}
 
 	// draw value of this player
-	Canvas->SetLinearDrawColor(TextColor);
-	Canvas->DrawText(NumFont, NumString, ScreenLoc.X - 0.5*NumXL, ScreenLoc.Y - 2.0*TextYL*FontScale - NumYL - AudioHeight, FontScale, FontScale);
+	Canvas->SetLinearDrawColor(BonusTextColor);
+	Canvas->DrawText(NumFont, NumString, ScreenLoc.X - 0.5*NumXL, BeaconPosY + BeaconPaddingY, FontScale, FontScale, TextRenderInfo); // TODO: add AudioHeight
+
+	//Canvas->SetLinearDrawColor(TextColor);
+	//Canvas->DrawText(NumFont, NumString, ScreenLoc.X - 0.5*NumXL, ScreenLoc.Y - 2.0*TextYL*FontScale - NumYL - AudioHeight, FontScale, FontScale);
 
 	//TextItem.SetColor(BonusTextColor);
 	//FFormatNamedArguments Args;

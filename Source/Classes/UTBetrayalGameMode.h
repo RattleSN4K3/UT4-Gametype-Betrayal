@@ -66,4 +66,9 @@ public:
 	virtual class AUTBot* AddBot(uint8 TeamNum = 255) override;
 	virtual class AUTBot* AddNamedBot(const FString& BotName, uint8 TeamNum = 255) override;
 
+	// TODO: TEMP. Remove once Pawn::PostRender is routed to HUD for PlayerBeacon
+	virtual void SetPlayerDefaults(APawn* PlayerPawn) override;
+
+	// TODO: TEMP. workaround for JumpBoots fix (callign SetPlayerDefaults)
+	TArray<APawn*> AlreadySpawnedPlayers;
 };

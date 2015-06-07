@@ -1,9 +1,11 @@
 #include "UTBetrayal.h"
+#include "UTBetrayalCharacter.h"
 #include "UTBetrayalGameState.h"
 #include "UTBetrayalPlayerState.h"
 #include "UTBetrayalHUD.h"
 #include "UTBetrayalMessage.h"
 #include "UTBetrayalBot.h"
+#include "UTBetrayalCharacterPostRenderer.h"
 
 #include "UTBot.h"
 #include "UTMutator_WeaponArena.h"
@@ -15,6 +17,10 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 : Super(ObjectInitializer)
 {
 	DisplayName = NSLOCTEXT("UTGameMode", "BET", "Betrayal");
+
+	static ConstructorHelpers::FObjectFinder<UClass> PlayerPawnObject(TEXT("Class'/UTBetrayal/DefaultCharacter_Betrayal.DefaultCharacter_Betrayal_C'"));
+	DefaultPawnClass = PlayerPawnObject.Object;
+	//DefaultPawnClass = AUTBetrayalCharacter::StaticClass();
 
 	GameStateClass = AUTBetrayalGameState::StaticClass();
 	PlayerStateClass = AUTBetrayalPlayerState::StaticClass();
@@ -416,6 +422,30 @@ void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APa
 		CheckScore(KillerPRI);
 	}
 }
+
+// Workaround for PostRender routed to HUD
+// TODO: FIXME: Route PostRender to UTHUD class
+
+void AUTBetrayalGameMode::SetPlayerDefaults(APawn* PlayerPawn)
+{
+	// FIXME: workaround for JumpBoots calling SetPlayerDefaults
+	// TODO: Pull Request/Forum thread update to get this fixed
+	if (!AlreadySpawnedPlayers.Contains(PlayerPawn))
+	{
+		AlreadySpawnedPlayers.Add(PlayerPawn);
+		AlreadySpawnedPlayers.Remove(NULL);
+
+		FActorSpawnParameters Params;
+		Params.bNoCollisionFail = true;
+		Params.Owner = PlayerPawn;
+		GetWorld()->SpawnActor<AUTBetrayalCharacterPostRenderer>(AUTBetrayalCharacterPostRenderer::StaticClass(), Params);
+	}
+
+	Super::SetPlayerDefaults(PlayerPawn);
+}
+
+// END Workaround for PostRender routed to HUD
+
 
 // Workaround for spawning custom bot
 // TODO: FIXME: Set bot class as class field (Pull Request?)

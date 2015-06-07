@@ -17,4 +17,8 @@ class AUTBetrayalHUD : public AUTHUD
 
 	virtual void DrawPlayerBeacon(AUTCharacter* P, UCanvas* BeaconCanvas, FVector CameraPosition, FVector CameraDir, FVector ScreenLoc);
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UFont* BeaconFont;
+
 };
