@@ -8,6 +8,7 @@
 #include "UTBetrayalCharacterPostRenderer.h"
 
 #include "UTBot.h"
+#include "UTFirstBloodMessage.h"
 #include "UTMutator_WeaponArena.h"
 #include "UTMutator_WeaponReplacement.h"
 
@@ -330,28 +331,25 @@ void AUTBetrayalGameMode::Logout(AController* Exiting)
 
 void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APawn* KilledPawn, TSubclassOf<UDamageType> DamageType)
 {
-	AUTBetrayalPlayerState* KillerPRI = NULL;
-	AUTBetrayalPlayerState* OtherPRI = NULL;
-
-	if (Killer != NULL)
-	{
-		KillerPRI = Cast<AUTBetrayalPlayerState>(Killer->PlayerState);
-	}
+	// TODO: Improve ScoreKill, call parent method and apply Betrayal logic separately
 
 	if ((Killer == Other) || (Killer == NULL))
 	{
-		if ((Other != NULL) && (Other->PlayerState != NULL))
+		// If it's a suicide, subtract a kill from the player...
+
+		if (Other != NULL && Other->PlayerState != NULL && Cast<AUTPlayerState>(Other->PlayerState) != NULL)
 		{
-			Other->PlayerState->Score -= 1;
-			Other->PlayerState->ForceNetUpdate();
+			Cast<AUTPlayerState>(Other->PlayerState)->AdjustScore(-1);
+			Cast<AUTPlayerState>(Other->PlayerState)->IncrementKills(DamageType, false);
 		}
 	}
-	else if (KillerPRI != NULL)
+	else
 	{
-		OtherPRI = Cast<AUTBetrayalPlayerState>(Other->PlayerState);
-		if (OtherPRI != NULL)
+		AUTBetrayalPlayerState* KillerPRI = Cast<AUTBetrayalPlayerState>(Killer->PlayerState);
+		AUTBetrayalPlayerState* OtherPRI = Cast<AUTBetrayalPlayerState>(Other->PlayerState);
+		if (KillerPRI != NULL && OtherPRI != NULL)
 		{
-			KillerPRI->Score += OtherPRI->ScoreValueFor(KillerPRI);
+			KillerPRI->AdjustScore(OtherPRI->ScoreValueFor(KillerPRI));
 			if (OtherPRI->bIsRogue && (OtherPRI == KillerPRI->Betrayer))
 			{
 				AUTPlayerController* KillerPC = Cast<AUTPlayerController>(KillerPRI->GetOwner());
@@ -376,8 +374,7 @@ void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APa
 				OtherPRI->RogueExpired();
 			}
 
-			KillerPRI->ForceNetUpdate();
-			KillerPRI->Kills++;
+			KillerPRI->IncrementKills(DamageType, true); 
 			if (KillerPRI->CurrentTeam != NULL)
 			{
 				KillerPRI->CurrentTeam->TeamPot++;
@@ -408,18 +405,21 @@ void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APa
 					}
 				}
 			}
+
+			FindAndMarkHighScorer();
+			CheckScore(KillerPRI);
+		}
+
+		if (!bFirstBloodOccurred)
+		{
+			BroadcastLocalized(this, UUTFirstBloodMessage::StaticClass(), 0, KillerPRI, NULL, NULL);
+			bFirstBloodOccurred = true;
 		}
 	}
 
 	if (BaseMutator != NULL)
 	{
 		BaseMutator->ScoreKill(Killer, Other, DamageType);
-	}
-
-	// TODO: Add support for MaxLives
-	if ((Killer != NULL)/* || (MaxLives > 0)*/)
-	{
-		CheckScore(KillerPRI);
 	}
 }
 
