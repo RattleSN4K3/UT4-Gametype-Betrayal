@@ -81,8 +81,8 @@ void UUTBetrayalScoreboard::DrawDaggers(AUTBetrayalPlayerState* PRI, float Rende
 {
 	//Just sanity clamp
 	int32 TempCount = FMath::Clamp<int32>(PRI->BetrayalCount, 0, 100);
-	int32 NumGoldDaggers = 6;// TempCount / 5;
-	int32 NumSilverDaggers = 3;// TempCount % 5;
+	int32 NumGoldDaggers = TempCount / 5;
+	int32 NumSilverDaggers = TempCount % 5;
 
 	float BarOpacity = 0.75f;
 	float DaggerAspect = DaggerTexCoords.VL == 0.0 ? 0.0 : DaggerTexCoords.UL / DaggerTexCoords.VL;
