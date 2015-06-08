@@ -54,6 +54,9 @@ void AUTBetrayalGameMode::InitGame(const FString& MapName, const FString& Option
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
+	// force force-respawn
+	bForceRespawn = true;
+
 	bClearPlayerInventory = true;
 	DefaultInventory.Empty();
 
