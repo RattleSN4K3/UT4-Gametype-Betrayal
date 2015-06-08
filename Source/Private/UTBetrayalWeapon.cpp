@@ -42,22 +42,24 @@ void AUTBetrayalWeapon::FireInstantHit(bool bDealDamage, FHitResult* OutHit)
 					{
 						if (CurrentFireMode == 1)
 						{
+							// TODO: route to game mode class instead of weapon check. Also not working with God-Mode
 							AUTBetrayalGameMode* Game = GetWorld()->GetAuthGameMode<AUTBetrayalGameMode>();
 							if (Game != NULL)
 							{
 								Game->ShotTeammate(InstigatorPRI, HitPRI, Instigator, HitPawn);
 							}
-
-							CurrentFireMode = 0; // TODO: Check if pending fire needs to be cleared and re-set
-							Super::FireInstantHit(bDealDamage, OutHit);
+						}
+						else
+						{
+							bDealDamage = false;
 						}
 					}
-					else if (CurrentFireMode == 0)
+					else if (CurrentFireMode == 1)
 					{
-						Super::FireInstantHit(bDealDamage, OutHit);
+						// TODO: team invitation
+						bDealDamage = false;
 					}
 				}
-				return;
 			}
 			else if (AUTPlayerController* PC = Cast<AUTPlayerController>(Instigator->Controller))
 			{
