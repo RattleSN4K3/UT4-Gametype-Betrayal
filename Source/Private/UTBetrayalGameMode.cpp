@@ -452,6 +452,23 @@ void AUTBetrayalGameMode::SetPlayerDefaults(APawn* PlayerPawn)
 
 // END Workaround for PostRender routed to HUD
 
+#if !UE_SERVER
+
+void AUTBetrayalGameMode::BuildPlayerInfo(TSharedPtr<SVerticalBox> Panel, AUTPlayerState* PlayerState)
+{
+	Super::BuildPlayerInfo(Panel, PlayerState);
+
+	if (AUTBetrayalPlayerState* BPRI = Cast<AUTBetrayalPlayerState>(PlayerState))
+	{
+		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
+		[
+			NewPlayerInfoLine(FString("Betrayals"), FString::Printf(TEXT("%i"), BPRI->BetrayalCount))
+		];
+	}
+}
+
+#endif
+
 
 // Workaround for spawning custom bot
 // TODO: FIXME: Set bot class as class field (Pull Request?)

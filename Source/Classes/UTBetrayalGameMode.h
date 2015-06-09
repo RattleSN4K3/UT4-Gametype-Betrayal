@@ -71,4 +71,9 @@ public:
 
 	// TODO: TEMP. workaround for JumpBoots fix (callign SetPlayerDefaults)
 	TArray<APawn*> AlreadySpawnedPlayers;
+
+#if !UE_SERVER
+	virtual void BuildPlayerInfo(TSharedPtr<SVerticalBox> Panel, AUTPlayerState* PlayerState) override;
+#endif
+
 };
