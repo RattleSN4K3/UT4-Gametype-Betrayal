@@ -9,6 +9,7 @@ struct FTeammateHudInfo
 	float TeammateNameStrWidth;
 	int32 NumGoldDaggers;
 	int32 NumSilverDaggers;
+	int32 NumRawDaggers;
 };
 
 UCLASS()

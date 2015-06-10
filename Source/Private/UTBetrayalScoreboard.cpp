@@ -4,7 +4,7 @@
 #include "UTGameState.h"
 
 UUTBetrayalScoreboard::UUTBetrayalScoreboard(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+: Super(ObjectInitializer)
 {
 	AllyColor = FColor(64, 128, 255);
 
@@ -13,7 +13,7 @@ UUTBetrayalScoreboard::UUTBetrayalScoreboard(const FObjectInitializer& ObjectIni
 	DaggerSpacing = 12.0f;			//spacing between individual daggers
 	SilverDaggerOffset = 10.0f;		//spacing between silver and gold daggers
 	DaggerXPadding = 6.0f;			//spacing between name and dagger icons
-	
+
 
 	DaggerTexCoords = FTextureUVs(262.0f, 53.0f, 16.0f, 28.0f);
 
@@ -68,6 +68,7 @@ void UUTBetrayalScoreboard::DrawPlayer(int32 Index, AUTPlayerState* PlayerState,
 	DrawDaggers(BPRI, RenderDelta, PosX, YOffset);
 
 	// Workaround for drawing team players in different color // FIXMESTEVE: add GetPlayerColor to get color by player
+	// draw player name with the specific ally color over the white one
 	if (AUTGameState* GS = GetWorld()->GetGameState<AUTGameState>())
 	{
 		if (UTHUDOwner != NULL && GS->OnSameTeam(BPRI, UTHUDOwner->PlayerOwner))
@@ -79,36 +80,47 @@ void UUTBetrayalScoreboard::DrawPlayer(int32 Index, AUTPlayerState* PlayerState,
 
 void UUTBetrayalScoreboard::DrawDaggers(AUTBetrayalPlayerState* PRI, float RenderDelta, float XOffset, float YOffset)
 {
-	//Just sanity clamp
-	int32 TempCount = FMath::Clamp<int32>(PRI->BetrayalCount, 0, 100);
-	int32 NumGoldDaggers = TempCount / 5;
-	int32 NumSilverDaggers = TempCount % 5;
-
 	float BarOpacity = 0.75f;
 	float DaggerAspect = DaggerTexCoords.VL == 0.0 ? 0.0 : DaggerTexCoords.UL / DaggerTexCoords.VL;
 
-	//Start drawing the daggers
-	for (int32 i = 0; i<NumGoldDaggers; i++)
+	if (PRI->BetrayalCount >= 100)
 	{
-		DrawTexture(UT3GHudTexture, XOffset, YOffset, 32 * DaggerAspect, 32, DaggerTexCoords.U, DaggerTexCoords.V, DaggerTexCoords.UL, DaggerTexCoords.VL, BarOpacity, GoldLinearColor);
+		// draw simple format "x NUM"
+		DrawTexture(UT3GHudTexture, XOffset, YOffset, 32 * DaggerAspect, 32, DaggerTexCoords.U, DaggerTexCoords.V, DaggerTexCoords.UL, DaggerTexCoords.VL, BarOpacity, FLinearColor::White);
+		XOffset += 32 * DaggerAspect + (DaggerSpacing * RenderScale);
 
-		//Don't bump for the last gold dagger drawn
-		if (i<NumGoldDaggers - 1)
+		// TODO: use Localization?
+		FString DaggerString = FString::Printf(TEXT("x%i"), PRI->BetrayalCount);
+		DrawText(FText::FromString(DaggerString), XOffset, YOffset + ColumnY, UTHUDOwner->SmallFont, 1.0f, 1.0f, FLinearColor::Gray, ETextHorzPos::Left, ETextVertPos::Center);
+	}
+	else
+	{
+		int32 NumGoldDaggers = PRI->BetrayalCount / 5;
+		int32 NumSilverDaggers = PRI->BetrayalCount % 5;
+
+		//Start drawing the daggers
+		for (int32 i = 0; i < NumGoldDaggers; i++)
 		{
+			DrawTexture(UT3GHudTexture, XOffset, YOffset, 32 * DaggerAspect, 32, DaggerTexCoords.U, DaggerTexCoords.V, DaggerTexCoords.UL, DaggerTexCoords.VL, BarOpacity, GoldLinearColor);
+
+			//Don't bump for the last gold dagger drawn
+			if (i<NumGoldDaggers - 1)
+			{
+				XOffset += (DaggerSpacing * RenderScale);
+			}
+		}
+
+		//Add spacing between gold/silver daggers
+		if (NumGoldDaggers > 0)
+		{
+			XOffset += (SilverDaggerOffset * RenderScale);
+		}
+
+		for (int32 i = 0; i < NumSilverDaggers; i++)
+		{
+			DrawTexture(UT3GHudTexture, XOffset, YOffset, 32 * DaggerAspect, 32, DaggerTexCoords.U, DaggerTexCoords.V, DaggerTexCoords.UL, DaggerTexCoords.VL, BarOpacity, SilverLinearColor);
+
 			XOffset += (DaggerSpacing * RenderScale);
 		}
-	}
-
-	//Add spacing between gold/silver daggers
-	if (NumGoldDaggers > 0)
-	{
-		XOffset += (SilverDaggerOffset * RenderScale);
-	}
-
-	for (int32 i = 0; i<NumSilverDaggers; i++)
-	{
-		DrawTexture(UT3GHudTexture, XOffset, YOffset, 32 * DaggerAspect, 32, DaggerTexCoords.U, DaggerTexCoords.V, DaggerTexCoords.UL, DaggerTexCoords.VL, BarOpacity, SilverLinearColor);
-
-		XOffset += (DaggerSpacing * RenderScale);
 	}
 }

@@ -96,7 +96,6 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 
 	float XL = 0.0f, YL = 0.0f;
 	float MaxTeammmateNameStrWidth = 0.0f;
-	int32 TempCount;
 
 	FTeammateHudInfo aTeammate;
 	TArray<FTeammateHudInfo> HudTeammates;
@@ -117,18 +116,15 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 			{
 				aTeammate.TeammateName = BPRI->CurrentTeam->Teammates[i]->PlayerName;
 				Canvas->StrLen(DrawFont,  FText::FromString(aTeammate.TeammateName).ToString(), aTeammate.TeammateNameStrWidth, YL);
-				aTeammate.NumGoldDaggers = 0;
-				aTeammate.NumSilverDaggers = 0;
 
 				if (aTeammate.TeammateNameStrWidth > MaxTeammmateNameStrWidth)
 				{
 					MaxTeammmateNameStrWidth = aTeammate.TeammateNameStrWidth;
 				}
 
-				//Just sanity clamp
-				TempCount = FMath::Clamp<int32>(BPRI->CurrentTeam->Teammates[i]->BetrayalCount, 0, 100);
-				aTeammate.NumGoldDaggers = TempCount / 5;
-				aTeammate.NumSilverDaggers = TempCount % 5;
+				aTeammate.NumRawDaggers = BPRI->CurrentTeam->Teammates[i]->BetrayalCount;
+				aTeammate.NumGoldDaggers = aTeammate.NumRawDaggers / 5;
+				aTeammate.NumSilverDaggers = aTeammate.NumRawDaggers % 5;
 
 				HudTeammates.Add(aTeammate);
 			}
@@ -140,18 +136,15 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 	{
 		aTeammate.TeammateName = BPRI->Betrayer->PlayerName;
 		Canvas->StrLen(DrawFont, FText::FromString(aTeammate.TeammateName).ToString(), aTeammate.TeammateNameStrWidth, YL);
-		aTeammate.NumGoldDaggers = 0;
-		aTeammate.NumSilverDaggers = 0;
 
 		if (aTeammate.TeammateNameStrWidth > MaxTeammmateNameStrWidth)
 		{
 			MaxTeammmateNameStrWidth = aTeammate.TeammateNameStrWidth;
 		}
 
-		//Just sanity clamp
-		TempCount = FMath::Clamp<int32>(BPRI->Betrayer->BetrayalCount, 0, 100);
-		aTeammate.NumGoldDaggers = TempCount / 5;
-		aTeammate.NumSilverDaggers = TempCount % 5;
+		aTeammate.NumRawDaggers = BPRI->Betrayer->BetrayalCount;
+		aTeammate.NumGoldDaggers = aTeammate.NumRawDaggers / 5;
+		aTeammate.NumSilverDaggers = aTeammate.NumRawDaggers % 5;
 
 		HudTeammates.Add(aTeammate);
 	}
@@ -163,11 +156,13 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 	//Draw the names of players on your team
 	for (int32 i = 0; i<HudTeammates.Num(); i++)
 	{
+		bool bDrawRaw = false;
 		FString PlayerName = HudTeammates[i].TeammateName;
 		float PlayerNameWidth = HudTeammates[i].TeammateNameStrWidth;
 		int32 NumGoldDaggers = HudTeammates[i].NumGoldDaggers;
 		int32 NumSilverDaggers = HudTeammates[i].NumSilverDaggers;
-
+		int32 NumRawDaggers = HudTeammates[i].NumRawDaggers;
+		
 		//Calculate the width the daggers take up on screen
 		float NumDaggersWidth = 0;
 		if (NumGoldDaggers > 0)
@@ -202,7 +197,17 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 			}
 		}
 
-		NumDaggersWidth = FMath::Max<float>(40.0, NumDaggersWidth);
+		// override drawing daggers, draw raw number instead
+		if (NumDaggersWidth >= 40.0f)
+		{
+			// TODO: use Localization?
+			FString DaggerString = FString::Printf(TEXT("x%i"), NumRawDaggers);
+			float XL, YL;
+			Canvas->TextSize(DrawFont, DaggerString, XL, YL);
+
+			NumDaggersWidth = XL + DaggerSpacing + DaggerWidth;
+			bDrawRaw = true;
+		}
 
 		//Center of screen
 		Pos.X = DaggerStartPos;
@@ -220,7 +225,7 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 				DaggerStartPos - PlayerNameWidth - (0.5 * NameplateBubbleWidth) * RenderScale,
 				Pos.Y + (NameYPadding * RenderScale));
 
-			//Start drawing the daggers
+			//Draw remaining time instead of daggers
 			Pos.X = DaggerStartPos + (0.5 * NameplateBubbleWidth * RenderScale);
 			FText NumberText = FText::AsNumber(BPRI->Betrayer->RemainingRogueTime);
 			Canvas_DrawText(DrawFont, NumberText, Pos.X, Pos.Y + (NameYPadding * RenderScale));
@@ -232,35 +237,51 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 				DaggerStartPos - PlayerNameWidth - (0.5 * NameplateBubbleWidth) * RenderScale,
 				Pos.Y + (NameYPadding * RenderScale));
 
-			//Start drawing the daggers
-			Pos.X = DaggerStartPos + (0.5 * NameplateBubbleWidth * RenderScale);
-			for (int32 j = 0; j<NumGoldDaggers; j++)
+			if (bDrawRaw)
 			{
-				Canvas->DrawColor = GoldLinearColor;
+				//Draw simple format "x NUM"
+				Canvas->DrawColor = FLinearColor::White;
 				Canvas->DrawTile(UT3GHudTexture, Pos.X, Pos.Y + (DaggerYPadding * RenderScale),
 					DaggerWidth * RenderScale, DaggerHeight * RenderScale,
 					DaggerTexCoords.U, DaggerTexCoords.V, DaggerTexCoords.UL, DaggerTexCoords.VL);
 
-				//Don't bump for the last gold dagger drawn
-				if (j<NumGoldDaggers - 1)
+				// TODO: use Localization?
+				FString DaggerString = FString::Printf(TEXT("x%i"), NumRawDaggers);
+				Canvas->DrawColor = FLinearColor::Gray;
+				Canvas_DrawText(DrawFont, DaggerString, Pos.X + (DaggerWidth + DaggerSpacing) * RenderScale, Pos.Y + (NameYPadding * RenderScale));
+			}
+			else
+			{
+				//Start drawing the daggers
+				Pos.X = DaggerStartPos + (0.5 * NameplateBubbleWidth * RenderScale);
+				for (int32 j = 0; j < NumGoldDaggers; j++)
 				{
+					Canvas->DrawColor = GoldLinearColor;
+					Canvas->DrawTile(UT3GHudTexture, Pos.X, Pos.Y + (DaggerYPadding * RenderScale),
+						DaggerWidth * RenderScale, DaggerHeight * RenderScale,
+						DaggerTexCoords.U, DaggerTexCoords.V, DaggerTexCoords.UL, DaggerTexCoords.VL);
+
+					//Don't bump for the last gold dagger drawn
+					if (j<NumGoldDaggers - 1)
+					{
+						Pos.X += (DaggerSpacing * RenderScale);
+					}
+				}
+
+				//Add spacing between gold/silver daggers
+				if (NumGoldDaggers > 0)
+				{
+					Pos.X += (SilverDaggerOffset * RenderScale);
+				}
+
+				for (int32 j = 0; j < NumSilverDaggers; j++)
+				{
+					Canvas->DrawColor = SilverLinearColor;
+					Canvas->DrawTile(UT3GHudTexture, Pos.X, Pos.Y + (DaggerYPadding * RenderScale),
+						DaggerWidth * RenderScale, DaggerHeight * RenderScale, DaggerTexCoords.U, DaggerTexCoords.V, DaggerTexCoords.UL, DaggerTexCoords.VL);
+
 					Pos.X += (DaggerSpacing * RenderScale);
 				}
-			}
-
-			//Add spacing between gold/silver daggers
-			if (NumGoldDaggers > 0)
-			{
-				Pos.X += (SilverDaggerOffset * RenderScale);
-			}
-
-			for (int32 j = 0; j<NumSilverDaggers; j++)
-			{
-				Canvas->DrawColor = SilverLinearColor;
-				Canvas->DrawTile(UT3GHudTexture, Pos.X, Pos.Y + (DaggerYPadding * RenderScale),
-					DaggerWidth * RenderScale, DaggerHeight * RenderScale, DaggerTexCoords.U, DaggerTexCoords.V, DaggerTexCoords.UL, DaggerTexCoords.VL);
-
-				Pos.X += (DaggerSpacing * RenderScale);
 			}
 		}
 
