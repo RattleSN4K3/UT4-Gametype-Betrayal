@@ -62,4 +62,7 @@ public:
 	virtual int32 ScoreValueFor(AUTBetrayalPlayerState* OtherPRI);
 	virtual float GetTrustWorthiness();
 
+	virtual void UpdateTeam(class AUTBetrayalTeam* Team);
+	virtual void ApplyTeamColorFor(AUTCharacter* P, bool bIsTeam);
+
 };

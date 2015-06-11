@@ -6,6 +6,7 @@
 #include "UTBetrayalMessage.h"
 #include "UTBetrayalBot.h"
 #include "UTBetrayalCharacterPostRenderer.h"
+#include "UTBetrayalCharacterTeamColor.h"
 
 #include "UTBot.h"
 #include "UTFirstBloodMessage.h"
@@ -273,6 +274,8 @@ void AUTBetrayalGameMode::MaybeStartTeam()
 				{
 					if (Teams[j]->AddTeammate(PRI, MaxTeamSize))
 					{
+						PRI->UpdateTeam(Teams[j]);
+
 						//Successfully added to a team
 						UUTGameplayStatics::UTPlaySound(GetWorld(), JoinTeamSound, PRI->GetOwner());
 						return;
@@ -300,6 +303,8 @@ void AUTBetrayalGameMode::MaybeStartTeam()
 				{
 					if (NewTeam->AddTeammate(PRI, MaxTeamSize))
 					{
+						PRI->UpdateTeam(NewTeam);
+
 						//Successfully added to a team
 						UUTGameplayStatics::UTPlaySound(GetWorld(), JoinTeamSound, PRI->GetOwner());
 
@@ -380,7 +385,7 @@ void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APa
 				OtherPRI->RogueExpired();
 			}
 
-			KillerPRI->IncrementKills(DamageType, true); 
+			KillerPRI->IncrementKills(DamageType, true);
 			if (KillerPRI->CurrentTeam != NULL)
 			{
 				KillerPRI->CurrentTeam->TeamPot++;
@@ -429,9 +434,6 @@ void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APa
 	}
 }
 
-// Workaround for PostRender routed to HUD
-// TODO: FIXME: Route PostRender to UTHUD class
-
 void AUTBetrayalGameMode::SetPlayerDefaults(APawn* PlayerPawn)
 {
 	// FIXME: workaround for JumpBoots calling SetPlayerDefaults
@@ -441,16 +443,29 @@ void AUTBetrayalGameMode::SetPlayerDefaults(APawn* PlayerPawn)
 		AlreadySpawnedPlayers.Add(PlayerPawn);
 		AlreadySpawnedPlayers.Remove(NULL);
 
+		// Workaround for PostRender routed to HUD
+		// TODO: FIXME: Route PostRender to UTHUD class
+
 		FActorSpawnParameters Params;
 		Params.bNoCollisionFail = true;
 		Params.Owner = PlayerPawn;
 		GetWorld()->SpawnActor<AUTBetrayalCharacterPostRenderer>(AUTBetrayalCharacterPostRenderer::StaticClass(), Params);
+
+		// END Workaround for PostRender routed to HUD
+
+		// Workaround for applying TeamColor to players
+
+		Params = FActorSpawnParameters();
+		Params.bNoCollisionFail = true;
+		Params.Owner = PlayerPawn;
+		GetWorld()->SpawnActor<AUTBetrayalCharacterTeamColor>(AUTBetrayalCharacterTeamColor::StaticClass(), Params);
+
+		// END Workaround for applying TeamColor to players
+
 	}
 
 	Super::SetPlayerDefaults(PlayerPawn);
 }
-
-// END Workaround for PostRender routed to HUD
 
 #if !UE_SERVER
 
@@ -461,9 +476,9 @@ void AUTBetrayalGameMode::BuildPlayerInfo(TSharedPtr<SVerticalBox> Panel, AUTPla
 	if (AUTBetrayalPlayerState* BPRI = Cast<AUTBetrayalPlayerState>(PlayerState))
 	{
 		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
-		[
-			NewPlayerInfoLine(FString("Betrayals"), FString::Printf(TEXT("%i"), BPRI->BetrayalCount))
-		];
+			[
+				NewPlayerInfoLine(FString("Betrayals"), FString::Printf(TEXT("%i"), BPRI->BetrayalCount))
+			];
 	}
 }
 

@@ -2,6 +2,7 @@
 #include "UTBetrayalGameMode.h"
 #include "UTPlayerController.h"
 #include "UTBetrayalPlayerState.h"
+#include "UTBetrayalGameState.h"
 
 AUTBetrayalPlayerState::AUTBetrayalPlayerState(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -114,4 +115,35 @@ float AUTBetrayalPlayerState::GetTrustWorthiness()
 	*/
 
 	return TrustWorthiness;
+}
+
+void AUTBetrayalPlayerState::UpdateTeam(AUTBetrayalTeam* Team)
+{
+	APlayerController* PC = GEngine->GetFirstLocalPlayerController(GetWorld());
+	AUTBetrayalGameState* GS = GetWorld()->GetGameState<AUTBetrayalGameState>();
+
+	if (PC != NULL && GS != NULL)
+	{
+		for (FConstPawnIterator It = GetWorld()->GetPawnIterator(); It; ++It)
+		{
+			AUTCharacter* P = Cast<AUTCharacter>(*It);
+			if (P != NULL && !P->bTearOff)
+			{
+				bool bOnSameTeam = PC->PlayerState == P->PlayerState || GS->OnSameTeam(PC, P);
+				ApplyTeamColorFor(P, bOnSameTeam);
+			}
+		}
+	}
+}
+
+void AUTBetrayalPlayerState::ApplyTeamColorFor(AUTCharacter* P, bool bIsTeam)
+{
+	const TArray<UMaterialInstanceDynamic*>& BodyMIs = P->GetBodyMIs();
+	for (UMaterialInstanceDynamic* MI : BodyMIs)
+	{
+		if (MI != NULL)
+		{
+			MI->SetScalarParameterValue(TEXT("TeamSelect"), bIsTeam ? 1.0 : 0.0);
+		}
+	}
 }
