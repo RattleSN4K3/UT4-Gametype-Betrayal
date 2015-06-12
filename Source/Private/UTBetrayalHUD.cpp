@@ -5,6 +5,7 @@
 
 // TODO: Use FUTCanvasTextItem to draw beacon
 // TODO: Add opacity to Beacons near crosshair
+// TODO: Split Pot from TeamInfo once widgets are fully customizable
 
 AUTBetrayalHUD::AUTBetrayalHUD(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

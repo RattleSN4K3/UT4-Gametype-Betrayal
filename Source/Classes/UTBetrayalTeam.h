@@ -15,7 +15,7 @@ class AUTBetrayalTeam : public AActor
 	UPROPERTY(Replicated)
 	AUTBetrayalPlayerState* Teammates[MAX_TEAMMATES];
 
-	//Value of the shared pot
+	/** Value of the shared pot */
 	UPROPERTY(Replicated)
 	int32 TeamPot;
 
