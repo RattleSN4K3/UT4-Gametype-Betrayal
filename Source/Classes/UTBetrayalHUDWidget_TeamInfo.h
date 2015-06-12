@@ -54,6 +54,14 @@ class UUTBetrayalHUDWidget_TeamInfo : public UUTHUDWidget
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Render")
 	float TeammateSpacing;
 
+	/** Max width of the daggers plate (percentage to current screen width) **/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Render")
+	float DaggersPlateMaxWidth;
+
+	/** Min width of the daggers plate (percentage to current screen width) **/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Render")
+	float DaggersPlateMinWidth;
+
 	/** font size for teammates **/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Render", Meta = (EditCondition = "!bOverrideNameFont"))
 	int32 NameFontSize;

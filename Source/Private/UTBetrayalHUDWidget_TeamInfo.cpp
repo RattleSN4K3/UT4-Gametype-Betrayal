@@ -25,6 +25,9 @@ UUTBetrayalHUDWidget_TeamInfo::UUTBetrayalHUDWidget_TeamInfo(const FObjectInitia
 	PotValPadding = 7;				//distance between teamnames and potvalue text
 	TeammateSpacing = -3.0f;		//distance between individual teammate huds
 
+	DaggersPlateMinWidth = 0.04; // about 76px for 1920 width
+	DaggersPlateMaxWidth = 0.07; // about 134px for 1920 width
+
 	DaggerTexCoords = FTextureUVs(262.0f, 53.0f, 16.0f, 28.0f);
 
 
@@ -52,8 +55,8 @@ UUTBetrayalHUDWidget_TeamInfo::UUTBetrayalHUDWidget_TeamInfo(const FObjectInitia
 	}
 
 	PotString = NSLOCTEXT("UTBetrayalHud", "PotString", "Pot {Pot}");
-	RogueString = NSLOCTEXT("UTBetrayalMessage", "RogueString", "Rogue {Time}");
-	FreelanceString = NSLOCTEXT("UTBetrayalMessage", "FreelanceString", "Freelance");
+	RogueString = NSLOCTEXT("UTBetrayalHud", "RogueString", "Rogue {Time}");
+	FreelanceString = NSLOCTEXT("UTBetrayalHud", "FreelanceString", "Freelance");
 }
 
 FVector2D UUTBetrayalHUDWidget_TeamInfo::ResolveHUDPosition(FVector2D Position, float Width, float Height)
@@ -198,7 +201,7 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 		}
 
 		// override drawing daggers, draw raw number instead
-		if (NumDaggersWidth >= 40.0f)
+		if (NumDaggersWidth >= DaggersPlateMaxWidth * Canvas->SizeX)
 		{
 			// TODO: use Localization?
 			FString DaggerString = FString::Printf(TEXT("x%i"), NumRawDaggers);
@@ -207,6 +210,10 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 
 			NumDaggersWidth = XL + DaggerSpacing + DaggerWidth;
 			bDrawRaw = true;
+		}
+		else
+		{
+			NumDaggersWidth = FMath::Max<float>(DaggersPlateMinWidth * Canvas->SizeX, NumDaggersWidth);
 		}
 
 		//Center of screen
