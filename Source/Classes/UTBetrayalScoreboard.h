@@ -10,6 +10,9 @@ class UUTBetrayalScoreboard : public UUTScoreboard
 {
 	GENERATED_UCLASS_BODY()
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scoreboard")
+	float ColumnHeaderKillsX;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Color")
 	FColor AllyColor;
 

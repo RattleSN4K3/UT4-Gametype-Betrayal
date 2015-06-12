@@ -6,6 +6,10 @@
 UUTBetrayalScoreboard::UUTBetrayalScoreboard(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
 {
+	ColumnMedalX = 0.5;
+	ColumnHeaderScoreX = 0.6;
+	ColumnHeaderKillsX = 0.72;
+
 	AllyColor = FColor(64, 128, 255);
 
 	DaggerWidth = 16;				//width of dagger icon
@@ -13,7 +17,6 @@ UUTBetrayalScoreboard::UUTBetrayalScoreboard(const FObjectInitializer& ObjectIni
 	DaggerSpacing = 12.0f;			//spacing between individual daggers
 	SilverDaggerOffset = 10.0f;		//spacing between silver and gold daggers
 	DaggerXPadding = 6.0f;			//spacing between name and dagger icons
-
 
 	DaggerTexCoords = FTextureUVs(262.0f, 53.0f, 16.0f, 28.0f);
 
@@ -34,6 +37,24 @@ void UUTBetrayalScoreboard::DrawScoreHeaders(float RenderDelta, float& YOffset)
 
 	// revert center buffer
 	CenterBuffer = OriginalCenterBuffer;
+
+	// TODO: Use GetScoreHeaders (Pull Request?!)
+	// draw additional kills column
+	float Width = 0.75 * Size.X;
+	float Height = 23;
+	int32 ColumnCnt = ((UTGameState && UTGameState->bTeamGame) || ActualPlayerCount > 16) ? 2 : 1;
+	float XOffset = ColumnCnt > 1 ? 0 : (Size.X * 0.5) - (Width * 0.5);
+
+	FText CH_Kills = NSLOCTEXT("UTBetrayalScoreboard", "ColumnHeader_PlayerKills", "KILLS");
+
+	float TempYOffset = YOffset - Height - 4;
+	for (int32 i = 0; i < ColumnCnt; i++)
+	{
+		if (UTGameState && UTGameState->HasMatchStarted())
+		{
+			DrawText(CH_Kills, XOffset + (Width * ColumnHeaderKillsX), TempYOffset + ColumnHeaderY, UTHUDOwner->TinyFont, 1.0f, 1.0f, FLinearColor::Black, ETextHorzPos::Center, ETextVertPos::Center);
+		}
+	}
 }
 
 void UUTBetrayalScoreboard::DrawPlayer(int32 Index, AUTPlayerState* PlayerState, float RenderDelta, float XOffset, float YOffset)
@@ -54,6 +75,13 @@ void UUTBetrayalScoreboard::DrawPlayer(int32 Index, AUTPlayerState* PlayerState,
 
 	// revert center buffer
 	CenterBuffer = OriginalCenterBuffer;
+
+	// draw additional kills stat
+	if (UTGameState && UTGameState->HasMatchStarted())
+	{
+		FText PlayerKills = FText::AsNumber(PlayerState->Kills);
+		DrawText(PlayerKills, XOffset + (Width * ColumnHeaderKillsX), YOffset + ColumnY, UTHUDOwner->SmallFont, 1.0f, 1.0f, Canvas->DrawColor, ETextHorzPos::Center, ETextVertPos::Center);
+	}
 
 	// re-create player name
 	FText PlayerName = FText::FromString(GetClampedName(PlayerState, UTHUDOwner->MediumFont, 1.f, 0.475f*Width));
