@@ -70,6 +70,16 @@ public:
 
 #if !UE_SERVER
 	virtual void BuildPlayerInfo(TSharedPtr<SVerticalBox> Panel, AUTPlayerState* PlayerState) override;
+
+	static FText RoundPerc(uint32 dividend, uint32 divisor)
+	{
+		float val = divisor > 0.0 ? (float)dividend / (float)divisor : 0.0;
+		FNumberFormattingOptions NumberOpts;
+		NumberOpts.MinimumFractionalDigits = 2;
+		NumberOpts.MaximumFractionalDigits = 2;
+		return FText::AsNumber(val, &NumberOpts);
+	}
+
 #endif
 
 };

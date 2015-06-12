@@ -21,6 +21,9 @@ void AUTBetrayalPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimePropert
 	DOREPLIFETIME(AUTBetrayalPlayerState, CurrentTeam);
 	DOREPLIFETIME(AUTBetrayalPlayerState, Betrayer);
 	DOREPLIFETIME(AUTBetrayalPlayerState, BetrayalCount);
+	DOREPLIFETIME(AUTBetrayalPlayerState, BetrayalPot);
+	DOREPLIFETIME(AUTBetrayalPlayerState, BetrayedCount);
+	DOREPLIFETIME(AUTBetrayalPlayerState, BetrayedPot);
 	DOREPLIFETIME(AUTBetrayalPlayerState, bIsRogue);
 	DOREPLIFETIME(AUTBetrayalPlayerState, RemainingRogueTime);
 }
@@ -34,6 +37,9 @@ void AUTBetrayalPlayerState::Reset()
 	CurrentTeam = NULL;
 	Betrayer = NULL;
 	BetrayalCount = 0;
+	BetrayalPot = 0;
+	BetrayedCount = 0;
+	BetrayedPot = 0;
 	BetrayedTeam = NULL;
 }
 

@@ -130,6 +130,8 @@ void AUTBetrayalGameMode::ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AU
 		return;
 
 	InstigatorPRI->Score += Team->TeamPot;
+	InstigatorPRI->BetrayalPot += Team->TeamPot;
+	HitPRI->BetrayedPot += Team->TeamPot;
 
 	// TODO: Add stats tracking
 	//Increment pot stat
@@ -144,6 +146,7 @@ void AUTBetrayalGameMode::ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AU
 	InstigatorPRI->SetRogueTimer();
 	InstigatorPRI->BetrayalCount++;
 	InstigatorPRI->BetrayedTeam = Team;
+	HitPRI->BetrayedCount++;
 	HitPRI->Betrayer = InstigatorPRI;
 	UUTGameplayStatics::UTPlaySound(GetWorld(), BetrayingSound, InstigatorPRI->GetOwner());
 
@@ -473,9 +476,23 @@ void AUTBetrayalGameMode::BuildPlayerInfo(TSharedPtr<SVerticalBox> Panel, AUTPla
 
 	if (AUTBetrayalPlayerState* BPRI = Cast<AUTBetrayalPlayerState>(PlayerState))
 	{
+		// TODO: Localization
 		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
 		[
-			NewPlayerInfoLine(FString("Betrayals"), FString::Printf(TEXT("%i"), BPRI->BetrayalCount))
+			NewPlayerInfoLine(FString("Betrayer"), FString::Printf(TEXT("%i"), BPRI->BetrayalCount))
+		];
+		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
+		[
+			NewPlayerInfoLine(FString("Victim"), FString::Printf(TEXT("%i"), BPRI->BetrayalCount))
+		];
+
+		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
+		[
+			NewPlayerInfoLine(FString("Average Betrayal Pot"), RoundPerc(BPRI->BetrayalPot, BPRI->BetrayalCount).ToString())
+		];
+		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
+		[
+			NewPlayerInfoLine(FString("Average Victim Pot"), RoundPerc(BPRI->BetrayedPot, BPRI->BetrayedCount).ToString())
 		];
 	}
 }

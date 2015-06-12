@@ -42,11 +42,23 @@ public:
 	UPROPERTY(Replicated)
 	AUTBetrayalPlayerState* Betrayer;
 
-	/** FIXME show the number of times this player has been a betrayer on the scoreboard */
+	/** Number of times this player has been a betrayer */
 	UPROPERTY(Replicated)
 	int32 BetrayalCount;
 
+	/** Total sum this player has gained through betrayals (for stats only) */
+	UPROPERTY(Replicated)
+	uint32 BetrayalPot;
+
 	AUTBetrayalTeam* BetrayedTeam;
+
+	/** Number of times being betrayed (for stats only) */
+	UPROPERTY(Replicated)
+	int32 BetrayedCount;
+
+	/** Total sum of pot this player has been betrayed for (for stats only) */
+	UPROPERTY(Replicated)
+	uint32 BetrayedPot;
 
 	/** How likely bot associated with this PRI is to betray teammates */
 	float TrustWorthiness;
