@@ -15,19 +15,46 @@ AUTBetrayalCharacterPostRenderer::AUTBetrayalCharacterPostRenderer(const FObject
 
 void AUTBetrayalCharacterPostRenderer::BeginPlay()
 {
-	RenderPawn = Cast<AUTCharacter>(GetOwner());
-	if (RenderPawn == NULL)
+	Super::BeginPlay();
+
+	AUTCharacter* Pawn = Cast<AUTCharacter>(GetOwner());
+	if (Pawn == NULL)
 	{
+		UE_LOG(Betrayal, Verbose, TEXT("CharacterPostRenderer: Destroy TeamColor helper %s"), *GetName());
 		Destroy();
 		return;
 	}
+
+	// store pawn
+	RenderPawn = Pawn;
+
+	HookRender();
+}
+
+void AUTBetrayalCharacterPostRenderer::HookRender()
+{
+	TArray<AUTPlayerController*> PCs;
 
 	// support for splitscreen. add to each PCs HUD
 	bool bFound = false;
 	for (FConstControllerIterator Iterator = GetWorld()->GetControllerIterator(); Iterator; ++Iterator)
 	{
 		AUTPlayerController* PC = Cast<AUTPlayerController>(*Iterator);
-		if (PC != NULL && PC->MyHUD != NULL)
+		if (PC == NULL) continue;
+
+		if (PC->MyHUD == NULL)
+		{
+			FTimerHandle TempHandle;
+			GetWorldTimerManager().SetTimer(TempHandle, this, &AUTBetrayalCharacterPostRenderer::HookRender, 0.1f, false);
+			return;
+		}
+
+		PCs.Add(PC);
+	}
+
+	for (auto PC : PCs)
+	{
+		if (PC && PC->MyHUD)
 		{
 			PC->MyHUD->RemovePostRenderedActor(RenderPawn);
 			PC->MyHUD->AddPostRenderedActor(this);
@@ -38,16 +65,15 @@ void AUTBetrayalCharacterPostRenderer::BeginPlay()
 	// destroy if no PC is found
 	if (!bFound)
 	{
+		UE_LOG(Betrayal, Verbose, TEXT("CharacterPostRenderer: No PC with a HUD found. Abort applying PostRender fix..."));
 		Destroy();
 		return;
 	}
-
-	Super::BeginPlay();
 }
 
 void AUTBetrayalCharacterPostRenderer::PostRenderFor(APlayerController* PC, UCanvas* Canvas, FVector CameraPosition, FVector CameraDir)
 {
-	if (PC == NULL || RenderPawn == NULL || RenderPawn->IsPendingKillPending() /* RenderPawn->IsValidLowLevelFast()*/)
+	if (PC == NULL || RenderPawn == NULL || RenderPawn->TimeOfDeath > 0.0 || RenderPawn->IsPendingKillPending() /* RenderPawn->IsValidLowLevelFast()*/)
 	{
 		Destroy();
 		return;

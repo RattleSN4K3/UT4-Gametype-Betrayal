@@ -14,4 +14,7 @@ class AUTBetrayalCharacterPostRenderer : public AActor
 	virtual void PostRenderFor(APlayerController *PC, UCanvas *Canvas, FVector CameraPosition, FVector CameraDir) override;
 
 	virtual bool IsPawnVisible(APlayerController* PC, FVector CameraPosition, ACharacter* P);
+
+	virtual void HookRender();
+
 };
