@@ -21,11 +21,20 @@ void AUTBetrayalPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimePropert
 	DOREPLIFETIME(AUTBetrayalPlayerState, CurrentTeam);
 	DOREPLIFETIME(AUTBetrayalPlayerState, Betrayer);
 	DOREPLIFETIME(AUTBetrayalPlayerState, BetrayalCount);
+	DOREPLIFETIME(AUTBetrayalPlayerState, bIsRogue);
+	DOREPLIFETIME(AUTBetrayalPlayerState, RemainingRogueTime);
+
+	// stats replication
 	DOREPLIFETIME(AUTBetrayalPlayerState, BetrayalPot);
 	DOREPLIFETIME(AUTBetrayalPlayerState, BetrayedCount);
 	DOREPLIFETIME(AUTBetrayalPlayerState, BetrayedPot);
-	DOREPLIFETIME(AUTBetrayalPlayerState, bIsRogue);
-	DOREPLIFETIME(AUTBetrayalPlayerState, RemainingRogueTime);
+	DOREPLIFETIME(AUTBetrayalPlayerState, RetributionCount);
+	DOREPLIFETIME(AUTBetrayalPlayerState, PaybackCount);
+	DOREPLIFETIME(AUTBetrayalPlayerState, HighestPot);
+
+	// Only to owner as this info shouldn't be revealed to others
+	// TODO: Replicate at end of the match to everyone?
+	DOREPLIFETIME_CONDITION(AUTBetrayalPlayerState, CurrentNemesis, COND_OwnerOnly);
 }
 
 void AUTBetrayalPlayerState::Reset()
@@ -150,6 +159,36 @@ void AUTBetrayalPlayerState::ApplyTeamColorFor(AUTCharacter* P, bool bIsTeam)
 		if (MI != NULL)
 		{
 			MI->SetScalarParameterValue(TEXT("TeamSelect"), bIsTeam ? 1.0 : 0.0);
+		}
+	}
+}
+
+void AUTBetrayalPlayerState::UpdateNemesis(AUTBetrayalPlayerState* PRI)
+{
+	if (Role == ROLE_Authority && PRI != NULL)
+	{
+		// update/increase kill count for current player
+		auto CurrentCount = NemesisData.FindRef(PRI->PlayerId);
+		NemesisData.Add(PRI->PlayerId, CurrentCount + 1);
+		NemesisNames.Add(PRI->PlayerId, PRI->PlayerName);
+
+		// find player with highest kill count
+		int32 BestId = -1;
+		auto BestCount = 0;
+		for (auto& Elem : NemesisData)
+		{
+			if (Elem.Value > BestCount)
+			{
+				BestId = Elem.Key;
+				BestCount = Elem.Value;
+			}
+		}
+
+		// update current replicated nemesis value
+		if (BestId != -1)
+		{
+			FString PlayerName = NemesisNames.FindRef(BestId);
+			CurrentNemesis = PlayerName;
 		}
 	}
 }

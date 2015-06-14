@@ -150,6 +150,8 @@ void AUTBetrayalGameMode::ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AU
 	HitPRI->Betrayer = InstigatorPRI;
 	UUTGameplayStatics::UTPlaySound(GetWorld(), BetrayingSound, InstigatorPRI->GetOwner());
 
+	InstigatorPRI->UpdateNemesis(HitPRI);
+
 	for (APlayerState* PS : GameState->PlayerArray)
 	{
 		AUTBetrayalPlayerState* PRI = Cast<AUTBetrayalPlayerState>(PS);
@@ -375,6 +377,9 @@ void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APa
 					OtherPC->ClientReceiveLocalizedMessage(AnnouncerMessageClass, 3);
 				}
 
+				KillerPRI->RetributionCount++;
+				OtherPRI->PaybackCount++;
+
 				// TODO: Add stats tracking
 				//Retribution stat
 				//KillerPRI->IncrementEventStat('EVENT_RETRIBUTIONS');
@@ -390,6 +395,7 @@ void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APa
 			if (KillerPRI->CurrentTeam != NULL)
 			{
 				KillerPRI->CurrentTeam->TeamPot++;
+				KillerPRI->HighestPot = FMath::Max<int32>(KillerPRI->HighestPot, KillerPRI->CurrentTeam->TeamPot);
 
 				// TODO: add proper bot support
 				if (KillerPRI->CurrentTeam->TeamPot > 2)
@@ -407,7 +413,7 @@ void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APa
 								float BetrayalValue = (float)(KillerPRI->CurrentTeam->TeamPot) + 0.3f*(float)BotPRI->ScoreValueFor(KillerPRI);
 								float BetrayalRandomness = 1.5 + RogueValue - B->CurrentAggression + BotPRI->GetTrustWorthiness();
 
-								UE_LOG(Betrayal, Verbose, TEXT("%s betrayal value %d  vs. %d"), *KillerPRI->PlayerName, BetrayalValue, BetrayalRandomness);
+								UE_LOG(Betrayal, Verbose, TEXT("%s betrayal value %d vs. %d"), *KillerPRI->PlayerName, BetrayalValue, BetrayalRandomness);
 								if ((BetrayalValue > BetrayalRandomness) && (FMath::FRand() < 0.2))
 								{
 									B->bBetrayTeam = true;
@@ -479,11 +485,19 @@ void AUTBetrayalGameMode::BuildPlayerInfo(TSharedPtr<SVerticalBox> Panel, AUTPla
 		// TODO: Localization
 		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
 		[
-			NewPlayerInfoLine(FString("Betrayer"), FString::Printf(TEXT("%i"), BPRI->BetrayalCount))
+			NewPlayerInfoLine(FString("Betrayals"), FString::Printf(TEXT("%i"), BPRI->BetrayalCount))
 		];
 		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
 		[
-			NewPlayerInfoLine(FString("Victim"), FString::Printf(TEXT("%i"), BPRI->BetrayalCount))
+			NewPlayerInfoLine(FString("Victim"), FString::Printf(TEXT("%i"), BPRI->BetrayedCount))
+		];
+		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
+		[
+			NewPlayerInfoLine(FString("Retributions"), FString::Printf(TEXT("%i"), BPRI->RetributionCount))
+		];
+		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
+		[
+			NewPlayerInfoLine(FString("Paybacks"), FString::Printf(TEXT("%i"), BPRI->PaybackCount))
 		];
 
 		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
@@ -494,6 +508,19 @@ void AUTBetrayalGameMode::BuildPlayerInfo(TSharedPtr<SVerticalBox> Panel, AUTPla
 		[
 			NewPlayerInfoLine(FString("Average Victim Pot"), RoundPerc(BPRI->BetrayedPot, BPRI->BetrayedCount).ToString())
 		];
+		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
+		[
+			NewPlayerInfoLine(FString("Highest Pot"), FString::Printf(TEXT("%i"), BPRI->HighestPot))
+		];
+
+		APlayerController* PC = Cast<APlayerController>(PlayerState->GetOwner());
+		if (PC != NULL && PC->IsLocalPlayerController())
+		{
+			Panel->AddSlot().Padding(30.0, 15.0, 30.0, 0.0)
+			[
+				NewPlayerInfoLine(FString("Nemesis"), BPRI->CurrentNemesis.IsEmpty() ? FString(TEXT("-")) : BPRI->CurrentNemesis)
+			];
+		}
 	}
 }
 

@@ -14,7 +14,16 @@ protected:
 
 	FTimerHandle TimerHandle_RogueTimer;
 
+	/** Player to betrayal count mapping array (for stats only). Mapped to PlayerID */
+	TMap< int32, uint16 > NemesisData;
+	/** Player to name mapping array (for stats only). Mapped to PlayerID */
+	TMap< int32, FString > NemesisNames;
+
 public:
+
+	/** Current Nemesis for this player  (for stats only) */
+	UPROPERTY(Replicated)
+	FString CurrentNemesis;
 
 	/** Remaining rogue time */
 	UPROPERTY(Replicated)
@@ -50,6 +59,14 @@ public:
 	UPROPERTY(Replicated)
 	uint32 BetrayalPot;
 
+	/** Number of times this player has repayed the betrayal */
+	UPROPERTY(Replicated)
+	int32 RetributionCount;
+
+	/** Number of times this player has payed back*/
+	UPROPERTY(Replicated)
+	int32 PaybackCount;
+
 	AUTBetrayalTeam* BetrayedTeam;
 
 	/** Number of times being betrayed (for stats only) */
@@ -59,6 +76,10 @@ public:
 	/** Total sum of pot this player has been betrayed for (for stats only) */
 	UPROPERTY(Replicated)
 	uint32 BetrayedPot;
+
+	/** Value of the highest pot this player has achieved (in team) (for stats only) */
+	UPROPERTY(Replicated)
+	uint32 HighestPot;
 
 	/** How likely bot associated with this PRI is to betray teammates */
 	float TrustWorthiness;
@@ -76,5 +97,7 @@ public:
 
 	virtual void UpdateTeam(class AUTBetrayalTeam* Team);
 	virtual void ApplyTeamColorFor(AUTCharacter* P, bool bIsTeam);
+
+	virtual void UpdateNemesis(AUTBetrayalPlayerState* PRI);
 
 };
