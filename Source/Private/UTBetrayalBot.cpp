@@ -8,6 +8,7 @@
 AUTBetrayalBot::AUTBetrayalBot(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	BetrayAggressiveness = 1.0;
 }
 
 bool AUTBetrayalBot::IsTeammate(AActor* TestActor)
@@ -47,7 +48,7 @@ float AUTBetrayalBot::RateEnemy(const FBotEnemyInfo& EnemyInfo)
 			else if (bBetrayTeam && PRI->CurrentTeam != NULL && PRI->CurrentTeam == EnemyPRI->CurrentTeam)
 			{
 				// maybe betray team mates
-				ThreatValue += 0.2;
+				ThreatValue += 0.6 * BetrayAggressiveness;
 			}
 		}
 		if (P->IsSpawnProtected())

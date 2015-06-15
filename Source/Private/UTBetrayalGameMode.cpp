@@ -416,6 +416,7 @@ void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APa
 								UE_LOG(Betrayal, Verbose, TEXT("%s betrayal value %d vs. %d"), *KillerPRI->PlayerName, BetrayalValue, BetrayalRandomness);
 								if ((BetrayalValue > BetrayalRandomness) && (FMath::FRand() < 0.2))
 								{
+									B->BetrayAggressiveness = BetrayalRandomness != 0.0 ? BetrayalValue / BetrayalRandomness : 0.5;
 									B->bBetrayTeam = true;
 								}
 							}

@@ -78,6 +78,7 @@ void AUTBetrayalWeapon::FireInstantHit(bool bDealDamage, FHitResult* OutHit)
 							InstigatorPRI->CurrentTeam->TeamPot >= FMath::Min<int32>(6, Game->GoalScore - FMath::Max<int32>(InstigatorPRI->Score, BotPRI->Score)))
 						{
 							UE_LOG(Betrayal, Log, TEXT("%s betray shooter"), *InstigatorPRI->PlayerName);
+							Bot->BetrayAggressiveness = 0.8;
 							Bot->bBetrayTeam = true;
 						}
 					}

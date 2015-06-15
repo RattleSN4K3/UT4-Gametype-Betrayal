@@ -12,6 +12,9 @@ class AUTBetrayalBot : public AUTBot
 	/** whether this bot should try to betray a team member */
 	UPROPERTY()
 	bool bBetrayTeam;
+	/** Used to rate team mates who betrayed this bot. Se when this bot has been betrayed (default:1.0) */
+	UPROPERTY()
+	float BetrayAggressiveness;
 
 	/** return whether passed in Actor is or belongs to a teammate */
 	virtual bool IsTeammate(AActor* TestActor) override;
