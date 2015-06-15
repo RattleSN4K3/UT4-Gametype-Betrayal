@@ -5,8 +5,6 @@
 #include "UTBetrayalTeam.h"
 #include "UTBot.h"
 
-// TODO: rate enemy if bBetrayteam and teammate
-
 AUTBetrayalBot::AUTBetrayalBot(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
@@ -21,4 +19,44 @@ bool AUTBetrayalBot::IsTeammate(AActor* TestActor)
 	}
 
 	return Super::IsTeammate(TestActor);
+}
+
+float AUTBetrayalBot::RateEnemy(const FBotEnemyInfo& EnemyInfo)
+{
+	// retrieve the base rating
+	float ThreatValue = Super::RateEnemy(EnemyInfo);
+
+	AUTCharacter* P = EnemyInfo.GetUTChar();
+	if (ThreatValue > 0.0 && P != NULL)
+	{
+		AUTBetrayalPlayerState* EnemyPRI = Cast<AUTBetrayalPlayerState>(P->PlayerState);
+		AUTBetrayalPlayerState* PRI = Cast<AUTBetrayalPlayerState>(PlayerState);
+		if (PRI != NULL && EnemyPRI != NULL)
+		{
+			if (PRI->Betrayer == EnemyPRI)
+			{
+				// payback kill
+				ThreatValue += 2.0;
+			}
+			else if ((EnemyPRI->bIsRogue && EnemyPRI->BetrayedTeam != NULL && EnemyPRI->BetrayedTeam == PRI->CurrentTeam) ||
+				(PRI->bIsRogue && PRI->BetrayedTeam != NULL && PRI->BetrayedTeam == EnemyPRI->CurrentTeam))
+			{
+				// retribution kill
+				ThreatValue += 1.2;
+			}
+			else if (bBetrayTeam && PRI->CurrentTeam != NULL && PRI->CurrentTeam == EnemyPRI->CurrentTeam)
+			{
+				// maybe betray team mates
+				ThreatValue += 0.2;
+			}
+		}
+		if (P->IsSpawnProtected())
+		{
+			// slightly ignore spawned players due to instant weapon
+			ThreatValue -= 0.4;
+		}
+	}
+
+	UE_LOG(Betrayal, Verbose, TEXT("Bot::RateEnemy %s: %f"), *EnemyInfo.GetUTChar()->GetName(), ThreatValue);
+	return ThreatValue;
 }

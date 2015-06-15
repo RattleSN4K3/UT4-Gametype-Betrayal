@@ -15,5 +15,7 @@ class AUTBetrayalBot : public AUTBot
 
 	/** return whether passed in Actor is or belongs to a teammate */
 	virtual bool IsTeammate(AActor* TestActor) override;
+	/** rating for enemy to focus on bot targets enemy with highest rating */
+	virtual float RateEnemy(const FBotEnemyInfo& EnemyInfo) override;
 
 };
