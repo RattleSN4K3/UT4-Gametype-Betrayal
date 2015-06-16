@@ -13,22 +13,65 @@ AUTBetrayalCharacterPostRenderer::AUTBetrayalCharacterPostRenderer(const FObject
 	bNetLoadOnClient = true;
 }
 
+void AUTBetrayalCharacterPostRenderer::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(AUTBetrayalCharacterPostRenderer, RenderPawn, COND_InitialOnly);
+}
+
 void AUTBetrayalCharacterPostRenderer::BeginPlay()
 {
-	Super::BeginPlay();
-
-	AUTCharacter* Pawn = Cast<AUTCharacter>(GetOwner());
-	if (Pawn == NULL)
+	if (Role == ROLE_Authority)
 	{
-		UE_LOG(Betrayal, Verbose, TEXT("CharacterPostRenderer: Destroy TeamColor helper %s"), *GetName());
-		Destroy();
-		return;
+		AUTCharacter* Pawn = Cast<AUTCharacter>(GetOwner());
+		if (Pawn == NULL)
+		{
+			UE_LOG(Betrayal, Verbose, TEXT("CharacterPostRenderer: Destroy TeamColor helper %s"), *GetName());
+			Destroy();
+			return;
+		}
+
+		// store pawn
+		RenderPawn = Pawn;
+		if (GetWorld()->GetNetMode() != NM_DedicatedServer)
+		{
+			OnRep_RenderPawn();
+		}
 	}
 
-	// store pawn
-	RenderPawn = Pawn;
+	Super::BeginPlay();
 
-	HookRender();
+	if (Role != ROLE_Authority)
+	{
+		// set timeout for replicated referenced Pawn... to clear/destroy zombie actors
+		SetLifeSpan(10.0f);
+	}
+}
+
+void AUTBetrayalCharacterPostRenderer::OnRep_RenderPawn()
+{
+	if (RenderPawn != NULL && !bRenderPawnInitialized)
+	{
+		// Actor referenced, set life spawn to infinite
+		SetLifeSpan(0.0f);
+
+		// Bind OnDied event to this pawn to garbage collect this zombie actor
+		RenderPawn->OnDied.AddDynamic(this, &AUTBetrayalCharacterPostRenderer::OnPawnDied);
+
+		if (GetWorld()->GetNetMode() != NM_DedicatedServer)
+		{
+			HookRender();
+		}
+
+		bRenderPawnInitialized = true;
+	}
+	else if (RenderPawn == NULL && bRenderPawnInitialized && GetWorld()->TimeSeconds - CreationTime > 10.0f)
+	{
+		// still existing and active replication? 
+		// Set life spawn just in case to destroy actor automatically
+		SetLifeSpan(5.0f);
+	}
 }
 
 void AUTBetrayalCharacterPostRenderer::HookRender()
@@ -115,4 +158,10 @@ bool AUTBetrayalCharacterPostRenderer::IsPawnVisible(APlayerController* PC, FVec
 	}
 
 	return true;
+}
+
+void AUTBetrayalCharacterPostRenderer::OnPawnDied(AController* Killer, const UDamageType* DamageType)
+{
+	UE_LOG(Betrayal, Log, TEXT("CharacterPostRenderer: RefPawn died. Destroy..."));
+	Destroy();
 }
