@@ -526,3 +526,20 @@ void AUTBetrayalGameMode::BuildPlayerInfo(TSharedPtr<SVerticalBox> Panel, AUTPla
 }
 
 #endif
+
+FText AUTBetrayalGameMode::BuildServerRules(AUTGameState* GameState)
+{
+	FFormatNamedArguments Args;
+	Args.Add("Rules", Super::BuildServerRules(GameState));
+	Args.Add("RogueValue", FText::AsNumber(RogueValue));
+	Args.Add("RogueTimePenalty", FText::AsNumber(AUTBetrayalPlayerState::StaticClass()->GetDefaultObject<AUTBetrayalPlayerState>()->RogueTimePenalty));
+
+	return FText::Format(NSLOCTEXT("UTBetrayalGameMode", "GameRules", "{Rules}  Rogue Value: {RogueValue}  Rogue time penalty: {RogueTimePenalty} s"), Args);
+}
+
+void AUTBetrayalGameMode::BuildServerResponseRules(FString& OutRules)
+{
+	// TODO: Re-order
+	OutRules += FString::Printf(TEXT("Rogue Value\t%i\t"), RogueValue);
+	OutRules += FString::Printf(TEXT("Rogue time penalty\t%i\t"), AUTBetrayalPlayerState::StaticClass()->GetDefaultObject<AUTBetrayalPlayerState>()->RogueTimePenalty);
+}

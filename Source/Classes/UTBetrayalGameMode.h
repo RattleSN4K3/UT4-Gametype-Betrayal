@@ -80,6 +80,24 @@ public:
 		return FText::AsNumber(val, &NumberOpts);
 	}
 
+	// TODO: add menu widgets for changing game options
+	/** called on the default object of this class by the UI to create widgets to manipulate this game type's settings
+	* you can use TAttributeProperty<> to easily implement get/set delegates that map directly to the config property address
+	* add any such to the ConfigProps array so the menu maintains the shared pointer
+	*/
+	//virtual void CreateConfigWidgets(TSharedPtr<class SVerticalBox> MenuSpace, bool bCreateReadOnly, TArray< TSharedPtr<TAttributePropertyBase> >& ConfigProps) override;
+
 #endif
+
+	// Allows gametypes to build their rules settings for the mid game menu.
+	virtual FText BuildServerRules(AUTGameState* GameState) override;
+
+	/**
+	*	Builds a \t separated list of rules that will be sent out to clients when they request server info via the UTServerBeaconClient.
+	**/
+	virtual void BuildServerResponseRules(FString& OutRules) override;
+	
+	// TODO: parameterize game options
+	//virtual void GetGameURLOptions(TArray<FString>& OptionsList, int32& DesiredPlayerCount) override;
 
 };
