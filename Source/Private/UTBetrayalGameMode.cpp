@@ -345,25 +345,15 @@ void AUTBetrayalGameMode::Logout(AController* Exiting)
 
 void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APawn* KilledPawn, TSubclassOf<UDamageType> DamageType)
 {
-	// TODO: Improve ScoreKill, call parent method and apply Betrayal logic separately
-
-	if ((Killer == Other) || (Killer == NULL))
-	{
-		// If it's a suicide, subtract a kill from the player...
-
-		if (Other != NULL && Other->PlayerState != NULL && Cast<AUTPlayerState>(Other->PlayerState) != NULL)
-		{
-			Cast<AUTPlayerState>(Other->PlayerState)->AdjustScore(-1);
-			Cast<AUTPlayerState>(Other->PlayerState)->IncrementKills(DamageType, false);
-		}
-	}
-	else
+	if (Killer != NULL && Killer != Other)
 	{
 		AUTBetrayalPlayerState* KillerPRI = Cast<AUTBetrayalPlayerState>(Killer->PlayerState);
 		AUTBetrayalPlayerState* OtherPRI = Cast<AUTBetrayalPlayerState>(Other->PlayerState);
 		if (KillerPRI != NULL && OtherPRI != NULL)
 		{
-			KillerPRI->AdjustScore(OtherPRI->ScoreValueFor(KillerPRI));
+			// only add additional score // Score - 1
+			KillerPRI->AdjustScore(OtherPRI->ScoreValueFor(KillerPRI) - 1);
+
 			if (OtherPRI->bIsRogue && (OtherPRI == KillerPRI->Betrayer))
 			{
 				AUTPlayerController* KillerPC = Cast<AUTPlayerController>(KillerPRI->GetOwner());
@@ -391,7 +381,6 @@ void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APa
 				OtherPRI->RogueExpired();
 			}
 
-			KillerPRI->IncrementKills(DamageType, true);
 			if (KillerPRI->CurrentTeam != NULL)
 			{
 				KillerPRI->CurrentTeam->TeamPot++;
@@ -424,22 +413,10 @@ void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APa
 					}
 				}
 			}
-
-			FindAndMarkHighScorer();
-			CheckScore(KillerPRI);
-		}
-
-		if (!bFirstBloodOccurred)
-		{
-			BroadcastLocalized(this, UUTFirstBloodMessage::StaticClass(), 0, KillerPRI, NULL, NULL);
-			bFirstBloodOccurred = true;
 		}
 	}
 
-	if (BaseMutator != NULL)
-	{
-		BaseMutator->ScoreKill(Killer, Other, DamageType);
-	}
+	Super::ScoreKill(Killer, Other, KilledPawn, DamageType);
 }
 
 void AUTBetrayalGameMode::SetPlayerDefaults(APawn* PlayerPawn)
