@@ -73,6 +73,8 @@ void AUTBetrayalCharacterPostRenderer::HookRender()
 
 void AUTBetrayalCharacterPostRenderer::PostRenderFor(APlayerController* PC, UCanvas* Canvas, FVector CameraPosition, FVector CameraDir)
 {
+	// TODO: FIXME: Find crash related to access violation (NULL POINTER)
+
 	if (PC == NULL || RenderPawn == NULL || RenderPawn->TimeOfDeath > 0.0 || RenderPawn->IsPendingKillPending() /* RenderPawn->IsValidLowLevelFast()*/)
 	{
 		Destroy();
@@ -92,7 +94,8 @@ void AUTBetrayalCharacterPostRenderer::PostRenderFor(APlayerController* PC, UCan
 	if (Hud != NULL && !RenderPawn->IsFeigningDeath())
 	{
 		float Dist = (CameraPosition - RenderPawn->GetActorLocation()).Size();
-		if (Dist <= RenderPawn->TeamPlayerIndicatorMaxDistance && IsPawnVisible(PC, CameraPosition, RenderPawn))
+		float MaxDist = 2.0 * RenderPawn->TeamPlayerIndicatorMaxDistance;
+		if (Dist <= MaxDist && IsPawnVisible(PC, CameraPosition, RenderPawn))
 		{
 			Hud->DrawPlayerBeacon(RenderPawn, Canvas, CameraPosition, CameraDir, ScreenPosition);
 		}

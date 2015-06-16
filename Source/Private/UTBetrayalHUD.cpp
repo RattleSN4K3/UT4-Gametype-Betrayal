@@ -4,7 +4,6 @@
 #include "UTHUD_DM.h"
 
 // TODO: Use FUTCanvasTextItem to draw beacon
-// TODO: Add opacity to Beacons near crosshair
 // TODO: Split Pot from TeamInfo once widgets are fully customizable
 
 AUTBetrayalHUD::AUTBetrayalHUD(const FObjectInitializer& ObjectInitializer)
@@ -34,6 +33,13 @@ AUTBetrayalHUD::AUTBetrayalHUD(const FObjectInitializer& ObjectInitializer)
 
 	static ConstructorHelpers::FObjectFinder<UFont> BeaconFontObj(TEXT("Font'/Engine/EngineFonts/Roboto.Roboto'"));
 	BeaconFont = BeaconFontObj.Object != NULL ? BeaconFontObj.Object : MediumFont;
+
+	static ConstructorHelpers::FObjectFinder<UTexture2D> UT3GHudTextureObj(TEXT("Texture2D'/UTBetrayal/Textures/HUDIcons.HUDIcons'"));
+	UT3GHudTexture = UT3GHudTextureObj.Object;
+
+	BeaconTextureUV = FTextureUVs(137.0, 91.0, 101.0, 34.0);
+
+	BeaconBonusString = NSLOCTEXT("UTBetrayal", "BeaconBonusDisplay", "+{Bonus}");
 }
 
 void AUTBetrayalHUD::DrawPlayerBeacon(AUTCharacter* P, UCanvas* Canvas, FVector CameraPosition, FVector CameraDir, FVector ScreenLoc)
@@ -47,8 +53,7 @@ void AUTBetrayalHUD::DrawPlayerBeacon(AUTCharacter* P, UCanvas* Canvas, FVector 
 	if (GS == NULL || PRI == NULL || ViewerPRI == NULL)
 		return;
 
-	FFontRenderInfo TextRenderInfo = FFontRenderInfo();
-	TextRenderInfo.bClipText = true;
+	FFontRenderInfo TextRenderInfo = Canvas->CreateFontRenderInfo(true, false);
 
 	float NameFontScale = 0.8;
 	float NumFontScale = 3.0;
@@ -67,7 +72,9 @@ void AUTBetrayalHUD::DrawPlayerBeacon(AUTCharacter* P, UCanvas* Canvas, FVector 
 	float NumXL, NumYL;
 	float Dist = (CameraPosition - P->GetActorLocation()).Size();
 	int32 Bonus = PRI->ScoreValueFor(ViewerPRI);
-	FString NumString = FString::Printf(TEXT("+%i"), Bonus);
+	FFormatNamedArguments Args;
+	Args.Add("Bonus", FText::AsNumber(Bonus));
+	FString NumString = FText::Format(BeaconBonusString, Args).ToString();
 
 	Canvas->TextSize(NumFont, NumString, NumXL, NumYL);
 	float FontScale = FMath::Clamp<float>(800.0f / (Dist + 1.0f), 0.65f, 1.0f);
@@ -79,6 +86,14 @@ void AUTBetrayalHUD::DrawPlayerBeacon(AUTCharacter* P, UCanvas* Canvas, FVector 
 	int XL = FMath::Max(TextXL, NumXL);
 	int YL = TextYL + NumYL;
 
+	// fade out beacons near crosshair and on distance
+	float AlphaDist = FMath::Clamp<float>((Dist - 1000.0f) / 2000.0f, 0.33f, 1.0f);
+	FVector CenterScreen(Canvas->SizeX*0.5, Canvas->SizeY*0.5, 0.0);
+	float AlphaFov = FMath::Clamp<float>((ScreenLoc-CenterScreen).Size2D() / (0.25*FMath::Min<int32>(Canvas->SizeX, Canvas->SizeY)), 0.33f, 1.0f);
+	float AlphaValue = AlphaDist * AlphaFov;
+	TextColor.A *= AlphaValue;
+	BeaconColor.A *= AlphaValue;
+
 	// TODO: Add support for Char preview height for speaking player
 	//if (CharPRI == PRI)
 	//{
@@ -87,14 +102,14 @@ void AUTBetrayalHUD::DrawPlayerBeacon(AUTCharacter* P, UCanvas* Canvas, FVector 
 	//}
 	
 	// Draw Beacon Background
-	float BeaconPaddingX = 0.1f * XL;
+	float BeaconPaddingX = 8.0f;
 	float BeaconPaddingY = BeaconPaddingX;
-	float BeaconW = XL + 2.0f * BeaconPaddingX;
+	float BeaconW = XL + 4.0f * BeaconPaddingX;
 	float BeaconH = YL + 2.0f * BeaconPaddingY;
 	float BeaconPosX = ScreenLoc.X - 0.5f * BeaconW;
 	float BeaconPosY = ScreenLoc.Y - BeaconH;
-	Canvas->SetLinearDrawColor(BeaconColor);
-	Canvas->DrawTile(Canvas->DefaultTexture, BeaconPosX, BeaconPosY, BeaconW, BeaconH, 0, 0, 1, 1);
+	Canvas->SetLinearDrawColor(FLinearColor(BeaconColor.R * 0.25, BeaconColor.R * 0.25, BeaconColor.R * 0.25, BeaconColor.A));
+	Canvas->DrawTile(UT3GHudTexture, BeaconPosX, BeaconPosY - 0.4*BeaconH, BeaconW, 1.8*BeaconH, BeaconTextureUV.U, BeaconTextureUV.V, BeaconTextureUV.UL, BeaconTextureUV.VL);
 
 	// TODO: Add support for Char preview height for speaking player
 	//if (CharPRI == PRI)
@@ -106,16 +121,6 @@ void AUTBetrayalHUD::DrawPlayerBeacon(AUTCharacter* P, UCanvas* Canvas, FVector 
 	//	Canvas.DrawTile(UT3GHudTexture, PulseAudioWidth, AudioHeight, 173, 132, 57, 34);
 	//}
 
-	//FUTCanvasTextItem TextItem(
-	//	FVector2D(FMath::TruncToFloat(ScreenLoc.X - 0.5*TextXL), FMath::TruncToFloat(ScreenLoc.Y - 2.5*TextYL*FontScale)),
-	//	FText::FromString(ScreenName), 
-	//	NameFont, TextColor, NULL
-	//);
-	//TextItem.Scale = FVector2D(FontScale, FontScale);
-	//TextItem.BlendMode = SE_BLEND_Translucent;
-	//TextItem.FontRenderInfo = Canvas->CreateFontRenderInfo(true, false);
-	//Canvas->DrawItem(TextItem);
-
 	Canvas->SetLinearDrawColor(TextColor);
 	Canvas->DrawText(NameFont, ScreenName, ScreenLoc.X - 0.5f*TextXL, ScreenLoc.Y - BeaconPaddingY - TextYL, NameFontScale, NameFontScale, TextRenderInfo);
 
@@ -126,27 +131,17 @@ void AUTBetrayalHUD::DrawPlayerBeacon(AUTCharacter* P, UCanvas* Canvas, FVector 
 		{
 			//This pawn is a rogue and betrayed the PC looking at him
 			BonusTextColor = RedColor;
+			BonusTextColor.A += 0.5;
 		}
 		else if (ViewerPRI->bIsRogue && (PRI->Betrayer == ViewerPRI))
 		{
 			//This pawn is out to get the rogue looking at him
 			BonusTextColor = GreenColor;
+			BonusTextColor.A += 0.5;
 		}
 	}
 
 	// draw value of this player
 	Canvas->SetLinearDrawColor(BonusTextColor);
 	Canvas->DrawText(NumFont, NumString, ScreenLoc.X - 0.5*NumXL, BeaconPosY + BeaconPaddingY, FontScale, FontScale, TextRenderInfo); // TODO: add AudioHeight
-
-	//Canvas->SetLinearDrawColor(TextColor);
-	//Canvas->DrawText(NumFont, NumString, ScreenLoc.X - 0.5*NumXL, ScreenLoc.Y - 2.0*TextYL*FontScale - NumYL - AudioHeight, FontScale, FontScale);
-
-	//TextItem.SetColor(BonusTextColor);
-	//FFormatNamedArguments Args;
-	//Args.Add("Bonus", FText::AsNumber(Bonus));
-	//TextItem.Text = FText::Format(NSLOCTEXT("UTBetrayal", "BeaconBonusDisplay", "+{Bonus}"), Args);
-
-	//TextItem.Position = FVector2D(FMath::TruncToFloat(ScreenLoc.X - 0.5*NumXL), FMath::TruncToFloat(ScreenLoc.Y - 2.0*TextYL*FontScale - NumYL - AudioHeight));
-	//Canvas->DrawItem(TextItem);
-
 }
