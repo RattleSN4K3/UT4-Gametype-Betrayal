@@ -47,7 +47,6 @@ class UUTBetrayalMessage : public UUTLocalMessage
 		//bBeep = False
 
 		MessageArea = FName(TEXT("GameMessages")); //MessageArea = 3
-		Importance = 0.8f; //AnnouncementPriority = 8
 
 		static ConstructorHelpers::FObjectFinder<USoundBase> BetrayalKillSoundFinder(TEXT("SoundWave'/UTBetrayal/Sounds/Announcer/A_RewardAnnouncer_Assassin.A_RewardAnnouncer_Assassin'"));
 		BetrayalKillSound = BetrayalKillSoundFinder.Object;
@@ -91,27 +90,27 @@ class UUTBetrayalMessage : public UUTLocalMessage
 		Super::ClientReceive(ClientData);
 
 		AUTPlayerController* PC = Cast<AUTPlayerController>(ClientData.LocalPC);
-		if (PC == NULL || PC->RewardAnnouncer == NULL)
+		if (PC == NULL || PC->Announcer == NULL)
 			return;
 
 		// TODO: Add support for dynamic music
 		if (ClientData.MessageIndex == 1)
 		{
-			PC->RewardAnnouncer->PlayAnnouncement(GetClass(), ClientData.MessageIndex, ClientData.OptionalObject);
+			PC->Announcer->PlayAnnouncement(GetClass(), ClientData.MessageIndex, ClientData.OptionalObject);
 		}
 		else if (ClientData.MessageIndex == 0)
 		{
-			PC->RewardAnnouncer->PlayAnnouncement(GetClass(), ClientData.MessageIndex, ClientData.OptionalObject);
+			PC->Announcer->PlayAnnouncement(GetClass(), ClientData.MessageIndex, ClientData.OptionalObject);
 			//PC->ClientMusicEvent(10);
 		}
 		else if ((ClientData.MessageIndex == 2) || (ClientData.MessageIndex == 3))
 		{
-			PC->RewardAnnouncer->PlayAnnouncement(GetClass(), ClientData.MessageIndex, ClientData.OptionalObject);
+			PC->Announcer->PlayAnnouncement(GetClass(), ClientData.MessageIndex, ClientData.OptionalObject);
 			//PC->ClientMusicEvent(10);
 		}
 		else if (ClientData.MessageIndex == 5)
 		{
-			PC->RewardAnnouncer->PlayAnnouncement(GetClass(), ClientData.MessageIndex, ClientData.OptionalObject);
+			PC->Announcer->PlayAnnouncement(GetClass(), ClientData.MessageIndex, ClientData.OptionalObject);
 			//PC->ClientMusicEvent(14);
 		}
 	}
@@ -134,10 +133,12 @@ class UUTBetrayalMessage : public UUTLocalMessage
 				if (USoundBase* Sound = Cast<USoundBase>(Prop->GetObjectPropertyValue(Prop->ContainerPtrToValuePtr<UObject>(CDO))))
 				{
 					FName SoundName = ToAnnouncementName(Prop->GetName());
-					if (!Announcer->CachedAudio.Contains(SoundName))
+					if (!Announcer->RewardCachedAudio.Contains(SoundName))
 					{
-						Announcer->CachedAudio.Add(SoundName, Sound);
+						Announcer->RewardCachedAudio.Add(SoundName, Sound);
 					}
+
+					// TODO: need to add Sound to StatusCachedAudio as well?
 				}
 			}
 		}
@@ -180,6 +181,12 @@ class UUTBetrayalMessage : public UUTLocalMessage
 	virtual bool UseLargeFont(int32 MessageIndex) const override
 	{
 		return (MessageIndex != 4);
+	}
+
+	/** Range of 0 to 1, affects where announcement is inserted into pending announcements queue. */
+	virtual float GetAnnouncementPriority(int32 Switch) const override
+	{
+		return 0.8f; //AnnouncementPriority = 8
 	}
 
 };
