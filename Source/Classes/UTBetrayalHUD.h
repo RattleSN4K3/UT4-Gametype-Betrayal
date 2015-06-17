@@ -18,9 +18,6 @@ class AUTBetrayalHUD : public AUTHUD
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Message)
 	FText BeaconBonusString;
 
-	virtual void DrawPlayerBeacon(AUTCharacter* P, UCanvas* BeaconCanvas, FVector CameraPosition, FVector CameraDir, FVector ScreenLoc);
-
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UFont* BeaconFont;
 
@@ -31,5 +28,13 @@ class AUTBetrayalHUD : public AUTHUD
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UT3 HUD")
 	FTextureUVs BeaconTextureUV;
+
+	virtual void DrawPlayerBeacon(AUTCharacter* P, UCanvas* BeaconCanvas, FVector CameraPosition, FVector CameraDir, FVector ScreenLoc);
+
+	/** remove an actor from the PostRenderedActors array */
+	virtual void RemovePostRenderedActor(AActor* A) override;
+
+	/** add an actor to the PostRenderedActors array */
+	virtual void AddPostRenderedActor(AActor* A) override;
 
 };

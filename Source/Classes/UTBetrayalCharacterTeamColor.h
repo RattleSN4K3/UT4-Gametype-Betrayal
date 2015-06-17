@@ -11,21 +11,22 @@ class AUTBetrayalCharacterTeamColor : public AActor
 
 protected:
 
-	bool bRefPawnInitialized;
+	AUTCharacter* RefPawn;
+	APlayerController* RefPC;
+
+	bool bPawnInitialized;
 
 	uint8 PlayerStateErrorCount;
 
-	UPROPERTY(Replicated, ReplicatedUsing = OnRep_RefPawn)
-	AUTCharacter* RefPawn;
 	UFUNCTION()
-	virtual void OnRep_RefPawn();
-	virtual void InitializePawn(AUTCharacter* Pawn);
+	virtual void OnPawnDied(AController* Killer, const UDamageType* DamageType);
+	
+	virtual void InitializePawn();
+	virtual void HookPawn();
 
-	UFUNCTION()
-	virtual void OnRefPawnDied(AController* Killer, const UDamageType* DamageType);
+public:
+
+	virtual void Assign(AUTCharacter* Char, APlayerController *PC);
 	virtual void UpdateTeamColor();
-
-	virtual void BeginPlay() override;
-
 
 };

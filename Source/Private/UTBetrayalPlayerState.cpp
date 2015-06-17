@@ -4,6 +4,8 @@
 #include "UTBetrayalPlayerState.h"
 #include "UTBetrayalGameState.h"
 
+#include "UTBetrayalCharacterPostRenderer.h"
+
 AUTBetrayalPlayerState::AUTBetrayalPlayerState(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
@@ -46,10 +48,15 @@ void AUTBetrayalPlayerState::Reset()
 	CurrentTeam = NULL;
 	Betrayer = NULL;
 	BetrayalCount = 0;
+
+	BetrayedTeam = NULL;
+
 	BetrayalPot = 0;
 	BetrayedCount = 0;
 	BetrayedPot = 0;
-	BetrayedTeam = NULL;
+	RetributionCount = 0;
+	PaybackCount = 0;
+	HighestPot = 0;
 }
 
 void AUTBetrayalPlayerState::SetRogueTimer()
@@ -159,6 +166,9 @@ void AUTBetrayalPlayerState::ApplyTeamColorFor(AUTCharacter* P, bool bIsTeam)
 		if (MI != NULL)
 		{
 			MI->SetScalarParameterValue(TEXT("TeamSelect"), bIsTeam ? 1.0 : 0.0);
+
+			// FIXME: TEMP HACK. HitFlashColor used for BrightSkin for team members
+			MI->SetVectorParameterValue(TEXT("HitFlashColor"), bIsTeam ? FLinearColor(0.0f, 0.0f, 1.0f) : FLinearColor(0.f, 0.f, 0.f, 0.f));
 		}
 	}
 }

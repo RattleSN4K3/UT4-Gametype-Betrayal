@@ -11,79 +11,100 @@
 AUTBetrayalCharacterTeamColor::AUTBetrayalCharacterTeamColor(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
-	bReplicates = true;
 	bAlwaysRelevant = true;
-	bReplicateMovement = false;
-	bNetLoadOnClient = true;
+	InitialLifeSpan = 30.f;
 }
 
-void AUTBetrayalCharacterTeamColor::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+void AUTBetrayalCharacterTeamColor::Assign(AUTCharacter* Char, APlayerController *PC)
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME_CONDITION(AUTBetrayalCharacterTeamColor, RefPawn, COND_InitialOnly);
-}
-
-void AUTBetrayalCharacterTeamColor::BeginPlay()
-{
-	if (Role == ROLE_Authority)
+	if (Char == NULL)
 	{
-		AUTCharacter* Pawn = Cast<AUTCharacter>(GetOwner());
-		if (Pawn == NULL)
-		{
-			UE_LOG(Betrayal, Log, TEXT("CharacterTeamColor: Destroy TeamColor helper %s"), *GetName());
-			Destroy();
-			return;
-		}
-
-		RefPawn = Pawn;
-		if (GetWorld()->GetNetMode() != NM_DedicatedServer)
-		{
-			OnRep_RefPawn();
-		}
+		UE_LOG(Betrayal, Log, TEXT("CharacterTeamColor: Destroy TeamColor helper %s"), *GetName());
+		Destroy();
+		return;
 	}
 
-	Super::BeginPlay();
-
-	if (Role != ROLE_Authority)
-	{
-		// set timeout for replicated referenced Pawn... to clear/destroy zombie actors
-		SetLifeSpan(10.0f);
-	}
+	RefPawn = Char;
+	RefPC = PC;
+	InitializePawn();
 }
 
-void AUTBetrayalCharacterTeamColor::OnRep_RefPawn()
+void AUTBetrayalCharacterTeamColor::InitializePawn()
 {
-	if (RefPawn != NULL)
+	if (RefPawn != NULL && !bPawnInitialized)
 	{
+		bPawnInitialized = true;
+
 		// Actor referenced, set life spawn to infinite
-		SetLifeSpan(0.0f);
+		SetLifeSpan(0.f);
 
 		// Bind OnDied event to this pawn to garbage collect this zombie actor
-		RefPawn->OnDied.AddDynamic(this, &AUTBetrayalCharacterTeamColor::OnRefPawnDied);
+		RefPawn->OnDied.AddDynamic(this, &AUTBetrayalCharacterTeamColor::OnPawnDied);
 
 		// initialize team color material
-		InitializePawn(RefPawn);
+		HookPawn();
+	}
+}
 
-		if (GetWorld()->GetNetMode() != NM_DedicatedServer)
-		{
-			UpdateTeamColor();
-		}
-		
-		bRefPawnInitialized = true;
-	}
-	else if (bRefPawnInitialized && GetWorld()->TimeSeconds - CreationTime > 10.0f)
+void AUTBetrayalCharacterTeamColor::HookPawn()
+{
+	// FIXME: TEMP HACK. Exchange default materials with Team materials properly
+
+	if (RefPawn == NULL || RefPC == NULL)
 	{
-		// still existing and active replication? 
-		// Set life spawn just in case to destroy actor automatically
-		SetLifeSpan(5.0f);
+		UE_LOG(Betrayal, Log, TEXT("CharacterTeamColor::HookPawn - No Pawn. Abort..."));
+		Destroy();
+		return;
 	}
+
+	AUTPlayerState* PS = Cast<AUTPlayerState>(RefPawn->PlayerState);
+	if (PS == NULL)
+	{
+		FTimerHandle TempHandle;
+		GetWorldTimerManager().SetTimer(TempHandle, this, &AUTBetrayalCharacterTeamColor::HookPawn, 0.1f, false);
+
+		PlayerStateErrorCount++;
+		if (PlayerStateErrorCount > 100)
+		{
+			UE_LOG(Betrayal, Log, TEXT("CharacterTeamColor::HookPawn - Too many tries to find PlayerState for %s. Destroy helper..."), *RefPawn->GetName());
+			Destroy();
+		}
+
+		UE_LOG(Betrayal, Log, TEXT("CharacterTeamColor::HookPawn - Retry to find PlayerState for %s..."), *RefPawn->GetName());
+		return;
+	}
+
+	// override materials with Team materials to apply team color
+	AUTTeamInfo* NewTeam = GetWorld()->SpawnActor<AUTTeamInfo>(AUTBetrayalTeamInfoStub::StaticClass());
+	PS->Team = NewTeam;
+	RefPawn->ApplyCharacterData(PS->GetSelectedCharacter());
+	PS->Team = NULL;
+
+	NewTeam->Destroy();
+
+	// Apply Rim color so Blue team glows from distance
+	const TArray<UMaterialInstanceDynamic*>& BodyMIs = RefPawn->GetBodyMIs();
+	for (UMaterialInstanceDynamic* MI : BodyMIs)
+	{
+		if (MI != NULL)
+		{
+			MI->SetVectorParameterValue(TEXT("RedTeamRim"), FLinearColor(0.0f, 0.0f, 0.0f));
+			MI->SetVectorParameterValue(TEXT("BlueTeamRim"), FLinearColor(0.0f, 0.0f, 40.0f));
+		}
+	}
+
+	PlayerStateErrorCount = 0;
+	UpdateTeamColor();
 }
 
 void AUTBetrayalCharacterTeamColor::UpdateTeamColor()
 {
-	AUTBetrayalPlayerState* PS = RefPawn ? Cast<AUTBetrayalPlayerState>(RefPawn->PlayerState) : NULL;
+	AUTBetrayalPlayerState* PS = NULL;
+	if (RefPawn != NULL)
+	{
+		PS = Cast<AUTBetrayalPlayerState>(RefPawn->PlayerState);
+	}
+
 	if (PS == NULL)
 	{
 		FTimerHandle TempHandle;
@@ -92,57 +113,29 @@ void AUTBetrayalCharacterTeamColor::UpdateTeamColor()
 		PlayerStateErrorCount++;
 		if (PlayerStateErrorCount > 100)
 		{
-			UE_LOG(Betrayal, Log, TEXT("CharacterTeamColor: Too many tries to find PlayerState for %s. Destroy helper..."), *RefPawn->GetName());
+			UE_LOG(Betrayal, Log, TEXT("CharacterTeamColor::UpdateTeamColor - Too many tries to find PlayerState for %s. Destroy helper..."), *RefPawn->GetName());
 			Destroy();
 		}
 
-		UE_LOG(Betrayal, Log, TEXT("CharacterTeamColor: Retry to find PlayerState for %s..."), *RefPawn->GetName());
+		UE_LOG(Betrayal, Log, TEXT("CharacterTeamColor::UpdateTeamColor - Retry to find PlayerState for %s..."), *RefPawn->GetName());
 		return;
 	}
 
 	bool bOnSameTeam = false;
-	if (PS->CurrentTeam != NULL)
+	if (RefPC != NULL && PS->CurrentTeam != NULL)
 	{
-		// TODO: Add support for Splitscreen team color overlay
-		APlayerController* PC = GEngine->GetFirstLocalPlayerController(GetWorld());
 		AUTBetrayalGameState* GS = GetWorld()->GetGameState<AUTBetrayalGameState>();
-		if (PC != NULL && GS != NULL)
+		if (GS != NULL)
 		{
-			bOnSameTeam = PC->PlayerState == PS || GS->OnSameTeam(PC, PS);
+			bOnSameTeam = RefPC->PlayerState == PS || GS->OnSameTeam(RefPC, PS);
 		}
 	}
 	
 	PS->ApplyTeamColorFor(RefPawn, bOnSameTeam);
 }
 
-void AUTBetrayalCharacterTeamColor::InitializePawn(AUTCharacter* Pawn)
+void AUTBetrayalCharacterTeamColor::OnPawnDied(AController* Killer, const UDamageType* DamageType)
 {
-	// FIXME: TEMP HACK. Exchange default materials with Team materials properly
-
-	if (Pawn == NULL)
-	{
-		UE_LOG(Betrayal, Log, TEXT("CharacterTeamColor: No Pawn. Abort..."));
-		return;
-	}
-
-	AUTPlayerState* PS = Cast<AUTPlayerState>(Pawn->PlayerState);
-	if (PS == NULL)
-	{
-		UE_LOG(Betrayal, Log, TEXT("CharacterTeamColor: No PlayerState. Abort..."));
-		return;
-	}
-
-	// override materials with Team materials to apply team color
-	AUTTeamInfo* NewTeam = GetWorld()->SpawnActor<AUTTeamInfo>(AUTBetrayalTeamInfoStub::StaticClass());
-	PS->Team = NewTeam;
-	Pawn->ApplyCharacterData(PS->GetSelectedCharacter());
-	PS->Team = NULL;
-
-	NewTeam->Destroy();
-}
-
-void AUTBetrayalCharacterTeamColor::OnRefPawnDied(AController* Killer, const UDamageType* DamageType)
-{
-	UE_LOG(Betrayal, Log, TEXT("CharacterTeamColor: RefPawn died. Destroy..."));
+	UE_LOG(Betrayal, Verbose, TEXT("CharacterTeamColor: RefPawn died. Destroy..."));
 	Destroy();
 }

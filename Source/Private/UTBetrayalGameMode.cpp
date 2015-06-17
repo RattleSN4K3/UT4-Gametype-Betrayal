@@ -419,39 +419,6 @@ void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APa
 	Super::ScoreKill(Killer, Other, KilledPawn, DamageType);
 }
 
-void AUTBetrayalGameMode::SetPlayerDefaults(APawn* PlayerPawn)
-{
-	// FIXME: workaround for JumpBoots calling SetPlayerDefaults
-	// TODO: Pull Request/Forum thread update to get this fixed
-	if (!AlreadySpawnedPlayers.Contains(PlayerPawn))
-	{
-		AlreadySpawnedPlayers.Add(PlayerPawn);
-		AlreadySpawnedPlayers.Remove(NULL);
-
-		// Workaround for PostRender routed to HUD
-		// TODO: FIXME: Route PostRender to UTHUD class
-
-		FActorSpawnParameters Params;
-		Params.bNoCollisionFail = true;
-		Params.Owner = PlayerPawn;
-		GetWorld()->SpawnActor<AUTBetrayalCharacterPostRenderer>(AUTBetrayalCharacterPostRenderer::StaticClass(), Params);
-
-		// END Workaround for PostRender routed to HUD
-
-		// Workaround for applying TeamColor to players
-
-		Params = FActorSpawnParameters();
-		Params.bNoCollisionFail = true;
-		Params.Owner = PlayerPawn;
-		GetWorld()->SpawnActor<AUTBetrayalCharacterTeamColor>(AUTBetrayalCharacterTeamColor::StaticClass(), Params);
-
-		// END Workaround for applying TeamColor to players
-
-	}
-
-	Super::SetPlayerDefaults(PlayerPawn);
-}
-
 #if !UE_SERVER
 
 void AUTBetrayalGameMode::BuildPlayerInfo(TSharedPtr<SVerticalBox> Panel, AUTPlayerState* PlayerState)

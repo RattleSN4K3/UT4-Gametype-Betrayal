@@ -6,111 +6,34 @@
 AUTBetrayalCharacterPostRenderer::AUTBetrayalCharacterPostRenderer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
-	bReplicates = true;
 	bAlwaysRelevant = true;
-	bReplicateMovement = false;
-	bNetLoadOnClient = true;
+	InitialLifeSpan = 30.f;
 }
 
-void AUTBetrayalCharacterPostRenderer::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
+void AUTBetrayalCharacterPostRenderer::Assign(AUTCharacter* Char)
 {
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME_CONDITION(AUTBetrayalCharacterPostRenderer, RenderPawn, COND_InitialOnly);
-}
-
-void AUTBetrayalCharacterPostRenderer::BeginPlay()
-{
-	if (Role == ROLE_Authority)
+	if (Char == NULL)
 	{
-		AUTCharacter* Pawn = Cast<AUTCharacter>(GetOwner());
-		if (Pawn == NULL)
-		{
-			UE_LOG(Betrayal, Verbose, TEXT("CharacterPostRenderer: Destroy TeamColor helper %s"), *GetName());
-			Destroy();
-			return;
-		}
-
-		// store pawn
-		RenderPawn = Pawn;
-		if (GetWorld()->GetNetMode() != NM_DedicatedServer)
-		{
-			OnRep_RenderPawn();
-		}
+		UE_LOG(Betrayal, Verbose, TEXT("CharacterPostRenderer: Destroy PostRender helper %s"), *GetName());
+		Destroy();
+		return;
 	}
 
-	Super::BeginPlay();
-
-	if (Role != ROLE_Authority)
-	{
-		// set timeout for replicated referenced Pawn... to clear/destroy zombie actors
-		SetLifeSpan(10.0f);
-	}
+	RenderPawn = Char;
+	InitializePawn();
 }
 
-void AUTBetrayalCharacterPostRenderer::OnRep_RenderPawn()
+void AUTBetrayalCharacterPostRenderer::InitializePawn()
 {
-	if (RenderPawn != NULL && !bRenderPawnInitialized)
+	if (RenderPawn != NULL && !bPawnInitialized)
 	{
+		bPawnInitialized = true;
+
 		// Actor referenced, set life spawn to infinite
-		SetLifeSpan(0.0f);
+		SetLifeSpan(0.f);
 
 		// Bind OnDied event to this pawn to garbage collect this zombie actor
 		RenderPawn->OnDied.AddDynamic(this, &AUTBetrayalCharacterPostRenderer::OnPawnDied);
-
-		if (GetWorld()->GetNetMode() != NM_DedicatedServer)
-		{
-			HookRender();
-		}
-
-		bRenderPawnInitialized = true;
-	}
-	else if (RenderPawn == NULL && bRenderPawnInitialized && GetWorld()->TimeSeconds - CreationTime > 10.0f)
-	{
-		// still existing and active replication? 
-		// Set life spawn just in case to destroy actor automatically
-		SetLifeSpan(5.0f);
-	}
-}
-
-void AUTBetrayalCharacterPostRenderer::HookRender()
-{
-	TArray<AUTPlayerController*> PCs;
-
-	// support for splitscreen. add to each PCs HUD
-	bool bFound = false;
-	for (FConstControllerIterator Iterator = GetWorld()->GetControllerIterator(); Iterator; ++Iterator)
-	{
-		AUTPlayerController* PC = Cast<AUTPlayerController>(*Iterator);
-		if (PC == NULL) continue;
-
-		if (PC->MyHUD == NULL)
-		{
-			FTimerHandle TempHandle;
-			GetWorldTimerManager().SetTimer(TempHandle, this, &AUTBetrayalCharacterPostRenderer::HookRender, 0.1f, false);
-			return;
-		}
-
-		PCs.Add(PC);
-	}
-
-	for (auto PC : PCs)
-	{
-		if (PC && PC->MyHUD)
-		{
-			PC->MyHUD->RemovePostRenderedActor(RenderPawn);
-			PC->MyHUD->AddPostRenderedActor(this);
-			bFound = true;
-		}
-	}
-
-	// destroy if no PC is found
-	if (!bFound)
-	{
-		UE_LOG(Betrayal, Verbose, TEXT("CharacterPostRenderer: No PC with a HUD found. Abort applying PostRender fix..."));
-		Destroy();
-		return;
 	}
 }
 
@@ -120,6 +43,7 @@ void AUTBetrayalCharacterPostRenderer::PostRenderFor(APlayerController* PC, UCan
 
 	if (PC == NULL || RenderPawn == NULL || RenderPawn->TimeOfDeath > 0.0 || RenderPawn->IsPendingKillPending() /* RenderPawn->IsValidLowLevelFast()*/)
 	{
+		RenderPawn = NULL;
 		Destroy();
 		return;
 	}
@@ -162,6 +86,6 @@ bool AUTBetrayalCharacterPostRenderer::IsPawnVisible(APlayerController* PC, FVec
 
 void AUTBetrayalCharacterPostRenderer::OnPawnDied(AController* Killer, const UDamageType* DamageType)
 {
-	UE_LOG(Betrayal, Log, TEXT("CharacterPostRenderer: RefPawn died. Destroy..."));
+	UE_LOG(Betrayal, Verbose, TEXT("CharacterPostRenderer: RenderPawn died. Destroy..."));
 	Destroy();
 }

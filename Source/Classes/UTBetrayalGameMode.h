@@ -62,12 +62,6 @@ public:
 	virtual void Logout(AController* Exiting) override;
 	virtual void ScoreKill(AController* Killer, AController* Other, APawn* KilledPawn, TSubclassOf<UDamageType> DamageType) override;
 
-	// TODO: TEMP. Remove once Pawn::PostRender is routed to HUD for PlayerBeacon
-	virtual void SetPlayerDefaults(APawn* PlayerPawn) override;
-
-	// TODO: TEMP. workaround for JumpBoots fix (callign SetPlayerDefaults)
-	TArray<APawn*> AlreadySpawnedPlayers;
-
 #if !UE_SERVER
 	virtual void BuildPlayerInfo(TSharedPtr<SVerticalBox> Panel, AUTPlayerState* PlayerState) override;
 
