@@ -84,20 +84,35 @@ public:
 	/** How likely bot associated with this PRI is to betray teammates */
 	float TrustWorthiness;
 
+	/** Set when TrustWorthiness is already cached */
 	bool bHasSetTrust;
 
 	virtual void Reset() override;
 
+	/** Starts the rogue timer to update the roque remaining time and expired at the given time */
 	virtual void SetRogueTimer();
+	/** Callback for the roque timer which is called every seconds. Used to also play warning sounds */
 	virtual void RogueTimer();
+	/** Called once the roque time expires in order to reset specific variables */
 	virtual void RogueExpired();
 
+	/** Returns the total score for this player in relation to the passed player */
 	virtual int32 ScoreValueFor(AUTBetrayalPlayerState* OtherPRI);
+	/** Returns the trust worthiness for this player based on the bot personality */
 	virtual float GetTrustWorthiness();
 
+	/** Updates player colors for the current team mates and all other players according to their relation */
 	virtual void UpdateTeam(class AUTBetrayalTeam* Team);
+	/** Apply player color for the given player */
 	virtual void ApplyTeamColorFor(AUTCharacter* P, bool bIsTeam);
 
+	/** Updates the Nemesis propertly stating who is the player who kill this player the mode.
+	 *  Using NemesisData and NemesisNames to check for the best player.
+	 *
+	 * @param PRI The last kill player's PlayerState to update the Nemesis data for
+	 * @see NemesisData
+	 * @see NemesisNames
+	 */
 	virtual void UpdateNemesis(AUTBetrayalPlayerState* PRI);
 
 };
