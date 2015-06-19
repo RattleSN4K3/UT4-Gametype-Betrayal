@@ -9,7 +9,6 @@
 #include "UTBetrayalCharacterPostRenderer.h"
 #include "UTBetrayalCharacterTeamColor.h"
 
-#include "UTFirstBloodMessage.h"
 #include "UTMutator_WeaponArena.h"
 #include "UTMutator_WeaponReplacement.h"
 
@@ -151,6 +150,7 @@ void AUTBetrayalGameMode::ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AU
 	UUTGameplayStatics::UTPlaySound(GetWorld(), BetrayingSound, InstigatorPRI->GetOwner());
 
 	InstigatorPRI->UpdateNemesis(HitPRI);
+	InstigatorPRI->UpdateTeam(NULL);
 
 	for (APlayerState* PS : GameState->PlayerArray)
 	{

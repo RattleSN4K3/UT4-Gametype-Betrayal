@@ -151,7 +151,7 @@ void AUTBetrayalPlayerState::UpdateTeam(AUTBetrayalTeam* Team)
 			AUTCharacter* P = Cast<AUTCharacter>(*It);
 			if (P != NULL && !P->bTearOff)
 			{
-				bool bOnSameTeam = PC->PlayerState == P->PlayerState || GS->OnSameTeam(PC, P);
+				bool bOnSameTeam = Team != NULL && (PC->PlayerState == P->PlayerState || GS->OnSameTeam(PC, P));
 				ApplyTeamColorFor(P, bOnSameTeam);
 			}
 		}
