@@ -469,6 +469,29 @@ void AUTBetrayalGameMode::BuildPlayerInfo(TSharedPtr<SVerticalBox> Panel, AUTPla
 	}
 }
 
+void AUTBetrayalGameMode::CreateConfigWidgets(TSharedPtr<class SVerticalBox> MenuSpace, bool bCreateReadOnly, TArray< TSharedPtr<TAttributePropertyBase> >& ConfigProps)
+//void AUTBetrayalGameMode::CreateConfigWidgets(bool bCreateReadOnly, TArray< FGameOptionWidgetInfo >& GameProps)
+{
+	Super::CreateConfigWidgets(MenuSpace, bCreateReadOnly, ConfigProps);
+	//Super::CreateConfigWidgets(bCreateReadOnly, GameProps);
+
+	// TODO: Remove ForceRespawn menu option
+	//// Remove ForceRespawn config option
+	//for (int32 i = 0; i < GameProps.Num(); i++)
+	//{
+	//	if (GameProps[i].ConfigProp.IsValid())
+	//	{
+	//		TAttributePropertyBase* Prop = GameProps[i].ConfigProp.Get();
+	//		if (Prop && Prop->GetURLKey().Equals(TEXT("ForceRespawn")))
+	//		{
+	//			GameProps[i].bRemove = true;
+	//		}
+	//	}
+	//}
+
+	// TODO: add menu widgets for changing additional game options
+}
+
 #endif
 
 FText AUTBetrayalGameMode::BuildServerRules(AUTGameState* GameState)
@@ -483,7 +506,26 @@ FText AUTBetrayalGameMode::BuildServerRules(AUTGameState* GameState)
 
 void AUTBetrayalGameMode::BuildServerResponseRules(FString& OutRules)
 {
+	Super::BuildServerResponseRules(OutRules);
+
 	// TODO: Re-order
 	OutRules += FString::Printf(TEXT("Rogue Value\t%i\t"), RogueValue);
 	OutRules += FString::Printf(TEXT("Rogue time penalty\t%i\t"), AUTBetrayalPlayerState::StaticClass()->GetDefaultObject<AUTBetrayalPlayerState>()->RogueTimePenalty);
+}
+
+void AUTBetrayalGameMode::GetGameURLOptions(TArray<FString>& OptionsList, int32& DesiredPlayerCount)
+{
+	Super::GetGameURLOptions(OptionsList, DesiredPlayerCount);
+
+	// Remove ForceRespawn option
+	for (int32 i = 0; i < OptionsList.Num(); i++)
+	{
+		if (OptionsList[i].StartsWith(TEXT("bForceRespawn")))
+		{
+			OptionsList.RemoveAt(i);
+			i--;
+		}
+	}
+
+	// TODO: parameterize additional game options (like allowing Boots, Rogue value, Rogue penalty)
 }
