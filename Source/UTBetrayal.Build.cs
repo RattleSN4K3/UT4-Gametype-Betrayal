@@ -18,6 +18,10 @@ namespace UnrealBuildTool.Rules
 					"AIModule", // For Bot subclassing
 				}
 			);
+			if (Target.Type != TargetRules.TargetType.Server)
+			{
+				PublicDependencyModuleNames.AddRange(new string[] { "Slate" });
+			}
 		}
 	}
 }

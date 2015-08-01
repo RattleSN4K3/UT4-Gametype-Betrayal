@@ -12,6 +12,8 @@
 #include "UTMutator_WeaponArena.h"
 #include "UTMutator_WeaponReplacement.h"
 
+#include "Private/Slate/Widgets/SUTTabWidget.h"
+
 AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
 {
@@ -343,7 +345,7 @@ void AUTBetrayalGameMode::Logout(AController* Exiting)
 	Super::Logout(Exiting);
 }
 
-void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APawn* KilledPawn, TSubclassOf<UDamageType> DamageType)
+void AUTBetrayalGameMode::ScoreKill_Implementation(AController* Killer, AController* Other, APawn* KilledPawn, TSubclassOf<UDamageType> DamageType)
 {
 	if (Killer != NULL && Killer != Other)
 	{
@@ -416,55 +418,60 @@ void AUTBetrayalGameMode::ScoreKill(AController* Killer, AController* Other, APa
 		}
 	}
 
-	Super::ScoreKill(Killer, Other, KilledPawn, DamageType);
+	Super::ScoreKill_Implementation(Killer, Other, KilledPawn, DamageType);
 }
 
 #if !UE_SERVER
 
-void AUTBetrayalGameMode::BuildPlayerInfo(TSharedPtr<SVerticalBox> Panel, AUTPlayerState* PlayerState)
+void AUTBetrayalGameMode::BuildPlayerInfo(AUTPlayerState* PlayerState, TSharedPtr<SUTTabWidget> TabWidget, TArray<TSharedPtr<TAttributeStat> >& StatList)
 {
-	Super::BuildPlayerInfo(Panel, PlayerState);
+	Super::BuildPlayerInfo(PlayerState, TabWidget, StatList);
 
+	BuildBetrayalInfo(PlayerState, TabWidget, StatList);
+}
+
+void AUTBetrayalGameMode::BuildBetrayalInfo(AUTPlayerState* PlayerState, TSharedPtr<class SUTTabWidget> TabWidget, TArray<TSharedPtr<TAttributeStat> >& StatList)
+{
 	if (AUTBetrayalPlayerState* BPRI = Cast<AUTBetrayalPlayerState>(PlayerState))
 	{
-		// TODO: Localization
-		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
-		[
-			NewPlayerInfoLine(FString("Betrayals"), FString::Printf(TEXT("%i"), BPRI->BetrayalCount))
-		];
-		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
-		[
-			NewPlayerInfoLine(FString("Victim"), FString::Printf(TEXT("%i"), BPRI->BetrayedCount))
-		];
-		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
-		[
-			NewPlayerInfoLine(FString("Retributions"), FString::Printf(TEXT("%i"), BPRI->RetributionCount))
-		];
-		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
-		[
-			NewPlayerInfoLine(FString("Paybacks"), FString::Printf(TEXT("%i"), BPRI->PaybackCount))
-		];
+		TAttributeStatBetrayal::StatValueTextFuncBet TwoDecimal = [](const AUTBetrayalPlayerState* PS, const float Value) -> FText
+		{
+			return FText::FromString(FString::Printf(TEXT("%8.2f"), Value));
+		};
 
-		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
-		[
-			NewPlayerInfoLine(FString("Average Betrayal Pot"), RoundPerc(BPRI->BetrayalPot, BPRI->BetrayalCount).ToString())
-		];
-		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
-		[
-			NewPlayerInfoLine(FString("Average Victim Pot"), RoundPerc(BPRI->BetrayedPot, BPRI->BetrayedCount).ToString())
-		];
-		Panel->AddSlot().Padding(30.0, 5.0, 30.0, 0.0)
-		[
-			NewPlayerInfoLine(FString("Highest Pot"), FString::Printf(TEXT("%i"), BPRI->HighestPot))
-		];
+		TSharedPtr<SVerticalBox> LeftPane;
+		TSharedPtr<SVerticalBox> RightPane;
+		TSharedPtr<SHorizontalBox> HBox;
+		BuildPaneHelper(HBox, LeftPane, RightPane);
+
+		TabWidget->AddTab(DisplayName, HBox);
+
+		NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTBetrayalGameMode", "Betrayals", "Betrayals"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float { return PS->BetrayalCount; })), StatList);
+		NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTBetrayalGameMode", "Victim", "Victim"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float { return PS->BetrayedCount; })), StatList);
+		NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTBetrayalGameMode", "Retributions", "Retributions"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float { return PS->RetributionCount; })), StatList);
+		NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTBetrayalGameMode", "Paybacks", "Paybacks"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float { return PS->PaybackCount; })), StatList);
+
+
+		NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTBetrayalGameMode", "AvergageBetrayalPot", "Average Betrayal Pot"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float
+		{
+			return PS->BetrayalCount > 0.f ? PS->BetrayalPot / PS->BetrayalCount : 0.f;
+		}, TwoDecimal)), StatList);
+
+		NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTBetrayalGameMode", "AvergageVictimPot", "Average Victim Pot"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float
+		{
+			return PS->BetrayedCount > 0.f ? PS->BetrayedPot / PS->BetrayedCount : 0.f;
+		}, TwoDecimal)), StatList);
+
+		NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTBetrayalGameMode", "HighestPot", "Highest Pot"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float { return PS->HighestPot; })), StatList);
 
 		APlayerController* PC = Cast<APlayerController>(PlayerState->GetOwner());
 		if (PC != NULL && PC->IsLocalPlayerController())
 		{
-			Panel->AddSlot().Padding(30.0, 15.0, 30.0, 0.0)
-			[
-				NewPlayerInfoLine(FString("Nemesis"), BPRI->CurrentNemesis.IsEmpty() ? FString(TEXT("-")) : BPRI->CurrentNemesis)
-			];
+			LeftPane->AddSlot()[SNew(SSpacer).Size(FVector2D(0.0f, 20.0f))];
+			NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTBetrayalGameMode", "Nemesis", "Nemesis"), MakeShareable(new TAttributeStatBetrayal(BPRI, nullptr, [](const AUTBetrayalPlayerState* PS, const float Value) -> FText
+			{
+				return PS->CurrentNemesis.IsEmpty() ? FText::FromString(FString(TEXT("-"))) : FText::FromString(PS->CurrentNemesis);
+			})), StatList);
 		}
 	}
 }

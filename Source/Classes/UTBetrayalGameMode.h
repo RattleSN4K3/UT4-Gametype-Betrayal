@@ -3,7 +3,47 @@
 #include "UTBetrayal.h"
 #include "UTBetrayalTeam.h"
 #include "UTBetrayalPlayerState.h"
+
+#include "Private/Slate/SUWPlayerInfoDialog.h"
+
 #include "UTBetrayalGameMode.generated.h"
+
+#if !UE_SERVER
+
+struct TAttributeStatBetrayal : public TAttributeStat
+{
+	typedef float(*StatValueFuncBet)(const AUTBetrayalPlayerState*);
+	typedef FText(*StatValueTextFuncBet)(const AUTBetrayalPlayerState*, const float Value);
+
+	TAttributeStatBetrayal(AUTBetrayalPlayerState* InPlayerState, StatValueFuncBet InValueFunc = nullptr, StatValueTextFuncBet InTextFunc = nullptr)
+		: TAttributeStat(InPlayerState, NAME_None, nullptr, nullptr), BetrayalPlayerState(InPlayerState), ValueFuncBet(InValueFunc), TextFuncBet(InTextFunc)
+	{
+		checkSlow(PlayerState.IsValid());
+	}
+
+	virtual float GetValue() const override
+	{
+		if (BetrayalPlayerState.IsValid() && ValueFuncBet != nullptr)
+		{
+			return ValueFuncBet(BetrayalPlayerState.Get());
+		}
+		return 0.0f;
+	}
+	virtual FText GetValueText() const override
+	{
+		if (BetrayalPlayerState.IsValid())
+		{
+			return (TextFuncBet != nullptr) ? TextFuncBet(BetrayalPlayerState.Get(), GetValue()) : FText::FromString(FString::FromInt((int32)GetValue()));
+		}
+		return FText();
+	}
+
+	TWeakObjectPtr<AUTBetrayalPlayerState> BetrayalPlayerState;
+	StatValueFuncBet ValueFuncBet;
+	StatValueTextFuncBet TextFuncBet;
+};
+
+#endif
 
 UCLASS()
 class AUTBetrayalGameMode : public AUTDMGameMode
@@ -60,19 +100,11 @@ public:
 	virtual void MaybeStartTeam();
 
 	virtual void Logout(AController* Exiting) override;
-	virtual void ScoreKill(AController* Killer, AController* Other, APawn* KilledPawn, TSubclassOf<UDamageType> DamageType) override;
+	virtual void ScoreKill_Implementation(AController* Killer, AController* Other, APawn* KilledPawn, TSubclassOf<UDamageType> DamageType) override;
 
 #if !UE_SERVER
-	virtual void BuildPlayerInfo(TSharedPtr<SVerticalBox> Panel, AUTPlayerState* PlayerState) override;
-
-	static FText RoundPerc(uint32 dividend, uint32 divisor)
-	{
-		float val = divisor > 0.0 ? (float)dividend / (float)divisor : 0.0;
-		FNumberFormattingOptions NumberOpts;
-		NumberOpts.MinimumFractionalDigits = 2;
-		NumberOpts.MaximumFractionalDigits = 2;
-		return FText::AsNumber(val, &NumberOpts);
-	}
+	virtual void BuildPlayerInfo(AUTPlayerState* PlayerState, TSharedPtr<class SUTTabWidget> TabWidget, TArray<TSharedPtr<struct TAttributeStat> >& StatList) override;
+	virtual void BuildBetrayalInfo(AUTPlayerState* PlayerState, TSharedPtr<class SUTTabWidget> TabWidget, TArray<TSharedPtr<struct TAttributeStat> >& StatList);
 
 	/** called on the default object of this class by the UI to create widgets to manipulate this game type's settings
 	* you can use TAttributeProperty<> to easily implement get/set delegates that map directly to the config property address
