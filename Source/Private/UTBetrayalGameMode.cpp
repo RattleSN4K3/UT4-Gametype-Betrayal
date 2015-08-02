@@ -1,6 +1,6 @@
 #include "UTBetrayal.h"
 #include "UTBetrayalGameMode.h"
-#include "UTBetrayalCharacter.h"
+//#include "UTBetrayalCharacter.h"
 #include "UTBetrayalGameState.h"
 #include "UTBetrayalPlayerState.h"
 #include "UTBetrayalHUD.h"
