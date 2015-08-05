@@ -94,20 +94,25 @@ Compile the solution with either target for the desired version.
 
 ## Testing
 
-- Editor  
-  If you are using the specific changelist, as specified in the [CHANGELIST.editor](CHANGELIST.editor) file, you can use the compiled source with the editor by just copying the binary file and the content into `Plugins` of the Launcher editor (_Editor target_ required): `UnrealTournamentEditor\UnrealTournament\Plugins`
-- Client/Server  
-  0. Hex-modify the specific binary file with the changelist specified in [CHANGELIST.editor](CHANGELIST.editor) to the changelist specified in [CHANGELIST.client](CHANGELIST.client)
-  0. Browse to `Engine\Build\BatchFiles`
-  0. Run the build automation tool with:  
+With the current build, _Unreal Tournament Editor_ differs from the client version. Because of that, the compiled version for the editor cannot be used with the client build. You need to compile the source code for each specific version or use the workaround in order o run the compiled editor version with the client build.
+
+### Editor
+
+If you are using the specific changelist, as specified in the [CHANGELIST.editor](CHANGELIST.editor) file, you can use the compiled source with the editor by just copying the binary file and the content into `Plugins` of the Launcher editor (_Editor target_ required): `UnrealTournamentEditor\UnrealTournament\Plugins`
+
+### Client/Server  
+
+0. Hex-modify the specific binary file with the changelist specified in [CHANGELIST.editor](CHANGELIST.editor) to the changelist specified in [CHANGELIST.client](CHANGELIST.client)
+0. Browse to `Engine\Build\BatchFiles`
+0. Run the build automation tool with:  
      - Windows: `RunUAT.bat MakeUTDLC -DLCName=UTBetrayal -platform=Win64 -version=3008041`
-  0. Wait until cooking process is done (could take a while)
-  0. After cooking is done, the package plugin can be found under:
-     - Windows: `UnrealTournament\Saved\StagedBuilds\UTBetrayal\Win64\UnrealTournament\Plugins\UTBetrayal`
-  0. Copy the files the the launcher plugin folder. %plugindir% would be `UnrealTournamentDev\UnrealTournament\Plugins\UTBetrayal`.
-     - Copy the plugin descriptor file `UTBetrayal.uplugin` to `%plugindir%`\
-     - Copy the binary files to `%plugindir%\Binaries`
-     - Copy the cooked PAK file to `%plugindir%\Content\Paks`
+0. Wait until cooking process is done (could take a while)
+0. After cooking is done, the package plugin can be found under:
+   - Windows: `UnrealTournament\Saved\StagedBuilds\UTBetrayal\Win64\UnrealTournament\Plugins\UTBetrayal`
+0. Copy the files the the launcher plugin folder. %plugindir% would be `UnrealTournamentDev\UnrealTournament\Plugins\UTBetrayal`.
+   - Copy the plugin descriptor file `UTBetrayal.uplugin` to `%plugindir%`\
+   - Copy the binary files to `%plugindir%\Binaries`
+   - Copy the cooked PAK file to `%plugindir%\Content\Paks`
 
 # Author
 RattleSN4K3
