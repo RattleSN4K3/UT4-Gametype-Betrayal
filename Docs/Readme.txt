@@ -1,14 +1,14 @@
 =============================================================================
  Betrayal for UT4
- August 5, 2015
- Version: 0.1
+ August 6, 2015
+ Version: 0.1.1
  ----------------------------------------------------------------------------
  Cooperate to get bonus points. Betray your team to keep them.
 =============================================================================
  Game: Unreal Tournament (UE4)
- Size: ~ 1.64 MB
- Version: 0.1
- Compatibility: Build 2637632 (7/29/2015)
+ Size: ~ 1.25 - 7.88 MB
+ Version: 0.1.1
+ Compatibility: Build 2634754 (7/29/2015)
  Type: C++
  Credits: Epic Games
 -----------------------------------------------------------------------------

@@ -113,9 +113,11 @@ If you are using the specific changelist, as specified in the [CHANGELIST.editor
 0. Browse to `Engine\Build\BatchFiles`
 0. Run the build automation tool with:  
      - Windows: `RunUAT.bat MakeUTDLC -DLCName=UTBetrayal -platform=Win64 -version=3008041`
+     - Linux: `RunUAT.bat MakeUTDLC -DLCName=UTBetrayal -platform=Linux -version=3008041`
 0. Wait until cooking process is done (could take a while)
-0. After cooking is done, the package plugin can be found under:
-   - Windows: `UnrealTournament\Saved\StagedBuilds\UTBetrayal\Win64\UnrealTournament\Plugins\UTBetrayal`
+0. After cooking is done, the cooked and staged content package of this plugin can be found under:
+   - Windows: `UnrealTournament\Saved\StagedBuilds\UTBetrayal\WindowsNoEditor\UnrealTournament\Content\Paks`
+   - Linux: `UnrealTournament\Saved\StagedBuilds\UTBetrayal\LinuxNoEditor\UnrealTournament\Content\Paks`
 0. Copy the files the the launcher plugin folder. %plugindir% would be `UnrealTournamentDev\UnrealTournament\Plugins\UTBetrayal`.
    - Copy the plugin descriptor file `UTBetrayal.uplugin` to `%plugindir%\`
    - Copy the binary files to `%plugindir%\Binaries\`
