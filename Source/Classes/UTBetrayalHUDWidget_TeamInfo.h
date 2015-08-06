@@ -149,7 +149,7 @@ protected:
 	* @param NameplateColor		linear color for the background texture
 	* @param WordHeight			height of the nameplate (already accounts for resolution)
 	*/
-	virtual void UUTBetrayalHUDWidget_TeamInfo::DrawNameplateBackground(FVector2D Pos, float WordWidth, FLinearColor NameplateColor, float WordHeight = 0.0);
+	virtual void DrawNameplateBackground(FVector2D Pos, float WordWidth, FLinearColor NameplateColor, float WordHeight = 0.0);
 	
 	/**
 	* Draws the nameplate behind the teammate names/daggers

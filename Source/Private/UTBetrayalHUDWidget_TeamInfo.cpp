@@ -205,10 +205,10 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 		{
 			// TODO: use Localization?
 			FString DaggerString = FString::Printf(TEXT("x%i"), NumRawDaggers);
-			float XL, YL;
-			Canvas->TextSize(DrawFont, DaggerString, XL, YL);
+			float TempXL, TempYL;
+			Canvas->TextSize(DrawFont, DaggerString, TempXL, TempYL);
 
-			NumDaggersWidth = XL + DaggerSpacing + DaggerWidth;
+			NumDaggersWidth = TempXL + DaggerSpacing + DaggerWidth;
 			bDrawRaw = true;
 		}
 		else
