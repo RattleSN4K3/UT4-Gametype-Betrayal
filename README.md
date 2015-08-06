@@ -43,24 +43,31 @@ __Method 2:__
 
 
 # Preview
-
-Beacon above players (with transparency):  
-<img src="Screenshots/1/Beacon.jpg" height="360px">
-
-Team Players with bright skin:  
-<img src="Screenshots/1/Brightskin.jpg" height="360px">  
+Betrayal fire modes:  
+<img src="Screenshots/2/Betrayal1.jpg" width="30%">
+<img src="Screenshots/2/Betrayal2.jpg" width="30%">
 
 General HUD:  
-<img src="Screenshots/1/HUD.jpg" height="360px">  
+<img src="Screenshots/2/HUD1.jpg" width="30%">
+<img src="Screenshots/2/HUD2.jpg" width="30%">
 
-Game Messages:  
-<img src="Screenshots/1/Messages.jpg" height="360px">  
+Various beacons above players (with transparency):  
+<img src="Screenshots/2/Beacons1.jpg" width="30%">
+<img src="Screenshots/2/Beacons2.jpg" width="30%">
+<img src="Screenshots/2/Beacons3.jpg" width="30%x">
 
 Scoreboard with highlighted team mates:  
-<img src="Screenshots/1/Scoreboard.jpg" height="360px">  
+<img src="Screenshots/2/Scoreboard1.jpg" width="30%x">
+<img src="Screenshots/2/Scoreboard2.jpg" width="30%x">
 
-Player card with additional stats for Betrayal:  
-<img src="Screenshots/1/Playercard.jpg" height="360px">
+Game Messages:  
+<img src="Screenshots/2/Messages.jpg" width="60%x">
+
+Team Players with bright skin:  
+<img src="Screenshots/2/Brightskin.jpg" width="60%x">
+
+Player card with additional stats for Betrayal:
+<img src="Screenshots/2/Playercard.jpg" width="60%x">
 
 
 # Compiling
@@ -110,9 +117,9 @@ If you are using the specific changelist, as specified in the [CHANGELIST.editor
 0. After cooking is done, the package plugin can be found under:
    - Windows: `UnrealTournament\Saved\StagedBuilds\UTBetrayal\Win64\UnrealTournament\Plugins\UTBetrayal`
 0. Copy the files the the launcher plugin folder. %plugindir% would be `UnrealTournamentDev\UnrealTournament\Plugins\UTBetrayal`.
-   - Copy the plugin descriptor file `UTBetrayal.uplugin` to `%plugindir%`\
-   - Copy the binary files to `%plugindir%\Binaries`
-   - Copy the cooked PAK file to `%plugindir%\Content\Paks`
+   - Copy the plugin descriptor file `UTBetrayal.uplugin` to `%plugindir%\`
+   - Copy the binary files to `%plugindir%\Binaries\`
+   - Copy the cooked PAK file to `%plugindir%\Content\Paks\`
 
 # Author
 RattleSN4K3
