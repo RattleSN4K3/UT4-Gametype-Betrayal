@@ -123,6 +123,6 @@ public:
 	**/
 	virtual void BuildServerResponseRules(FString& OutRules) override;
 	
-	virtual void GetGameURLOptions(TArray<FString>& OptionsList, int32& DesiredPlayerCount) override;
+	virtual void GetGameURLOptions(const TArray<TSharedPtr<TAttributePropertyBase>>& MenuProps, TArray<FString>& OptionsList, int32& DesiredPlayerCount) override;
 
 };

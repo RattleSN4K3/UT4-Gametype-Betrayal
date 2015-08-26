@@ -96,21 +96,21 @@ class UUTBetrayalMessage : public UUTLocalMessage
 		// TODO: Add support for dynamic music
 		if (ClientData.MessageIndex == 1)
 		{
-			PC->Announcer->PlayAnnouncement(GetClass(), ClientData.MessageIndex, ClientData.OptionalObject);
+			PC->Announcer->PlayAnnouncement(GetClass(), ClientData.MessageIndex, ClientData.RelatedPlayerState_1, ClientData.RelatedPlayerState_2, ClientData.OptionalObject);
 		}
 		else if (ClientData.MessageIndex == 0)
 		{
-			PC->Announcer->PlayAnnouncement(GetClass(), ClientData.MessageIndex, ClientData.OptionalObject);
+			PC->Announcer->PlayAnnouncement(GetClass(), ClientData.MessageIndex, ClientData.RelatedPlayerState_1, ClientData.RelatedPlayerState_2, ClientData.OptionalObject);
 			//PC->ClientMusicEvent(10);
 		}
 		else if ((ClientData.MessageIndex == 2) || (ClientData.MessageIndex == 3))
 		{
-			PC->Announcer->PlayAnnouncement(GetClass(), ClientData.MessageIndex, ClientData.OptionalObject);
+			PC->Announcer->PlayAnnouncement(GetClass(), ClientData.MessageIndex, ClientData.RelatedPlayerState_1, ClientData.RelatedPlayerState_2, ClientData.OptionalObject);
 			//PC->ClientMusicEvent(10);
 		}
 		else if (ClientData.MessageIndex == 5)
 		{
-			PC->Announcer->PlayAnnouncement(GetClass(), ClientData.MessageIndex, ClientData.OptionalObject);
+			PC->Announcer->PlayAnnouncement(GetClass(), ClientData.MessageIndex, ClientData.RelatedPlayerState_1, ClientData.RelatedPlayerState_2, ClientData.OptionalObject);
 			//PC->ClientMusicEvent(14);
 		}
 	}
@@ -167,7 +167,7 @@ class UUTBetrayalMessage : public UUTLocalMessage
 		return ToAnnouncementName(TEXT("BetrayalKillSound"));
 	}
 	
-	virtual FLinearColor GetMessageColor(int32 MessageIndex) const override
+	virtual FLinearColor GetMessageColor_Implementation(int32 MessageIndex) const override
 	{
 		if ((MessageIndex == 1) || (MessageIndex == 5))
 		{

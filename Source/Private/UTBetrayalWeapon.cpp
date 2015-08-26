@@ -3,11 +3,15 @@
 #include "UTBetrayalPlayerState.h"
 #include "UTBetrayalGameMode.h"
 #include "UTBetrayalBot.h"
-#include "StatNames.h"
+//#include "StatNames.h"
 
 AUTBetrayalWeapon::AUTBetrayalWeapon(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	//@TODO: use stat names from StatNames.h
+	static FName NAME_InstagibKills(TEXT("InstagibKills"));
+	static FName NAME_InstagibDeaths(TEXT("InstagibDeaths"));
+
 	KillStatsName = NAME_InstagibKills;
 	DeathStatsName = NAME_InstagibDeaths;
 }
@@ -24,7 +28,7 @@ void AUTBetrayalWeapon::FireInstantHit(bool bDealDamage, FHitResult* OutHit)
 	FHitResult Hit;
 	AUTPlayerController* UTPC = UTOwner ? Cast<AUTPlayerController>(UTOwner->Controller) : NULL;
 	float PredictionTime = UTPC ? UTPC->GetPredictionTime() : 0.f;
-	HitScanTrace(SpawnLocation, EndTrace, Hit, PredictionTime);
+	HitScanTrace(SpawnLocation, EndTrace, InstantHitInfo[CurrentFireMode].TraceHalfSize, Hit, PredictionTime);
 
 	if (bDealDamage && Role == ROLE_Authority && Instigator != NULL)
 	{

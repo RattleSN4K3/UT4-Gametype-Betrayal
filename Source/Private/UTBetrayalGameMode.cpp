@@ -520,9 +520,9 @@ void AUTBetrayalGameMode::BuildServerResponseRules(FString& OutRules)
 	OutRules += FString::Printf(TEXT("Rogue time penalty\t%i\t"), AUTBetrayalPlayerState::StaticClass()->GetDefaultObject<AUTBetrayalPlayerState>()->RogueTimePenalty);
 }
 
-void AUTBetrayalGameMode::GetGameURLOptions(TArray<FString>& OptionsList, int32& DesiredPlayerCount)
+void AUTBetrayalGameMode::GetGameURLOptions(const TArray<TSharedPtr<TAttributePropertyBase>>& MenuProps, TArray<FString>& OptionsList, int32& DesiredPlayerCount)
 {
-	Super::GetGameURLOptions(OptionsList, DesiredPlayerCount);
+	Super::GetGameURLOptions(MenuProps, OptionsList, DesiredPlayerCount);
 
 	// Remove ForceRespawn option
 	for (int32 i = 0; i < OptionsList.Num(); i++)
