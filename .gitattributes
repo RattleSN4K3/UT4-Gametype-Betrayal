@@ -1,0 +1,9 @@
+*.bat eol=crlf
+
+*.cpp eol=crlf
+*.h eol=crlf
+
+*.cs eol=crlf
+*.vb eol=crlf
+
+
