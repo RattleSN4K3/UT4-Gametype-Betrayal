@@ -8,6 +8,13 @@
 AUTBetrayalWeapon::AUTBetrayalWeapon(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	bHideInMenus = true;
+	DroppedPickupClass = NULL;
+
+	AmmoCost.SetNum(2);
+	AmmoCost[0] = 1;
+	AmmoCost[1] = 1;
+
 	//@TODO: use stat names from StatNames.h
 	static FName NAME_InstagibKills(TEXT("InstagibKills"));
 	static FName NAME_InstagibDeaths(TEXT("InstagibDeaths"));
