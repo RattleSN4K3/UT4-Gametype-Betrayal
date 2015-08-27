@@ -19,8 +19,7 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 {
 	DisplayName = NSLOCTEXT("UTGameMode", "BET", "Betrayal");
 
-	static ConstructorHelpers::FObjectFinder<UClass> PlayerPawnObject(TEXT("Class'/UTBetrayal/DefaultCharacter_Betrayal.DefaultCharacter_Betrayal_C'"));
-	DefaultPawnClass = PlayerPawnObject.Object;
+	PlayerPawnObject = FStringAssetReference(TEXT("/UTBetrayal/DefaultCharacter_Betrayal.DefaultCharacter_Betrayal_C"));
 	//DefaultPawnClass = AUTBetrayalCharacter::StaticClass();
 
 	GameStateClass = AUTBetrayalGameState::StaticClass();
