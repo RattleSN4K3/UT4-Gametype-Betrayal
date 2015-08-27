@@ -11,9 +11,15 @@ AUTBetrayalWeapon::AUTBetrayalWeapon(const FObjectInitializer& ObjectInitializer
 	//@TODO: use stat names from StatNames.h
 	static FName NAME_InstagibKills(TEXT("InstagibKills"));
 	static FName NAME_InstagibDeaths(TEXT("InstagibDeaths"));
+	static FName NAME_InstagibHits(TEXT("InstagibHits"));
+	static FName NAME_InstagibShots(TEXT("InstagibShots"));
 
 	KillStatsName = NAME_InstagibKills;
+	AltKillStatsName = NAME_InstagibKills;
 	DeathStatsName = NAME_InstagibDeaths;
+	AltDeathStatsName = NAME_InstagibDeaths;
+	HitsStatsName = NAME_InstagibHits;
+	ShotsStatsName = NAME_InstagibShots;
 }
 
 void AUTBetrayalWeapon::FireInstantHit(bool bDealDamage, FHitResult* OutHit)
