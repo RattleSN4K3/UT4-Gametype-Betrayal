@@ -111,7 +111,6 @@ public:
 	* add any such to the ConfigProps array so the menu maintains the shared pointer
 	*/
 	virtual void CreateConfigWidgets(TSharedPtr<class SVerticalBox> MenuSpace, bool bCreateReadOnly, TArray< TSharedPtr<TAttributePropertyBase> >& ConfigProps) override;
-	//virtual void CreateConfigWidgets(bool bCreateReadOnly, TArray< FGameOptionWidgetInfo >& GameProps) override;
 
 #endif
 
@@ -123,6 +122,9 @@ public:
 	**/
 	virtual void BuildServerResponseRules(FString& OutRules) override;
 	
+	// used to modify list of game options in custom games menu
+	virtual void CreateGameURLOptions(TArray<TSharedPtr<TAttributePropertyBase>>& MenuProps) override;
+
 	virtual void GetGameURLOptions(const TArray<TSharedPtr<TAttributePropertyBase>>& MenuProps, TArray<FString>& OptionsList, int32& DesiredPlayerCount) override;
 
 };

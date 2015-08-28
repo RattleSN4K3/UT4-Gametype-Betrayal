@@ -13,6 +13,7 @@
 #include "UTMutator_WeaponReplacement.h"
 
 #include "Private/Slate/Widgets/SUTTabWidget.h"
+#include "SNumericEntryBox.h"
 
 AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
@@ -442,6 +443,176 @@ void AUTBetrayalGameMode::ScoreKill_Implementation(AController* Killer, AControl
 	Super::ScoreKill_Implementation(Killer, Other, KilledPawn, DamageType);
 }
 
+void AUTBetrayalGameMode::CreateConfigWidgets(TSharedPtr<class SVerticalBox> MenuSpace, bool bCreateReadOnly, TArray< TSharedPtr<TAttributePropertyBase> >& ConfigProps)
+{
+	// TEMP: OVERRIDEN IN ORDER TO PREVENT CRASH
+	//Super::CreateConfigWidgets(MenuSpace, bCreateReadOnly, ConfigProps);
+
+
+	// TODO: REMOVE: TEMP: Copied from UTGameMode::CreateConfigWidgets
+	//       this will prevent a crash as ForceRespawn is removed. Causing accessing null pointer
+	// // *
+	CreateGameURLOptions(ConfigProps);
+
+	TSharedPtr< TAttributeProperty<int32> > TimeLimitAttr = StaticCastSharedPtr<TAttributeProperty<int32>>(FindGameURLOption(ConfigProps, TEXT("TimeLimit")));
+	TSharedPtr< TAttributeProperty<int32> > GoalScoreAttr = StaticCastSharedPtr<TAttributeProperty<int32>>(FindGameURLOption(ConfigProps, TEXT("GoalScore")));
+	TSharedPtr< TAttributeProperty<int32> > CombatantsAttr = StaticCastSharedPtr<TAttributeProperty<int32>>(FindGameURLOption(ConfigProps, TEXT("BotFill")));
+
+	if (CombatantsAttr.IsValid())
+	{
+		MenuSpace->AddSlot()
+		.AutoHeight()
+		.VAlign(VAlign_Top)
+		.Padding(0.0f, 0.0f, 0.0f, 5.0f)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.Padding(0.0f, 5.0f, 0.0f, 0.0f)
+			[
+				SNew(SBox)
+				.WidthOverride(350)
+				[
+					SNew(STextBlock)
+					.TextStyle(SUWindowsStyle::Get(), "UT.Common.NormalText")
+					.Text(NSLOCTEXT("UTGameMode", "NumCombatants", "Number of Combatants"))
+				]
+			]
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.Padding(20.0f, 0.0f, 0.0f, 0.0f)
+			[
+				SNew(SBox)
+				.WidthOverride(300)
+				[
+					bCreateReadOnly ?
+					StaticCastSharedRef<SWidget>(
+					SNew(STextBlock)
+					.TextStyle(SUWindowsStyle::Get(), "UT.Common.ButtonText.White")
+					.Text(CombatantsAttr.ToSharedRef(), &TAttributeProperty<int32>::GetAsText)
+					) :
+					StaticCastSharedRef<SWidget>(
+					SNew(SNumericEntryBox<int32>)
+					.Value(CombatantsAttr.ToSharedRef(), &TAttributeProperty<int32>::GetOptional)
+					.OnValueChanged(CombatantsAttr.ToSharedRef(), &TAttributeProperty<int32>::Set)
+					.AllowSpin(true)
+					.Delta(1)
+					.MinValue(1)
+					.MaxValue(32)
+					.MinSliderValue(1)
+					.MaxSliderValue(32)
+					.EditableTextBoxStyle(SUWindowsStyle::Get(), "UT.Common.NumEditbox.White")
+
+					)
+				]
+			]
+		];
+	}
+
+	if (GoalScoreAttr.IsValid())
+	{
+		MenuSpace->AddSlot()
+		.AutoHeight()
+		.VAlign(VAlign_Top)
+		.Padding(0.0f, 0.0f, 0.0f, 5.0f)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.VAlign(VAlign_Center)
+			[
+				SNew(SBox)
+				.WidthOverride(350)
+				[
+					SNew(STextBlock)
+					.TextStyle(SUWindowsStyle::Get(), "UT.Common.NormalText")
+					.Text(NSLOCTEXT("UTGameMode", "GoalScore", "Goal Score"))
+				]
+			]
+			+ SHorizontalBox::Slot()
+			.Padding(20.0f, 0.0f, 0.0f, 0.0f)
+			.AutoWidth()
+			[
+				SNew(SBox)
+				.WidthOverride(300)
+				[
+					bCreateReadOnly ?
+					StaticCastSharedRef<SWidget>(
+					SNew(STextBlock)
+					.TextStyle(SUWindowsStyle::Get(), "UT.Common.ButtonText.White")
+					.Text(GoalScoreAttr.ToSharedRef(), &TAttributeProperty<int32>::GetAsText)
+					) :
+					StaticCastSharedRef<SWidget>(
+					SNew(SNumericEntryBox<int32>)
+					.Value(GoalScoreAttr.ToSharedRef(), &TAttributeProperty<int32>::GetOptional)
+					.OnValueChanged(GoalScoreAttr.ToSharedRef(), &TAttributeProperty<int32>::Set)
+					.AllowSpin(true)
+					.Delta(1)
+					.MinValue(0)
+					.MaxValue(999)
+					.MinSliderValue(0)
+					.MaxSliderValue(99)
+					.EditableTextBoxStyle(SUWindowsStyle::Get(), "UT.Common.NumEditbox.White")
+					)
+				]
+			]
+		];
+	}
+
+	if (TimeLimitAttr.IsValid())
+	{
+		MenuSpace->AddSlot()
+		.AutoHeight()
+		.VAlign(VAlign_Top)
+		.Padding(0.0f, 0.0f, 0.0f, 5.0f)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.VAlign(VAlign_Center)
+			[
+				SNew(SBox)
+				.WidthOverride(350)
+				[
+					SNew(STextBlock)
+					.TextStyle(SUWindowsStyle::Get(), "UT.Common.NormalText")
+					.Text(NSLOCTEXT("UTGameMode", "TimeLimit", "Time Limit"))
+				]
+			]
+			+ SHorizontalBox::Slot()
+			.Padding(20.0f, 0.0f, 0.0f, 0.0f)
+			.AutoWidth()
+			[
+				SNew(SBox)
+				.WidthOverride(300)
+				[
+					bCreateReadOnly ?
+					StaticCastSharedRef<SWidget>(
+					SNew(STextBlock)
+					.TextStyle(SUWindowsStyle::Get(), "UT.Common.ButtonText.White")
+					.Text(TimeLimitAttr.ToSharedRef(), &TAttributeProperty<int32>::GetAsText)
+					) :
+					StaticCastSharedRef<SWidget>(
+					SNew(SNumericEntryBox<int32>)
+					.Value(TimeLimitAttr.ToSharedRef(), &TAttributeProperty<int32>::GetOptional)
+					.OnValueChanged(TimeLimitAttr.ToSharedRef(), &TAttributeProperty<int32>::Set)
+					.AllowSpin(true)
+					.Delta(1)
+					.MinValue(0)
+					.MaxValue(999)
+					.MinSliderValue(0)
+					.MaxSliderValue(60)
+					.EditableTextBoxStyle(SUWindowsStyle::Get(), "UT.Common.NumEditbox.White")
+					)
+				]
+			]
+		];
+	}
+	// * //
+
+	// TODO: add menu widgets for changing additional game options
+}
+
 #if !UE_SERVER
 
 void AUTBetrayalGameMode::BuildPlayerInfo(AUTPlayerState* PlayerState, TSharedPtr<SUTTabWidget> TabWidget, TArray<TSharedPtr<TAttributeStat> >& StatList)
@@ -497,29 +668,6 @@ void AUTBetrayalGameMode::BuildBetrayalInfo(AUTPlayerState* PlayerState, TShared
 	}
 }
 
-void AUTBetrayalGameMode::CreateConfigWidgets(TSharedPtr<class SVerticalBox> MenuSpace, bool bCreateReadOnly, TArray< TSharedPtr<TAttributePropertyBase> >& ConfigProps)
-//void AUTBetrayalGameMode::CreateConfigWidgets(bool bCreateReadOnly, TArray< FGameOptionWidgetInfo >& GameProps)
-{
-	Super::CreateConfigWidgets(MenuSpace, bCreateReadOnly, ConfigProps);
-	//Super::CreateConfigWidgets(bCreateReadOnly, GameProps);
-
-	// TODO: Remove ForceRespawn menu option
-	//// Remove ForceRespawn config option
-	//for (int32 i = 0; i < GameProps.Num(); i++)
-	//{
-	//	if (GameProps[i].ConfigProp.IsValid())
-	//	{
-	//		TAttributePropertyBase* Prop = GameProps[i].ConfigProp.Get();
-	//		if (Prop && Prop->GetURLKey().Equals(TEXT("ForceRespawn")))
-	//		{
-	//			GameProps[i].bRemove = true;
-	//		}
-	//	}
-	//}
-
-	// TODO: add menu widgets for changing additional game options
-}
-
 #endif
 
 FText AUTBetrayalGameMode::BuildServerRules(AUTGameState* GameState)
@@ -541,19 +689,34 @@ void AUTBetrayalGameMode::BuildServerResponseRules(FString& OutRules)
 	Super::BuildServerResponseRules(OutRules);
 }
 
+void AUTBetrayalGameMode::CreateGameURLOptions(TArray<TSharedPtr<TAttributePropertyBase>>& MenuProps)
+{
+	Super::CreateGameURLOptions(MenuProps);
+
+	// Remove ForceRespawn option
+	for (int32 i = MenuProps.Num() - 1; i >= 0; i--)
+	{
+		if (MenuProps[i].IsValid() && MenuProps[i]->GetURLKey().Equals(TEXT("ForceRespawn"), ESearchCase::IgnoreCase))
+		{
+			MenuProps.RemoveAt(i);
+		}
+	}
+}
+
 void AUTBetrayalGameMode::GetGameURLOptions(const TArray<TSharedPtr<TAttributePropertyBase>>& MenuProps, TArray<FString>& OptionsList, int32& DesiredPlayerCount)
 {
 	Super::GetGameURLOptions(MenuProps, OptionsList, DesiredPlayerCount);
 
-	// Remove ForceRespawn option
-	for (int32 i = 0; i < OptionsList.Num(); i++)
-	{
-		if (OptionsList[i].StartsWith(TEXT("bForceRespawn")))
-		{
-			OptionsList.RemoveAt(i);
-			i--;
-		}
-	}
+	// TODO: remove as already handled in CreateGameURLOptions
+	//// Remove ForceRespawn option
+	//for (int32 i = 0; i < OptionsList.Num(); i++)
+	//{
+	//	if (OptionsList[i].StartsWith(TEXT("ForceRespawn")) || OptionsList[i].StartsWith(TEXT("bForceRespawn")))
+	//	{
+	//		OptionsList.RemoveAt(i);
+	//		i--;
+	//	}
+	//}
 
 	// TODO: parameterize additional game options (like allowing Boots, Rogue value, Rogue penalty)
 }
