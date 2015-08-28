@@ -48,16 +48,31 @@ class UUTBetrayalMessage : public UUTLocalMessage
 
 		MessageArea = FName(TEXT("GameMessages")); //MessageArea = 3
 
-		static ConstructorHelpers::FObjectFinder<USoundBase> BetrayalKillSoundFinder(TEXT("SoundWave'/UTBetrayal/Sounds/Announcer/A_RewardAnnouncer_Assassin.A_RewardAnnouncer_Assassin'"));
-		BetrayalKillSound = BetrayalKillSoundFinder.Object;
-		static ConstructorHelpers::FObjectFinder<USoundBase> RetributionSoundFinder(TEXT("SoundWave'/UTBetrayal/Sounds/Announcer/A_RewardAnnouncer_Retribution.A_RewardAnnouncer_Retribution'"));
-		RetributionSound = RetributionSoundFinder.Object;
-		static ConstructorHelpers::FObjectFinder<USoundBase> PaybackSoundFinder(TEXT("SoundWave'/UTBetrayal/Sounds/Announcer/A_RewardAnnouncer_Payback.A_RewardAnnouncer_Payback'"));
-		PaybackSound = PaybackSoundFinder.Object;
-		static ConstructorHelpers::FObjectFinder<USoundBase> JoinTeamSoundFinder(TEXT("SoundWave'/UTBetrayal/Sounds/A_StatusAnnouncer_YouAreOnBlue.A_StatusAnnouncer_YouAreOnBlue'"));
-		JoinTeamSound = JoinTeamSoundFinder.Object;
-		static ConstructorHelpers::FObjectFinder<USoundBase> PaybackAvoidedSoundFinder(TEXT("SoundWave'/UTBetrayal/Sounds/Announcer/A_RewardAnnouncer_Excellent.A_RewardAnnouncer_Excellent'"));
-		PaybackAvoidedSound = PaybackAvoidedSoundFinder.Object;
+		// Structure to hold one-time initialization
+		struct FConstructorStatics
+		{
+			ConstructorHelpers::FObjectFinder<USoundBase> BetrayalKillSound;
+			ConstructorHelpers::FObjectFinder<USoundBase> RetributionSound;
+			ConstructorHelpers::FObjectFinder<USoundBase> PaybackSound;
+			ConstructorHelpers::FObjectFinder<USoundBase> JoinTeamSound;
+			ConstructorHelpers::FObjectFinder<USoundBase> PaybackAvoidedSound;
+
+			FConstructorStatics()
+				: BetrayalKillSound(TEXT("SoundWave'/UTBetrayal/Sounds/Announcer/A_RewardAnnouncer_Assassin.A_RewardAnnouncer_Assassin'"))
+				, RetributionSound(TEXT("SoundWave'/UTBetrayal/Sounds/Announcer/A_RewardAnnouncer_Retribution.A_RewardAnnouncer_Retribution'"))
+				, PaybackSound(TEXT("SoundWave'/UTBetrayal/Sounds/Announcer/A_RewardAnnouncer_Payback.A_RewardAnnouncer_Payback'"))
+				, JoinTeamSound(TEXT("SoundWave'/UTBetrayal/Sounds/A_StatusAnnouncer_YouAreOnBlue.A_StatusAnnouncer_YouAreOnBlue'"))
+				, PaybackAvoidedSound(TEXT("SoundWave'/UTBetrayal/Sounds/Announcer/A_RewardAnnouncer_Excellent.A_RewardAnnouncer_Excellent'"))
+			{
+			}
+		};
+		static FConstructorStatics ConstructorStatics; 
+		
+		BetrayalKillSound = ConstructorStatics.BetrayalKillSound.Object;
+		RetributionSound = ConstructorStatics.RetributionSound.Object;
+		PaybackSound = ConstructorStatics.PaybackSound.Object;
+		JoinTeamSound = ConstructorStatics.JoinTeamSound.Object;
+		PaybackAvoidedSound = ConstructorStatics.PaybackAvoidedSound.Object;
 
 		BetrayalKill = NSLOCTEXT("UTBetrayalMessage", "BetrayalKill", "{Killer} BETRAYED {Killed}!");
 		BetrayalJoinTeam = NSLOCTEXT("UTBetrayalMessage", "BetrayalJoinTeam", "JOINING NEW TEAM");
