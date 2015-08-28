@@ -40,7 +40,7 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 	static FConstructorStatics ConstructorStatics;
 
 
-	DisplayName = NSLOCTEXT("UTGameMode", "BET", "Betrayal");
+	DisplayName = NSLOCTEXT("UTBetrayal", "GameName", "Betrayal");
 
 	PlayerPawnObject.Reset(); // clearing out PlayerPawnObject to prevent InitGame overriding DefaultPawnClass, allowing Blueprint sub-classes specifiying Pawn class
 	DefaultPawnClass = ConstructorStatics.PawnClass.Object;
