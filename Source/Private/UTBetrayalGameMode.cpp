@@ -534,11 +534,11 @@ FText AUTBetrayalGameMode::BuildServerRules(AUTGameState* GameState)
 
 void AUTBetrayalGameMode::BuildServerResponseRules(FString& OutRules)
 {
-	Super::BuildServerResponseRules(OutRules);
-
-	// TODO: Re-order
+	// TODO: proper order
 	OutRules += FString::Printf(TEXT("Rogue Value\t%i\t"), RogueValue);
 	OutRules += FString::Printf(TEXT("Rogue time penalty\t%i\t"), AUTBetrayalPlayerState::StaticClass()->GetDefaultObject<AUTBetrayalPlayerState>()->RogueTimePenalty);
+
+	Super::BuildServerResponseRules(OutRules);
 }
 
 void AUTBetrayalGameMode::GetGameURLOptions(const TArray<TSharedPtr<TAttributePropertyBase>>& MenuProps, TArray<FString>& OptionsList, int32& DesiredPlayerCount)
