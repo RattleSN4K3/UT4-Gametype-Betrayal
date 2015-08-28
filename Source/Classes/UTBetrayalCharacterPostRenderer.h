@@ -3,6 +3,9 @@
 #include "UTBetrayal.h"
 #include "UTBetrayalCharacterPostRenderer.generated.h"
 
+// TODO: Remove class if PostRender works fully reliable
+// Class is not directly used/needed if the character class is a subclass of UTBetrayalCharacter
+
 UCLASS()
 class AUTBetrayalCharacterPostRenderer : public AActor
 {

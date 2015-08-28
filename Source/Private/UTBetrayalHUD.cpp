@@ -1,6 +1,7 @@
 #include "UTBetrayal.h"
 #include "UTBetrayalHUD.h"
 #include "UTBetrayalPlayerState.h"
+#include "UTBetrayalCharacter.h"
 #include "UTBetrayalCharacterPostRenderer.h"
 #include "UTBetrayalCharacterTeamColor.h"
 #include "UTHUD_DM.h"
@@ -163,14 +164,18 @@ void AUTBetrayalHUD::DrawPlayerBeacon(AUTCharacter* P, UCanvas* Canvas, FVector 
 // TODO: TEMP. Remove once Pawn::PostRender is routed to HUD for PlayerBeacon
 void AUTBetrayalHUD::RemovePostRenderedActor(AActor* A)
 {
-	if (AUTCharacter* Char = Cast<AUTCharacter>(A))
+	AUTCharacter* Char = Cast<AUTCharacter>(A); 
+	if (Char != NULL && !Char->IsA(AUTBetrayalCharacter::StaticClass()))
 	{
 		AUTBetrayalCharacterPostRenderer* Render;
 		if (Char->Children.FindItemByClass(&Render))
 		{
 			PostRenderedActors.Remove(Render);
 		}
+	}
 
+	if (Char != NULL)
+	{
 		AUTBetrayalCharacterTeamColor* TeamColor;
 		if (Char->Children.FindItemByClass(&TeamColor))
 		{
@@ -185,9 +190,11 @@ void AUTBetrayalHUD::RemovePostRenderedActor(AActor* A)
 // TODO: TEMP. Remove once Pawn::PostRender is routed to HUD for PlayerBeacon
 void AUTBetrayalHUD::AddPostRenderedActor(AActor* A)
 {
-	if (AUTCharacter* Char = Cast<AUTCharacter>(A))
+	AUTCharacter* Char = Cast<AUTCharacter>(A);
+
+	// Workaround for PostRender routed to HUD
+	if (Char != NULL && !Char->IsA(AUTBetrayalCharacter::StaticClass()))
 	{
-		// Workaround for PostRender routed to HUD
 		// TODO: FIXME: Route PostRender to UTHUD class
 
 		PostRenderedActors.Remove(Char);
@@ -200,11 +207,12 @@ void AUTBetrayalHUD::AddPostRenderedActor(AActor* A)
 				Super::AddPostRenderedActor(PostRenderer);
 			}
 		}
+	}
+	// END Workaround for PostRender routed to HUD
 
-		// END Workaround for PostRender routed to HUD
-
-		// Workaround for applying TeamColor to players
-
+	// Workaround for applying TeamColor to players
+	if (Char != NULL)
+	{
 		if (!Char->Children.FindItemByClass<AUTBetrayalCharacterTeamColor>())
 		{
 			if (AUTBetrayalCharacterTeamColor* TeamColorHelper = GetWorld()->SpawnActor<AUTBetrayalCharacterTeamColor>(AUTBetrayalCharacterTeamColor::StaticClass()))
@@ -212,10 +220,8 @@ void AUTBetrayalHUD::AddPostRenderedActor(AActor* A)
 				TeamColorHelper->Assign(Char, PlayerOwner);
 			}
 		}
-		// END Workaround for applying TeamColor to players
-
-		return;
 	}
+	// END Workaround for applying TeamColor to players
 
 	Super::AddPostRenderedActor(A);
 }

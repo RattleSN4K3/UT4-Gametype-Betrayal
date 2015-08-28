@@ -3,6 +3,9 @@
 #include "UTBetrayalHUD.h"
 #include "UTPlayerCameraManager.h"
 
+// TODO: Remove class if PostRender works fully reliable
+// Class is not directly used/needed if the character class is a subclass of UTBetrayalCharacter
+
 AUTBetrayalCharacterPostRenderer::AUTBetrayalCharacterPostRenderer(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
