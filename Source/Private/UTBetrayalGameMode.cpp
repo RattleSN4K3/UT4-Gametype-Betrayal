@@ -84,11 +84,14 @@ void AUTBetrayalGameMode::InitGame(const FString& MapName, const FString& Option
 	}
 }
 
-void AUTBetrayalGameMode::BeginGame()
+void AUTBetrayalGameMode::BeginPlay()
 {
-	Super::BeginGame();
+	Super::BeginPlay();
 
-	GetWorldTimerManager().SetTimer(TimerHandle_MaybeStartTeam, this, &AUTBetrayalGameMode::MaybeStartTeam, 1.0f, true);
+	if (!GetWorldTimerManager().IsTimerActive(TimerHandle_MaybeStartTeam))
+	{
+		GetWorldTimerManager().SetTimer(TimerHandle_MaybeStartTeam, this, &AUTBetrayalGameMode::MaybeStartTeam, 1.0f, true);
+	}
 }
 
 bool AUTBetrayalGameMode::AllowMutator(TSubclassOf<AUTMutator> MutClass)
