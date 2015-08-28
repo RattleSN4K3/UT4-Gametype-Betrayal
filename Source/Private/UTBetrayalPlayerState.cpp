@@ -9,11 +9,22 @@
 AUTBetrayalPlayerState::AUTBetrayalPlayerState(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	// Structure to hold one-time initialization
+	struct FConstructorStatics
+	{
+		ConstructorHelpers::FObjectFinder<USoundCue> RogueFadingSound;
+
+		FConstructorStatics()
+			: RogueFadingSound(TEXT("SoundCue'/UTBetrayal/Sounds/UT3ServerSignOut_Cue.UT3ServerSignOut_Cue'"))
+		{
+		}
+	};
+	static FConstructorStatics ConstructorStatics;
+
 	RemainingRogueTime = -1000;
 	RogueTimePenalty = 30;
 
-	static ConstructorHelpers::FObjectFinder<USoundCue> RogueFadingSoundFinder(TEXT("SoundCue'/UTBetrayal/Sounds/UT3ServerSignOut_Cue.UT3ServerSignOut_Cue'"));
-	RogueFadingSound = RogueFadingSoundFinder.Object;
+	RogueFadingSound = ConstructorStatics.RogueFadingSound.Object;
 }
 
 void AUTBetrayalPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const

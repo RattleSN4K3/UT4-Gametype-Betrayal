@@ -17,10 +17,36 @@
 AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
 {
+	// Structure to hold one-time initialization
+	struct FConstructorStatics
+	{
+		ConstructorHelpers::FObjectFinder<UClass> PawnClass;
+		ConstructorHelpers::FObjectFinder<UClass> InstaGibRifleClass;
+
+		ConstructorHelpers::FObjectFinder<USoundCue> BetrayingSoundAsset;
+		ConstructorHelpers::FObjectFinder<USoundCue> BetrayedSoundAsset;
+		ConstructorHelpers::FObjectFinder<USoundCue> JoinTeamSoundAsset;
+
+		FConstructorStatics()
+			: PawnClass(TEXT("Class'/UTBetrayal/DefaultCharacter_Betrayal.DefaultCharacter_Betrayal_C'"))
+			, InstaGibRifleClass(TEXT("Class'/UTBetrayal/BP_InstagibRifle_Betrayal.BP_InstagibRifle_Betrayal_C'")) // Class'/Game/RestrictedAssets/Weapons/ShockRifle/BP_InstagibRifle.BP_InstagibRifle_C'
+
+			, BetrayingSoundAsset(TEXT("SoundCue'/UTBetrayal/Sounds/A_Gameplay_CTF_EnemyFlagGrab_Cue.A_Gameplay_CTF_EnemyFlagGrab_Cue'"))
+			, BetrayedSoundAsset(TEXT("SoundCue'/UTBetrayal/Sounds/A_Gameplay_CTF_EnemyFlagReturn_Cue.A_Gameplay_CTF_EnemyFlagReturn_Cue'"))
+			, JoinTeamSoundAsset(TEXT("SoundCue'/UTBetrayal/Sounds/A_Gameplay_CTF_TeamFlagReturn_Cue.A_Gameplay_CTF_TeamFlagReturn_Cue'"))
+		{
+		}
+	};
+	static FConstructorStatics ConstructorStatics;
+
+
 	DisplayName = NSLOCTEXT("UTGameMode", "BET", "Betrayal");
 
-	PlayerPawnObject = FStringAssetReference(TEXT("/UTBetrayal/DefaultCharacter_Betrayal.DefaultCharacter_Betrayal_C"));
+	PlayerPawnObject = ConstructorStatics.PawnClass.Object;
+	DefaultPawnClass = ConstructorStatics.PawnClass.Object;
 	//DefaultPawnClass = AUTBetrayalCharacter::StaticClass();
+
+	InstagibRifleClass = ConstructorStatics.InstaGibRifleClass.Object;
 
 	GameStateClass = AUTBetrayalGameState::StaticClass();
 	PlayerStateClass = AUTBetrayalPlayerState::StaticClass();
@@ -33,20 +59,13 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 	// TODO: Option to have PickNewEnemy/IsTeammate as Squad/BotDecisionComponent (Pull request?)
 	BotClass = AUTBetrayalBot::StaticClass();
 
-	//static ConstructorHelpers::FObjectFinder<UClass> InstagibRifle(TEXT("Class'/Game/RestrictedAssets/Weapons/ShockRifle/BP_InstagibRifle.BP_InstagibRifle_C'"));
-	static ConstructorHelpers::FObjectFinder<UClass> InstagibRifle(TEXT("Class'/UTBetrayal/BP_InstagibRifle_Betrayal.BP_InstagibRifle_Betrayal_C'"));
-	InstagibRifleClass = InstagibRifle.Object;
-
 	bForceRespawn = true;
 
 	RogueValue = 6;
 
-	static ConstructorHelpers::FObjectFinder<USoundCue> BetrayingSoundAsset(TEXT("SoundCue'/UTBetrayal/Sounds/A_Gameplay_CTF_EnemyFlagGrab_Cue.A_Gameplay_CTF_EnemyFlagGrab_Cue'"));
-	static ConstructorHelpers::FObjectFinder<USoundCue> BetrayedSoundAsset(TEXT("SoundCue'/UTBetrayal/Sounds/A_Gameplay_CTF_EnemyFlagReturn_Cue.A_Gameplay_CTF_EnemyFlagReturn_Cue'"));
-	static ConstructorHelpers::FObjectFinder<USoundCue> JoinTeamSoundAsset(TEXT("SoundCue'/UTBetrayal/Sounds/A_Gameplay_CTF_TeamFlagReturn_Cue.A_Gameplay_CTF_TeamFlagReturn_Cue'"));
-	BetrayingSound = BetrayingSoundAsset.Object;
-	BetrayedSound = BetrayedSoundAsset.Object;
-	JoinTeamSound = JoinTeamSoundAsset.Object;
+	BetrayingSound = ConstructorStatics.BetrayingSoundAsset.Object;
+	BetrayedSound = ConstructorStatics.BetrayedSoundAsset.Object;
+	JoinTeamSound = ConstructorStatics.JoinTeamSoundAsset.Object;
 }
 
 void AUTBetrayalGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)

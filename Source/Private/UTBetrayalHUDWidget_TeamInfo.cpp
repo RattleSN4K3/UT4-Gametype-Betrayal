@@ -6,6 +6,21 @@
 UUTBetrayalHUDWidget_TeamInfo::UUTBetrayalHUDWidget_TeamInfo(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
 {
+	// Structure to hold one-time initialization
+	struct FConstructorStatics
+	{
+		ConstructorHelpers::FObjectFinder<UTexture2D> HudTexture;
+		ConstructorHelpers::FObjectFinder<UFont> NameFont;
+
+		FConstructorStatics()
+			: HudTexture(TEXT("Texture2D'/UTBetrayal/Textures/HUDIcons.HUDIcons'"))
+			, NameFont(TEXT("Font'/Engine/EngineFonts/Roboto.Roboto'"))
+		{
+		}
+	};
+	static FConstructorStatics ConstructorStatics;
+
+
 	Position = FVector2D(-5.0f, 5.0f);
 	Size = FVector2D(180.0f, 43.0f);
 	ScreenPosition = FVector2D(0.5f, 0.0f);
@@ -44,14 +59,11 @@ UUTBetrayalHUDWidget_TeamInfo::UUTBetrayalHUDWidget_TeamInfo(const FObjectInitia
 	SilverLinearColor = FLinearColor(0.75f, 0.75f, 0.75f, 1.0f);
 	BlackBackgroundColor = FLinearColor(0.7f, 0.7f, 0.7f, 0.7f);
 
-	static ConstructorHelpers::FObjectFinder<UTexture2D> UT3GHudTextureObj(TEXT("Texture2D'/UTBetrayal/Textures/HUDIcons.HUDIcons'"));
-	UT3GHudTexture = UT3GHudTextureObj.Object;
-
-	static ConstructorHelpers::FObjectFinder<UFont> NameFontObj(TEXT("Font'/Engine/EngineFonts/Roboto.Roboto'"));
-	if (NameFontObj.Object != NULL)
+	UT3GHudTexture = ConstructorStatics.HudTexture.Object;
+	if (ConstructorStatics.NameFont.Object != NULL)
 	{
 		bOverrideNameFont = true;
-		NameFont = NameFontObj.Object;
+		NameFont = ConstructorStatics.NameFont.Object;
 	}
 
 	PotString = NSLOCTEXT("UTBetrayalHud", "PotString", "Pot {Pot}");

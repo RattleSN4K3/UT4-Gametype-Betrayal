@@ -11,6 +11,20 @@
 AUTBetrayalHUD::AUTBetrayalHUD(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+	// Structure to hold one-time initialization
+	struct FConstructorStatics
+	{
+		ConstructorHelpers::FObjectFinder<UFont> BeaconFont;
+		ConstructorHelpers::FObjectFinder<UTexture2D> HudTexture;
+
+		FConstructorStatics()
+			: BeaconFont(TEXT("Font'/Engine/EngineFonts/Roboto.Roboto'"))
+			, HudTexture(TEXT("Texture2D'/UTBetrayal/Textures/HUDIcons.HUDIcons'"))
+		{
+		}
+	};
+	static FConstructorStatics ConstructorStatics;
+
 	RequiredHudWidgetClasses = AUTHUD_DM::StaticClass()->GetDefaultObject<AUTHUD_DM>()->RequiredHudWidgetClasses;
 
 	RequiredHudWidgetClasses.Remove(TEXT("/Script/UnrealTournament.UTHUDWidget_WeaponCrosshair"));
@@ -33,11 +47,8 @@ AUTBetrayalHUD::AUTBetrayalHUD(const FObjectInitializer& ObjectInitializer)
 	BackgroundDefaultColor = FLinearColor(1.0f, 1.0f, 1.0f, 0.5f);
 	BackgroundTeamColor = FLinearColor(0.5f, 0.8f, 10.f, 0.8f);
 
-	static ConstructorHelpers::FObjectFinder<UFont> BeaconFontObj(TEXT("Font'/Engine/EngineFonts/Roboto.Roboto'"));
-	BeaconFont = BeaconFontObj.Object != NULL ? BeaconFontObj.Object : MediumFont;
-
-	static ConstructorHelpers::FObjectFinder<UTexture2D> UT3GHudTextureObj(TEXT("Texture2D'/UTBetrayal/Textures/HUDIcons.HUDIcons'"));
-	UT3GHudTexture = UT3GHudTextureObj.Object;
+	BeaconFont = ConstructorStatics.BeaconFont.Object == NULL ? MediumFont : ConstructorStatics.BeaconFont.Object;
+	UT3GHudTexture = ConstructorStatics.HudTexture.Object;
 
 	BeaconTextureUV = FTextureUVs(137.0, 91.0, 101.0, 34.0);
 

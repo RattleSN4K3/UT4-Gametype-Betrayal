@@ -5,10 +5,20 @@
 UUTBetrayalHUDWidget_Leaderboard::UUTBetrayalHUDWidget_Leaderboard(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
-	static ConstructorHelpers::FObjectFinder<UClass> HudObject(TEXT("Class'/Game/RestrictedAssets/UI/HUDWidgets/bpHW_DMLeaderboard.bpHW_DMLeaderboard_C'"));
+	// Structure to hold one-time initialization
+	struct FConstructorStatics
+	{
+		ConstructorHelpers::FObjectFinder<UClass> HudObject;
 
-	UClass* Cls = HudObject.Object;
-	if (HudObject.Object != NULL && Cls != NULL)
+		FConstructorStatics()
+			: HudObject(TEXT("Class'/Game/RestrictedAssets/UI/HUDWidgets/bpHW_DMLeaderboard.bpHW_DMLeaderboard_C'"))
+		{
+		}
+	};
+	static FConstructorStatics ConstructorStatics;
+
+	UClass* Cls = ConstructorStatics.HudObject.Object;
+	if (ConstructorStatics.HudObject.Object != NULL && Cls != NULL)
 	{
 		UObject* CDO = Cls->GetDefaultObject(false);
 		if (CDO != NULL)

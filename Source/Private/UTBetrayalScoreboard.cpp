@@ -6,6 +6,18 @@
 UUTBetrayalScoreboard::UUTBetrayalScoreboard(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
 {
+	// Structure to hold one-time initialization
+	struct FConstructorStatics
+	{
+		ConstructorHelpers::FObjectFinder<UTexture2D> HudTexture;
+
+		FConstructorStatics()
+			: HudTexture(TEXT("Texture2D'/UTBetrayal/Textures/HUDIcons.HUDIcons'"))
+		{
+		}
+	};
+	static FConstructorStatics ConstructorStatics; 
+	
 	ColumnMedalX = 0.5;
 	ColumnHeaderScoreX = 0.6;
 	ColumnHeaderKillsX = 0.72;
@@ -23,8 +35,7 @@ UUTBetrayalScoreboard::UUTBetrayalScoreboard(const FObjectInitializer& ObjectIni
 	GoldLinearColor = FLinearColor(1.0f, 1.0f, 0.0f, 1.0f);
 	SilverLinearColor = FLinearColor(0.75f, 0.75f, 0.75f, 1.0f);
 
-	static ConstructorHelpers::FObjectFinder<UTexture2D> UT3GHudTextureObj(TEXT("Texture2D'/UTBetrayal/Textures/HUDIcons.HUDIcons'"));
-	UT3GHudTexture = UT3GHudTextureObj.Object;
+	UT3GHudTexture = ConstructorStatics.HudTexture.Object;
 }
 
 void UUTBetrayalScoreboard::DrawScoreHeaders(float RenderDelta, float& YOffset)
