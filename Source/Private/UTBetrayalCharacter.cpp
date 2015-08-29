@@ -157,47 +157,45 @@ void AUTBetrayalCharacter::UpdateBodyColorFlash(float DeltaTime)
 
 void AUTBetrayalCharacter::ApplyCharacterData(TSubclassOf<AUTCharacterContent> CharType)
 {
-	if (!bTeamMaterialHookedOnce)
+	// Try to hook a temp team to this character ...
+	AUTBetrayalGameState* GS = GetWorld()->GetGameState<AUTBetrayalGameState>();
+	AUTPlayerState* PS = Cast<AUTPlayerState>(PlayerState);
+	if (GS != NULL && GS->HookTeam(this, PS))
 	{
-		// Try to hook a temp team to this character ...
-		AUTBetrayalGameState* GS = GetWorld()->GetGameState<AUTBetrayalGameState>();
-		AUTPlayerState* PS = Cast<AUTPlayerState>(PlayerState);
-		if (GS != NULL && GS->HookTeam(this, PS))
+		// ... in order to let ApplyCharacterData use the Team materials
+		Super::ApplyCharacterData(CharType);
+
+		// just clear team
+		GS->UnhookTeam(this, PS);
+
+		// Apply Rim color so Blue team glows from distance
+		for (UMaterialInstanceDynamic* MI : BodyMIs)
 		{
-			bTeamMaterialHookedOnce = true;
-
-			// ... in order to let ApplyCharacterData use the Team materials
-			Super::ApplyCharacterData(CharType);
-
-			// just clear team
-			GS->UnhookTeam(this, PS);
-
-			// Apply Rim color so Blue team glows from distance
-			for (UMaterialInstanceDynamic* MI : BodyMIs)
+			if (MI != NULL)
 			{
-				if (MI != NULL)
-				{
-					MI->SetVectorParameterValue(TEXT("RedTeamRim"), FLinearColor(0.0f, 0.0f, 0.0f));
-					MI->SetVectorParameterValue(TEXT("BlueTeamRim"), FLinearColor(0.0f, 0.0f, 40.0f));
-				}
+				MI->SetVectorParameterValue(TEXT("RedTeamRim"), FLinearColor(0.0f, 0.0f, 0.0f));
+				MI->SetVectorParameterValue(TEXT("BlueTeamRim"), FLinearColor(0.0f, 0.0f, 40.0f));
 			}
 		}
-		else
-		{
-			// fallback: creating teamcolor helper for this character
-			if (!Children.FindItemByClass<AUTBetrayalCharacterTeamColor>())
-			{
-				if (AUTBetrayalCharacterTeamColor* TeamColorHelper = GetWorld()->SpawnActor<AUTBetrayalCharacterTeamColor>(AUTBetrayalCharacterTeamColor::StaticClass()))
-				{
-					TeamColorHelper->Assign(this);
-				}
-			}
+	}
+	else if (!bTeamMaterialHookedOnce)
+	{
+		bTeamMaterialHookedOnce = true;
 
-			Super::ApplyCharacterData(CharType);
+		// fallback: creating teamcolor helper for this character
+		if (!Children.FindItemByClass<AUTBetrayalCharacterTeamColor>())
+		{
+			if (AUTBetrayalCharacterTeamColor* TeamColorHelper = GetWorld()->SpawnActor<AUTBetrayalCharacterTeamColor>(AUTBetrayalCharacterTeamColor::StaticClass()))
+			{
+				TeamColorHelper->Assign(this);
+			}
 		}
+
+		Super::ApplyCharacterData(CharType);
 	}
 	else
 	{
+		// just to be sure character data is set
 		Super::ApplyCharacterData(CharType);
 	}
 
