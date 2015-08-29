@@ -1,6 +1,9 @@
 #include "UTBetrayal.h"
 #include "UTBetrayalCharacter.h"
 #include "UTBetrayalHUD.h"
+#include "UTBetrayalGameState.h"
+#include "UTBetrayalPlayerState.h"
+
 #include "UTPlayerCameraManager.h"
 
 // Betrayal Character is the main character class for Betrayal which is handling all
@@ -98,6 +101,8 @@ AUTBetrayalCharacter::AUTBetrayalCharacter(const FObjectInitializer& ObjectIniti
 	}
 }
 
+// FIXME: PostRender used as workaround. 
+// TODO: TEMP. Remove once Pawn::PostRender is routed to HUD for PlayerBeacon
 void AUTBetrayalCharacter::PostRenderFor(APlayerController* PC, UCanvas* Canvas, FVector CameraPosition, FVector CameraDir)
 {
 	// safety check
@@ -142,4 +147,98 @@ bool AUTBetrayalCharacter::IsPawnVisible(APlayerController* PC, FVector CameraPo
 	}
 
 	return true;
+}
+
+void AUTBetrayalCharacter::UpdateBodyColorFlash(float DeltaTime)
+{
+	// prevent changing color on any hit (for instance falling damage)
+}
+
+void AUTBetrayalCharacter::ApplyCharacterData(TSubclassOf<AUTCharacterContent> CharType)
+{
+	if (!bTeamMaterialHookedOnce)
+	{
+		// Try to hook a temp team to this character ...
+		AUTBetrayalGameState* GS = GetWorld()->GetGameState<AUTBetrayalGameState>();
+		AUTPlayerState* PS = Cast<AUTPlayerState>(PlayerState);
+		if (GS != NULL && GS->HookTeam(this, PS))
+		{
+			bTeamMaterialHookedOnce = true;
+
+			// ... in order to let ApplyCharacterData use the Team materials
+			Super::ApplyCharacterData(CharType);
+
+			// just clear team
+			GS->UnhookTeam(this, PS);
+
+			// Apply Rim color so Blue team glows from distance
+			for (UMaterialInstanceDynamic* MI : BodyMIs)
+			{
+				if (MI != NULL)
+				{
+					MI->SetVectorParameterValue(TEXT("RedTeamRim"), FLinearColor(0.0f, 0.0f, 0.0f));
+					MI->SetVectorParameterValue(TEXT("BlueTeamRim"), FLinearColor(0.0f, 0.0f, 40.0f));
+				}
+			}
+		}
+		else
+		{
+			// TODO: Hook AUTBetrayalCharacterTeamColor helper 
+			Super::ApplyCharacterData(CharType);
+		}
+	}
+	else
+	{
+		Super::ApplyCharacterData(CharType);
+	}
+
+	UpdateTeamColor();
+}
+
+void AUTBetrayalCharacter::UpdateTeamColor()
+{
+	APlayerController* LocalPC = GEngine->GetFirstLocalPlayerController(GetWorld());
+	if (LocalPC == NULL)
+	{
+		UE_LOG(Betrayal, Log, TEXT("Character::UpdateTeamColor - No Local PlayerController"));
+		return;
+	}
+
+	AUTBetrayalPlayerState* PS = Cast<AUTBetrayalPlayerState>(PlayerState);
+	if (PS == NULL)
+	{
+		UE_LOG(Betrayal, Log, TEXT("Character::UpdateTeamColor - Unable to find Betrayal PlayerStateRetry for %s..."), *GetName());
+		return;
+	}
+
+	bool bOnSameTeam = false;
+	if (PS->CurrentTeam != NULL)
+	{
+		if (GetController() == LocalPC || LocalPC->PlayerState == PS)
+		{
+			bOnSameTeam = true;
+		}
+		else
+		{
+			AUTGameState* GS = GetWorld()->GetGameState<AUTGameState>();
+			bOnSameTeam = GS != NULL && GS->OnSameTeam(LocalPC, PS);
+		}
+	}
+
+	ApplyTeamColorFor(bOnSameTeam);
+}
+
+void AUTBetrayalCharacter::ApplyTeamColorFor(bool bIsTeam)
+{
+	for (UMaterialInstanceDynamic* MI : BodyMIs)
+	{
+		if (MI != NULL)
+		{
+			MI->SetScalarParameterValue(TEXT("TeamSelect"), bIsTeam ? 1.0 : 0.0);
+			MI->SetScalarParameterValue(TEXT("FullBodyFlashPct"), bIsTeam ? 0.4 : 1.0);
+
+			// FIXME: TEMP HACK. HitFlashColor used for BrightSkin for team members
+			MI->SetVectorParameterValue(TEXT("HitFlashColor"), bIsTeam ? FLinearColor(0.0f, 0.0f, 1.0f) : FLinearColor(0.f, 0.f, 0.f, 0.f));
+		}
+	}
 }

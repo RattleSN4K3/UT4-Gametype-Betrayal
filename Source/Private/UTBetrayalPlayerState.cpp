@@ -152,36 +152,8 @@ float AUTBetrayalPlayerState::GetTrustWorthiness()
 
 void AUTBetrayalPlayerState::UpdateTeam(AUTBetrayalTeam* Team)
 {
-	APlayerController* PC = GEngine->GetFirstLocalPlayerController(GetWorld());
-	AUTBetrayalGameState* GS = GetWorld()->GetGameState<AUTBetrayalGameState>();
-
-	if (PC != NULL && GS != NULL)
-	{
-		for (FConstPawnIterator It = GetWorld()->GetPawnIterator(); It; ++It)
-		{
-			AUTCharacter* P = Cast<AUTCharacter>(*It);
-			if (P != NULL && !P->bTearOff)
-			{
-				bool bOnSameTeam = Team != NULL && (PC->PlayerState == P->PlayerState || GS->OnSameTeam(PC, P));
-				ApplyTeamColorFor(P, bOnSameTeam);
-			}
-		}
-	}
-}
-
-void AUTBetrayalPlayerState::ApplyTeamColorFor(AUTCharacter* P, bool bIsTeam)
-{
-	const TArray<UMaterialInstanceDynamic*>& BodyMIs = P->GetBodyMIs();
-	for (UMaterialInstanceDynamic* MI : BodyMIs)
-	{
-		if (MI != NULL)
-		{
-			MI->SetScalarParameterValue(TEXT("TeamSelect"), bIsTeam ? 1.0 : 0.0);
-
-			// FIXME: TEMP HACK. HitFlashColor used for BrightSkin for team members
-			MI->SetVectorParameterValue(TEXT("HitFlashColor"), bIsTeam ? FLinearColor(0.0f, 0.0f, 1.0f) : FLinearColor(0.f, 0.f, 0.f, 0.f));
-		}
-	}
+	// for listen server support, call notify team change locally
+	NotifyTeamChanged();
 }
 
 void AUTBetrayalPlayerState::UpdateNemesis(AUTBetrayalPlayerState* PRI)
@@ -210,6 +182,21 @@ void AUTBetrayalPlayerState::UpdateNemesis(AUTBetrayalPlayerState* PRI)
 		{
 			FString PlayerName = NemesisNames.FindRef(BestId);
 			CurrentNemesis = PlayerName;
+		}
+	}
+}
+
+void AUTBetrayalPlayerState::NotifyTeamChanged_Implementation()
+{
+	Super::NotifyTeamChanged_Implementation();
+
+	// notify all other pawns to change the team overlay
+	for (FConstPawnIterator It = GetWorld()->GetPawnIterator(); It; ++It)
+	{
+		AUTBetrayalCharacter* P = Cast<AUTBetrayalCharacter>(*It);
+		if (P != NULL && P->PlayerState != this && !P->bTearOff)
+		{
+			P->NotifyTeamChanged();
 		}
 	}
 }

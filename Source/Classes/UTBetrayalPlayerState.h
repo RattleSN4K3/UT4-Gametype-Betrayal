@@ -44,7 +44,7 @@ public:
 	bool bIsRogue;
 
 	/** Current alliance */
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = NotifyTeamChanged)
 	AUTBetrayalTeam* CurrentTeam;
 
 	/** Last player to betray you */
@@ -103,8 +103,6 @@ public:
 
 	/** Updates player colors for the current team mates and all other players according to their relation */
 	virtual void UpdateTeam(class AUTBetrayalTeam* Team);
-	/** Apply player color for the given player */
-	virtual void ApplyTeamColorFor(AUTCharacter* P, bool bIsTeam);
 
 	/** Updates the Nemesis propertly stating who is the player who kill this player the mode.
 	 *  Using NemesisData and NemesisNames to check for the best player.
@@ -114,5 +112,7 @@ public:
 	 * @see NemesisNames
 	 */
 	virtual void UpdateNemesis(AUTBetrayalPlayerState* PRI);
+
+	virtual void NotifyTeamChanged_Implementation();
 
 };

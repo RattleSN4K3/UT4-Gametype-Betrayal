@@ -28,5 +28,6 @@ public:
 
 	virtual void Assign(AUTCharacter* Char, APlayerController *PC);
 	virtual void UpdateTeamColor();
+	virtual void ApplyTeamColorFor(AUTCharacter* P, bool bIsTeam);
 
 };

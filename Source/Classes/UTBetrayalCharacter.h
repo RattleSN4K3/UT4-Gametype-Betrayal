@@ -16,8 +16,21 @@ class AUTBetrayalCharacter : public AUTCharacter
 {
 	GENERATED_UCLASS_BODY()
 
+	/** set when character materials are already swapped once to team materials */
+	bool bTeamMaterialHookedOnce;
+
 	virtual void PostRenderFor(APlayerController *PC, UCanvas *Canvas, FVector CameraPosition, FVector CameraDir) override;
 
 	/** Checks whether the character is in line-of-sight */
 	virtual bool IsPawnVisible(APlayerController* PC, FVector CameraPosition);
+
+	virtual void ApplyCharacterData(TSubclassOf<class AUTCharacterContent> Data) override;
+
+	virtual void UpdateBodyColorFlash(float DeltaTime) override;
+
+	/** Updates player color according to the relation of the local player */
+	virtual void UpdateTeamColor();
+	/** Apply player color for the given team */
+	virtual void ApplyTeamColorFor(bool bIsTeam);
+
 };

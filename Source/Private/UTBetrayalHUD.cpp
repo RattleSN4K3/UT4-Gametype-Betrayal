@@ -160,8 +160,6 @@ void AUTBetrayalHUD::DrawPlayerBeacon(AUTCharacter* P, UCanvas* Canvas, FVector 
 	Canvas->DrawText(NumFont, NumString, ScreenLoc.X - 0.5*NumXL, BeaconPosY + BeaconPaddingY, FontScale, FontScale, TextRenderInfo); // TODO: add AudioHeight
 }
 
-// FIXME: PostRender used as workaround. 
-// TODO: TEMP. Remove once Pawn::PostRender is routed to HUD for PlayerBeacon
 void AUTBetrayalHUD::RemovePostRenderedActor(AActor* A)
 {
 	AUTCharacter* Char = Cast<AUTCharacter>(A); 
@@ -172,10 +170,7 @@ void AUTBetrayalHUD::RemovePostRenderedActor(AActor* A)
 		{
 			PostRenderedActors.Remove(Render);
 		}
-	}
 
-	if (Char != NULL)
-	{
 		AUTBetrayalCharacterTeamColor* TeamColor;
 		if (Char->Children.FindItemByClass(&TeamColor))
 		{
@@ -186,15 +181,13 @@ void AUTBetrayalHUD::RemovePostRenderedActor(AActor* A)
 	Super::RemovePostRenderedActor(A);
 }
 
-// FIXME: PostRender used as workaround. 
-// TODO: TEMP. Remove once Pawn::PostRender is routed to HUD for PlayerBeacon
 void AUTBetrayalHUD::AddPostRenderedActor(AActor* A)
 {
 	AUTCharacter* Char = Cast<AUTCharacter>(A);
-
-	// Workaround for PostRender routed to HUD
 	if (Char != NULL && !Char->IsA(AUTBetrayalCharacter::StaticClass()))
 	{
+		// Workaround for PostRender routed to HUD
+
 		// TODO: FIXME: Route PostRender to UTHUD class
 
 		PostRenderedActors.Remove(Char);
@@ -207,12 +200,9 @@ void AUTBetrayalHUD::AddPostRenderedActor(AActor* A)
 				Super::AddPostRenderedActor(PostRenderer);
 			}
 		}
-	}
-	// END Workaround for PostRender routed to HUD
+		// END Workaround for PostRender routed to HUD
 
-	// Workaround for applying TeamColor to players
-	if (Char != NULL)
-	{
+		// Workaround for applying TeamColor to players
 		if (!Char->Children.FindItemByClass<AUTBetrayalCharacterTeamColor>())
 		{
 			if (AUTBetrayalCharacterTeamColor* TeamColorHelper = GetWorld()->SpawnActor<AUTBetrayalCharacterTeamColor>(AUTBetrayalCharacterTeamColor::StaticClass()))
@@ -220,8 +210,8 @@ void AUTBetrayalHUD::AddPostRenderedActor(AActor* A)
 				TeamColorHelper->Assign(Char, PlayerOwner);
 			}
 		}
+		// END Workaround for applying TeamColor to players
 	}
-	// END Workaround for applying TeamColor to players
 
 	Super::AddPostRenderedActor(A);
 }

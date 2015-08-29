@@ -1,10 +1,19 @@
 #include "UTBetrayal.h"
 #include "UTBetrayalGameState.h"
 #include "UTBetrayalPlayerState.h"
+#include "UTBetrayalTeamInfoStub.h"
 
 AUTBetrayalGameState::AUTBetrayalGameState(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+}
+
+void AUTBetrayalGameState::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// create temp team to be used to use team materials for overriden materials in applying character data for Betrayal character
+	TempTeamForHook = GetWorld()->SpawnActor<AUTTeamInfo>(AUTBetrayalTeamInfoStub::StaticClass());
 }
 
 bool AUTBetrayalGameState::OnSameTeam(const AActor* Actor1, const AActor* Actor2)
@@ -41,4 +50,25 @@ AUTBetrayalPlayerState* AUTBetrayalGameState::GetBetrayalPRIFor(const AActor* A)
 	}
 
 	return PRI;
+}
+
+bool AUTBetrayalGameState::HookTeam(AUTCharacter* Char, AUTPlayerState* PS)
+{
+	if (Char == NULL || PS == NULL)
+		return false;
+
+	if (PS->Team == NULL && TempTeamForHook != NULL)
+	{
+		PS->Team = TempTeamForHook;
+	}
+
+	return PS->Team != NULL;
+}
+
+void AUTBetrayalGameState::UnhookTeam(AUTCharacter* Char, AUTPlayerState* PS)
+{
+	if (Char != NULL && PS != NULL)
+	{
+		PS->Team = NULL;
+	}
 }

@@ -173,9 +173,6 @@ void AUTBetrayalGameMode::ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AU
 	HitPRI->Betrayer = InstigatorPRI;
 	UUTGameplayStatics::UTPlaySound(GetWorld(), BetrayingSound, InstigatorPRI->GetOwner());
 
-	InstigatorPRI->UpdateNemesis(HitPRI);
-	InstigatorPRI->UpdateTeam(NULL);
-
 	for (APlayerState* PS : GameState->PlayerArray)
 	{
 		AUTBetrayalPlayerState* PRI = Cast<AUTBetrayalPlayerState>(PS);
@@ -200,6 +197,9 @@ void AUTBetrayalGameMode::ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AU
 	//Record a betrayal stat?
 
 	RemoveFromTeam(InstigatorPRI);
+
+	InstigatorPRI->UpdateNemesis(HitPRI);
+	InstigatorPRI->UpdateTeam(NULL);
 
 	if (!Team->IsPendingKillPending())
 	{

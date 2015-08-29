@@ -131,7 +131,23 @@ void AUTBetrayalCharacterTeamColor::UpdateTeamColor()
 		}
 	}
 	
-	PS->ApplyTeamColorFor(RefPawn, bOnSameTeam);
+	ApplyTeamColorFor(RefPawn, bOnSameTeam);
+}
+
+void AUTBetrayalCharacterTeamColor::ApplyTeamColorFor(AUTCharacter* P, bool bIsTeam)
+{
+	const TArray<UMaterialInstanceDynamic*>& BodyMIs = P->GetBodyMIs();
+	for (UMaterialInstanceDynamic* MI : BodyMIs)
+	{
+		if (MI != NULL)
+		{
+			MI->SetScalarParameterValue(TEXT("TeamSelect"), bIsTeam ? 1.0 : 0.0);
+			MI->SetScalarParameterValue(TEXT("FullBodyFlashPct"), bIsTeam ? 0.4 : 1.0);
+
+			// FIXME: TEMP HACK. HitFlashColor used for BrightSkin for team members
+			MI->SetVectorParameterValue(TEXT("HitFlashColor"), bIsTeam ? FLinearColor(0.0f, 0.0f, 1.0f) : FLinearColor(0.f, 0.f, 0.f, 0.f));
+		}
+	}
 }
 
 void AUTBetrayalCharacterTeamColor::OnPawnDied(AController* Killer, const UDamageType* DamageType)
