@@ -207,7 +207,7 @@ void AUTBetrayalHUD::AddPostRenderedActor(AActor* A)
 		{
 			if (AUTBetrayalCharacterTeamColor* TeamColorHelper = GetWorld()->SpawnActor<AUTBetrayalCharacterTeamColor>(AUTBetrayalCharacterTeamColor::StaticClass()))
 			{
-				TeamColorHelper->Assign(Char, PlayerOwner);
+				TeamColorHelper->Assign(Char);
 			}
 		}
 		// END Workaround for applying TeamColor to players

@@ -12,7 +12,6 @@ class AUTBetrayalCharacterTeamColor : public AActor
 protected:
 
 	AUTCharacter* RefPawn;
-	APlayerController* RefPC;
 
 	bool bPawnInitialized;
 
@@ -26,7 +25,7 @@ protected:
 
 public:
 
-	virtual void Assign(AUTCharacter* Char, APlayerController *PC);
+	virtual void Assign(AUTCharacter* Char);
 	virtual void UpdateTeamColor();
 	virtual void ApplyTeamColorFor(AUTCharacter* P, bool bIsTeam);
 

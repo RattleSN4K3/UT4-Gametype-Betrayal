@@ -15,17 +15,16 @@ AUTBetrayalCharacterTeamColor::AUTBetrayalCharacterTeamColor(const FObjectInitia
 	InitialLifeSpan = 30.f;
 }
 
-void AUTBetrayalCharacterTeamColor::Assign(AUTCharacter* Char, APlayerController *PC)
+void AUTBetrayalCharacterTeamColor::Assign(AUTCharacter* Char)
 {
 	if (Char == NULL)
 	{
-		UE_LOG(Betrayal, Log, TEXT("CharacterTeamColor: Destroy TeamColor helper %s"), *GetName());
+		UE_LOG(Betrayal, Log, TEXT("CharacterTeamColor: No character. Destroy TeamColor helper %s"), *GetName());
 		Destroy();
 		return;
 	}
 
 	RefPawn = Char;
-	RefPC = PC;
 	InitializePawn();
 }
 
@@ -50,7 +49,7 @@ void AUTBetrayalCharacterTeamColor::HookPawn()
 {
 	// FIXME: TEMP HACK. Exchange default materials with Team materials properly
 
-	if (RefPawn == NULL || RefPC == NULL)
+	if (RefPawn == NULL)
 	{
 		UE_LOG(Betrayal, Log, TEXT("CharacterTeamColor::HookPawn - No Pawn. Abort..."));
 		Destroy();
@@ -122,12 +121,17 @@ void AUTBetrayalCharacterTeamColor::UpdateTeamColor()
 	}
 
 	bool bOnSameTeam = false;
-	if (RefPC != NULL && PS->CurrentTeam != NULL)
+	if (PS->CurrentTeam != NULL)
 	{
-		AUTBetrayalGameState* GS = GetWorld()->GetGameState<AUTBetrayalGameState>();
-		if (GS != NULL)
+		APlayerController* LocalPC = GEngine->GetFirstLocalPlayerController(GetWorld());
+		if (PS->GetInstigatorController() == LocalPC || LocalPC->PlayerState == PS)
 		{
-			bOnSameTeam = RefPC->PlayerState == PS || GS->OnSameTeam(RefPC, PS);
+			bOnSameTeam = true;
+		}
+		else
+		{
+			AUTGameState* GS = GetWorld()->GetGameState<AUTGameState>();
+			bOnSameTeam = GS != NULL && GS->OnSameTeam(LocalPC, PS);
 		}
 	}
 	

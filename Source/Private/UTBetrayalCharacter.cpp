@@ -3,6 +3,7 @@
 #include "UTBetrayalHUD.h"
 #include "UTBetrayalGameState.h"
 #include "UTBetrayalPlayerState.h"
+#include "UTBetrayalCharacterTeamColor.h"
 
 #include "UTPlayerCameraManager.h"
 
@@ -183,7 +184,15 @@ void AUTBetrayalCharacter::ApplyCharacterData(TSubclassOf<AUTCharacterContent> C
 		}
 		else
 		{
-			// TODO: Hook AUTBetrayalCharacterTeamColor helper 
+			// fallback: creating teamcolor helper for this character
+			if (!Children.FindItemByClass<AUTBetrayalCharacterTeamColor>())
+			{
+				if (AUTBetrayalCharacterTeamColor* TeamColorHelper = GetWorld()->SpawnActor<AUTBetrayalCharacterTeamColor>(AUTBetrayalCharacterTeamColor::StaticClass()))
+				{
+					TeamColorHelper->Assign(this);
+				}
+			}
+
 			Super::ApplyCharacterData(CharType);
 		}
 	}
