@@ -60,13 +60,15 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 	// TODO: Option to have PickNewEnemy/IsTeammate as Squad/BotDecisionComponent (Pull request?)
 	BotClass = AUTBetrayalBot::StaticClass();
 
-	bForceRespawn = true;
-
-	RogueValue = 6;
-
 	BetrayingSound = ConstructorStatics.BetrayingSoundAsset.Object;
 	BetrayedSound = ConstructorStatics.BetrayedSoundAsset.Object;
 	JoinTeamSound = ConstructorStatics.JoinTeamSoundAsset.Object;
+
+	bForceRespawn = true;
+	RogueValue = 6;
+
+	// TEMP: prevent spawning "No class"
+	bNoDefaultLeaderHat = true;
 }
 
 void AUTBetrayalGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
