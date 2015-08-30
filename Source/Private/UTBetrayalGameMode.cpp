@@ -65,6 +65,8 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 	JoinTeamSound = ConstructorStatics.JoinTeamSoundAsset.Object;
 
 	bForceRespawn = true;
+	ForceRespawnTime = RespawnWaitTime;
+
 	RogueValue = 6;
 
 	// TEMP: prevent spawning "No class"
@@ -77,6 +79,7 @@ void AUTBetrayalGameMode::InitGame(const FString& MapName, const FString& Option
 
 	// force force-respawn
 	bForceRespawn = true;
+	ForceRespawnTime = RespawnWaitTime; // force respawn exactly after the waiting time
 
 	bClearPlayerInventory = true;
 	DefaultInventory.Empty();
