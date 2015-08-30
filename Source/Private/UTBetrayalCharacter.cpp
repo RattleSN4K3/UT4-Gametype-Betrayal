@@ -13,7 +13,7 @@
 // class.
 
 // In order to create clean copies, first duplicate BaseUTCharacter and reparent to UTBetrayalCharacter. Then duplicate
-// DefaultCharacter_Betrayal and reparent to BaseUTCharacter_Betrayal.
+// DefaultCharacter and reparent to BaseUTCharacter_Betrayal.
 
 AUTBetrayalCharacter::AUTBetrayalCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -148,6 +148,11 @@ bool AUTBetrayalCharacter::IsPawnVisible(APlayerController* PC, FVector CameraPo
 	}
 
 	return true;
+}
+
+void AUTBetrayalCharacter::SetBodyColorFlash(const UCurveLinearColor* ColorCurve, bool bRimOnly)
+{
+	// prevent changing color on any hit (for instance falling damage)
 }
 
 void AUTBetrayalCharacter::UpdateBodyColorFlash(float DeltaTime)

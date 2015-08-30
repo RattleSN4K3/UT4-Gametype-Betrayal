@@ -9,7 +9,7 @@
 // class.
 
 // In order to create clean copies, first duplicate BaseUTCharacter and reparent to UTBetrayalCharacter. Then duplicate
-// DefaultCharacter_Betrayal and reparent to BaseUTCharacter_Betrayal.
+// DefaultCharacter and reparent to BaseUTCharacter_Betrayal.
 
 UCLASS()
 class AUTBetrayalCharacter : public AUTCharacter
@@ -26,6 +26,7 @@ class AUTBetrayalCharacter : public AUTCharacter
 
 	virtual void ApplyCharacterData(TSubclassOf<class AUTCharacterContent> Data) override;
 
+	virtual void SetBodyColorFlash(const UCurveLinearColor* ColorCurve, bool bRimOnly) override;
 	virtual void UpdateBodyColorFlash(float DeltaTime) override;
 
 	/** Updates player color according to the relation of the local player */
