@@ -624,10 +624,237 @@ void AUTBetrayalGameMode::BuildPlayerInfo(AUTPlayerState* PlayerState, TSharedPt
 {
 	Super::BuildPlayerInfo(PlayerState, TabWidget, StatList);
 
-	BuildBetrayalInfo(PlayerState, TabWidget, StatList);
+	// TODO: re-implement if player mesh preview isn't that big
+	//BuildBetrayalInfo(PlayerState, TabWidget, StatList);
+}
+
+void AUTBetrayalGameMode::BuildScoreInfo(AUTPlayerState* PlayerState, TSharedPtr<class SUTTabWidget> TabWidget, TArray<TSharedPtr<TAttributeStat> >& StatList)
+{
+	// COPIED from StatNames
+	// //*
+	static FName NAME_AttackerScore(TEXT("AttackerScore"));
+	static FName NAME_DefenderScore(TEXT("DefenderScore"));
+	static FName NAME_SupporterScore(TEXT("SupporterScore"));
+	static FName NAME_TeamKills(TEXT("TeamKills"));
+
+	static FName NAME_UDamageTime(TEXT("UDamageTime"));
+	static FName NAME_BerserkTime(TEXT("BerserkTime"));
+	static FName NAME_InvisibilityTime(TEXT("InvisibilityTime"));
+	static FName NAME_UDamageCount(TEXT("UDamageCount"));
+	static FName NAME_BerserkCount(TEXT("BerserkCount"));
+	static FName NAME_InvisibilityCount(TEXT("InvisibilityCount"));
+	static FName NAME_BootJumps(TEXT("BootJumps"));
+	static FName NAME_ShieldBeltCount(TEXT("ShieldBeltCount"));
+	static FName NAME_ArmorVestCount(TEXT("ArmorVestCount"));
+	static FName NAME_ArmorPadsCount(TEXT("ArmorPadsCount"));
+	static FName NAME_HelmetCount(TEXT("HelmetCount"));
+	static FName NAME_KegCount(TEXT("KegCount"));
+
+	static FName NAME_SkillRating(TEXT("SkillRating"));
+	static FName NAME_TDMSkillRating(TEXT("TDMSkillRating"));
+	static FName NAME_DMSkillRating(TEXT("DMSkillRating"));
+	static FName NAME_CTFSkillRating(TEXT("CTFSkillRating"));
+
+	static FName NAME_SkillRatingSamples(TEXT("SkillRatingSamples"));
+	static FName NAME_TDMSkillRatingSamples(TEXT("TDMSkillRatingSamples"));
+	static FName NAME_DMSkillRatingSamples(TEXT("DMSkillRatingSamples"));
+	static FName NAME_CTFSkillRatingSamples(TEXT("CTFSkillRatingSamples"));
+
+	static FName NAME_MatchesPlayed(TEXT("MatchesPlayed"));
+	static FName NAME_MatchesQuit(TEXT("MatchesQuit"));
+	static FName NAME_TimePlayed(TEXT("TimePlayed"));
+	static FName NAME_Wins(TEXT("Wins"));
+	static FName NAME_Losses(TEXT("Losses"));
+	static FName NAME_Kills(TEXT("Kills"));
+	static FName NAME_Deaths(TEXT("Deaths"));
+	static FName NAME_Suicides(TEXT("Suicides"));
+
+	static FName NAME_MultiKillLevel0(TEXT("MultiKillLevel0"));
+	static FName NAME_MultiKillLevel1(TEXT("MultiKillLevel1"));
+	static FName NAME_MultiKillLevel2(TEXT("MultiKillLevel2"));
+	static FName NAME_MultiKillLevel3(TEXT("MultiKillLevel3"));
+
+	static FName NAME_SpreeKillLevel0(TEXT("SpreeKillLevel0"));
+	static FName NAME_SpreeKillLevel1(TEXT("SpreeKillLevel1"));
+	static FName NAME_SpreeKillLevel2(TEXT("SpreeKillLevel2"));
+	static FName NAME_SpreeKillLevel3(TEXT("SpreeKillLevel3"));
+	static FName NAME_SpreeKillLevel4(TEXT("SpreeKillLevel4"));
+
+	static FName NAME_ImpactHammerKills(TEXT("ImpactHammerKills"));
+	static FName NAME_EnforcerKills(TEXT("EnforcerKills"));
+	static FName NAME_BioRifleKills(TEXT("BioRifleKills"));
+	static FName NAME_ShockBeamKills(TEXT("ShockBeamKills"));
+	static FName NAME_ShockCoreKills(TEXT("ShockCoreKills"));
+	static FName NAME_ShockComboKills(TEXT("ShockComboKills"));
+	static FName NAME_LinkKills(TEXT("LinkKills"));
+	static FName NAME_LinkBeamKills(TEXT("LinkBeamKills"));
+	static FName NAME_MinigunKills(TEXT("MinigunKills"));
+	static FName NAME_MinigunShardKills(TEXT("MinigunShardKills"));
+	static FName NAME_FlakShardKills(TEXT("FlakShardKills"));
+	static FName NAME_FlakShellKills(TEXT("FlakShellKills"));
+	static FName NAME_RocketKills(TEXT("RocketKills"));
+	static FName NAME_SniperKills(TEXT("SniperKills"));
+	static FName NAME_SniperHeadshotKills(TEXT("SniperHeadshotKills"));
+	static FName NAME_RedeemerKills(TEXT("RedeemerKills"));
+	static FName NAME_InstagibKills(TEXT("InstagibKills"));
+	static FName NAME_TelefragKills(TEXT("TelefragKills"));
+
+	static FName NAME_ImpactHammerDeaths(TEXT("ImpactHammerDeaths"));
+	static FName NAME_EnforcerDeaths(TEXT("EnforcerDeaths"));
+	static FName NAME_BioRifleDeaths(TEXT("BioRifleDeaths"));
+	static FName NAME_ShockBeamDeaths(TEXT("ShockBeamDeaths"));
+	static FName NAME_ShockCoreDeaths(TEXT("ShockCoreDeaths"));
+	static FName NAME_ShockComboDeaths(TEXT("ShockComboDeaths"));
+	static FName NAME_LinkDeaths(TEXT("LinkDeaths"));
+	static FName NAME_LinkBeamDeaths(TEXT("LinkBeamDeaths"));
+	static FName NAME_MinigunDeaths(TEXT("MinigunDeaths"));
+	static FName NAME_MinigunShardDeaths(TEXT("MinigunShardDeaths"));
+	static FName NAME_FlakShardDeaths(TEXT("FlakShardDeaths"));
+	static FName NAME_FlakShellDeaths(TEXT("FlakShellDeaths"));
+	static FName NAME_RocketDeaths(TEXT("RocketDeaths"));
+	static FName NAME_SniperDeaths(TEXT("SniperDeaths"));
+	static FName NAME_SniperHeadshotDeaths(TEXT("SniperHeadshotDeaths"));
+	static FName NAME_RedeemerDeaths(TEXT("RedeemerDeaths"));
+	static FName NAME_InstagibDeaths(TEXT("InstagibDeaths"));
+	static FName NAME_TelefragDeaths(TEXT("TelefragDeaths"));
+
+	static FName NAME_PlayerXP(TEXT("PlayerXP"));
+
+	static FName NAME_BestShockCombo(TEXT("BestShockCombo"));
+	static FName NAME_AmazingCombos(TEXT("AmazingCombos"));
+	static FName NAME_AirRox(TEXT("AirRox"));
+	static FName NAME_FlakShreds(TEXT("FlakShreds"));
+	static FName NAME_AirSnot(TEXT("AirSnot"));
+
+	static FName NAME_RunDist(TEXT("RunDist"));
+	static FName NAME_SprintDist(TEXT("SprintDist"));
+	static FName NAME_InAirDist(TEXT("InAirDist"));
+	static FName NAME_SwimDist(TEXT("SwimDist"));
+	static FName NAME_TranslocDist(TEXT("TranslocDist"));
+	static FName NAME_NumDodges(TEXT("NumDodges"));
+	static FName NAME_NumWallDodges(TEXT("NumWallDodges"));
+	static FName NAME_NumJumps(TEXT("NumJumps"));
+	static FName NAME_NumLiftJumps(TEXT("NumLiftJumps"));
+	static FName NAME_NumFloorSlides(TEXT("NumFloorSlides"));
+	static FName NAME_NumWallRuns(TEXT("NumWallRuns"));
+	static FName NAME_NumImpactJumps(TEXT("NumImpactJumps"));
+	static FName NAME_NumRocketJumps(TEXT("NumRocketJumps"));
+	static FName NAME_SlideDist(TEXT("SlideDist"));
+	static FName NAME_WallRunDist(TEXT("WallRunDist"));
+
+	static FName NAME_EnforcerShots(TEXT("EnforcerShots"));
+	static FName NAME_BioRifleShots(TEXT("BioRifleShots"));
+	static FName NAME_ShockRifleShots(TEXT("ShockRifleShots"));
+	static FName NAME_LinkShots(TEXT("LinkShots"));
+	static FName NAME_MinigunShots(TEXT("MinigunShots"));
+	static FName NAME_FlakShots(TEXT("FlakShots"));
+	static FName NAME_RocketShots(TEXT("RocketShots"));
+	static FName NAME_SniperShots(TEXT("SniperShots"));
+	static FName NAME_RedeemerShots(TEXT("RedeemerShots"));
+	static FName NAME_InstagibShots(TEXT("InstagibShots"));
+
+	static FName NAME_EnforcerHits(TEXT("EnforcerHits"));
+	static FName NAME_BioRifleHits(TEXT("BioRifleHits"));
+	static FName NAME_ShockRifleHits(TEXT("ShockRifleHits"));
+	static FName NAME_LinkHits(TEXT("LinkHits"));
+	static FName NAME_MinigunHits(TEXT("MinigunHits"));
+	static FName NAME_FlakHits(TEXT("FlakHits"));
+	static FName NAME_RocketHits(TEXT("RocketHits"));
+	static FName NAME_SniperHits(TEXT("SniperHits"));
+	static FName NAME_RedeemerHits(TEXT("RedeemerHits"));
+	static FName NAME_InstagibHits(TEXT("InstagibHits"));
+	// *//
+
+	// Copied from UTGameMode
+	// /**
+	TAttributeStat::StatValueTextFunc TwoDecimal = [](const AUTPlayerState* PS, const TAttributeStat* Stat) -> FText
+	{
+		return FText::FromString(FString::Printf(TEXT("%8.2f"), Stat->GetValue()));
+	};
+
+	TSharedPtr<SVerticalBox> LeftPane;
+	TSharedPtr<SVerticalBox> RightPane;
+	TSharedPtr<SHorizontalBox> HBox;
+	BuildPaneHelper(HBox, LeftPane, RightPane);
+
+	TabWidget->AddTab(NSLOCTEXT("AUTGameMode", "Score", "Score"), HBox);
+
+	NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTGameMode", "Kills", "Kills"), MakeShareable(new TAttributeStat(PlayerState, NAME_None, [](const AUTPlayerState* PS, const TAttributeStat* Stat) -> float { return PS->Kills;	})), StatList);
+	NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTGameMode", "Deaths", "Deaths"), MakeShareable(new TAttributeStat(PlayerState, NAME_None, [](const AUTPlayerState* PS, const TAttributeStat* Stat) -> float {	return PS->Deaths; })), StatList);
+	NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTGameMode", "Suicides", "Suicides"), MakeShareable(new TAttributeStat(PlayerState, NAME_Suicides)), StatList);
+	NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTGameMode", "ScorePM", "Score Per Minute"), MakeShareable(new TAttributeStat(PlayerState, NAME_None, [](const AUTPlayerState* PS, const TAttributeStat* Stat) -> float
+	{
+		return (PS->StartTime <  PS->GetWorld()->GameState->ElapsedTime) ? PS->Score * 60.f / (PS->GetWorld()->GameState->ElapsedTime - PS->StartTime) : 0.f;
+	}, TwoDecimal)), StatList);
+	NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTGameMode", "KDRatio", "K/D Ratio"), MakeShareable(new TAttributeStat(PlayerState, NAME_None, [](const AUTPlayerState* PS, const TAttributeStat* Stat) -> float
+	{
+		return (PS->Deaths > 0) ? float(PS->Kills) / PS->Deaths : 0.f;
+	}, TwoDecimal)), StatList);
+
+	NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTGameMode", "BeltPickups", "Shield Belt Pickups"), MakeShareable(new TAttributeStat(PlayerState, NAME_ShieldBeltCount)), StatList);
+	NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTGameMode", "VestPickups", "Armor Vest Pickups"), MakeShareable(new TAttributeStat(PlayerState, NAME_ArmorVestCount)), StatList);
+	NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTGameMode", "PadPickups", "Thigh Pad Pickups"), MakeShareable(new TAttributeStat(PlayerState, NAME_ArmorPadsCount)), StatList);
+	NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTGameMode", "HelmetPickups", "Helmet Pickups"), MakeShareable(new TAttributeStat(PlayerState, NAME_HelmetCount)), StatList);
+	NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTGameMode", "JumpBootJumps", "JumpBoot Jumps"), MakeShareable(new TAttributeStat(PlayerState, NAME_BootJumps)), StatList);
+
+	LeftPane->AddSlot().AutoHeight()[SNew(SBox).HeightOverride(40.0f)];
+	NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTGameMode", "UDamagePickups", "UDamage Pickups"), MakeShareable(new TAttributeStat(PlayerState, NAME_UDamageCount)), StatList);
+	NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTGameMode", "BerserkPickups", "Berserk Pickups"), MakeShareable(new TAttributeStat(PlayerState, NAME_BerserkCount)), StatList);
+	NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTGameMode", "InvisibilityPickups", "Invisibility Pickups"), MakeShareable(new TAttributeStat(PlayerState, NAME_InvisibilityCount)), StatList);
+	NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTGameMode", "KegPickups", "Keg Pickups"), MakeShareable(new TAttributeStat(PlayerState, NAME_KegCount)), StatList);
+
+	TAttributeStat::StatValueTextFunc ToTime = [](const AUTPlayerState* PS, const TAttributeStat* Stat) -> FText
+	{
+		int32 Seconds = (int32)Stat->GetValue();
+		int32 Mins = Seconds / 60;
+		Seconds -= Mins * 60;
+		return FText::FromString(FString::Printf(TEXT("%d:%02d"), Mins, Seconds));
+	};
+
+	RightPane->AddSlot().AutoHeight()[SNew(SBox).HeightOverride(40.0f)];
+	NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTGameMode", "UDamageControl", "UDamage Control"), MakeShareable(new TAttributeStat(PlayerState, NAME_UDamageTime, nullptr, ToTime)), StatList);
+	NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTGameMode", "BerserkControl", "Berserk Control"), MakeShareable(new TAttributeStat(PlayerState, NAME_BerserkTime, nullptr, ToTime)), StatList);
+	NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTGameMode", "InvisibilityControl", "Invisibility Control"), MakeShareable(new TAttributeStat(PlayerState, NAME_InvisibilityTime, nullptr, ToTime)), StatList);
+	// **/
+
+	LeftPane->AddSlot().AutoHeight()[SNew(SBox).HeightOverride(40.0f)];
+	RightPane->AddSlot().AutoHeight()[SNew(SBox).HeightOverride(40.0f)];
+	NewInfoHeader(LeftPane, DisplayName);
+	NewInfoHeader(RightPane, DisplayName);
+	AddBetrayalInfo(PlayerState, TabWidget, StatList, HBox, LeftPane, RightPane);
+}
+
+void AUTBetrayalGameMode::NewInfoHeader(TSharedPtr<SVerticalBox> VBox, FText DisplayName)
+{
+	VBox->AddSlot()
+	.AutoHeight()
+	[
+		SNew(SHorizontalBox)
+		+ SHorizontalBox::Slot()
+		.HAlign(HAlign_Fill)
+		[
+			SNew(STextBlock)
+			.Text(DisplayName)
+			.TextStyle(SUWindowsStyle::Get(), "UT.Common.NormalText")
+			.ColorAndOpacity(FLinearColor::White)
+		]
+	];
 }
 
 void AUTBetrayalGameMode::BuildBetrayalInfo(AUTPlayerState* PlayerState, TSharedPtr<class SUTTabWidget> TabWidget, TArray<TSharedPtr<TAttributeStat> >& StatList)
+{
+	if (AUTBetrayalPlayerState* BPRI = Cast<AUTBetrayalPlayerState>(PlayerState))
+	{
+		TSharedPtr<SVerticalBox> LeftPane;
+		TSharedPtr<SVerticalBox> RightPane;
+		TSharedPtr<SHorizontalBox> HBox;
+		BuildPaneHelper(HBox, LeftPane, RightPane);
+
+		AddBetrayalInfo(PlayerState, TabWidget, StatList, HBox, LeftPane, RightPane);
+	}
+}
+
+void AUTBetrayalGameMode::AddBetrayalInfo(AUTPlayerState* PlayerState, TSharedPtr<class SUTTabWidget> TabWidget, TArray<TSharedPtr<TAttributeStat> >& StatList, TSharedPtr<SHorizontalBox> HBox, TSharedPtr<SVerticalBox> LeftPane, TSharedPtr<SVerticalBox> RightPane)
 {
 	if (AUTBetrayalPlayerState* BPRI = Cast<AUTBetrayalPlayerState>(PlayerState))
 	{
@@ -636,12 +863,13 @@ void AUTBetrayalGameMode::BuildBetrayalInfo(AUTPlayerState* PlayerState, TShared
 			return FText::FromString(FString::Printf(TEXT("%8.2f"), Value));
 		};
 
-		TSharedPtr<SVerticalBox> LeftPane;
-		TSharedPtr<SVerticalBox> RightPane;
-		TSharedPtr<SHorizontalBox> HBox;
-		BuildPaneHelper(HBox, LeftPane, RightPane);
+		// TODO: temporarily removed due to workaround of adding stats to score tab instead of creating custom one
+		//TSharedPtr<SVerticalBox> LeftPane;
+		//TSharedPtr<SVerticalBox> RightPane;
+		//TSharedPtr<SHorizontalBox> HBox;
+		//BuildPaneHelper(HBox, LeftPane, RightPane);
 
-		TabWidget->AddTab(DisplayName, HBox);
+		//TabWidget->AddTab(DisplayName, HBox);
 
 		NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTBetrayalGameMode", "Betrayals", "Betrayals"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float { return PS->BetrayalCount; })), StatList);
 		NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTBetrayalGameMode", "Victim", "Victim"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float { return PS->BetrayedCount; })), StatList);

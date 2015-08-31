@@ -105,6 +105,11 @@ public:
 #if !UE_SERVER
 	virtual void BuildPlayerInfo(AUTPlayerState* PlayerState, TSharedPtr<class SUTTabWidget> TabWidget, TArray<TSharedPtr<struct TAttributeStat> >& StatList) override;
 	virtual void BuildBetrayalInfo(AUTPlayerState* PlayerState, TSharedPtr<class SUTTabWidget> TabWidget, TArray<TSharedPtr<struct TAttributeStat> >& StatList);
+	// TEMP: workaround
+	// TODO: remove once player mesh preview is smaller
+	virtual void NewInfoHeader(TSharedPtr<SVerticalBox> VBox, FText DisplayName);
+	virtual void BuildScoreInfo(AUTPlayerState* PlayerState, TSharedPtr<class SUTTabWidget> TabWidget, TArray<TSharedPtr<struct TAttributeStat> >& StatList) override;
+	virtual void AddBetrayalInfo(AUTPlayerState* PlayerState, TSharedPtr<class SUTTabWidget> TabWidget, TArray<TSharedPtr<struct TAttributeStat> >& StatList, TSharedPtr<SHorizontalBox> HBox, TSharedPtr<SVerticalBox> LeftPane, TSharedPtr<SVerticalBox> RightPane);
 
 	/** called on the default object of this class by the UI to create widgets to manipulate this game type's settings
 	* you can use TAttributeProperty<> to easily implement get/set delegates that map directly to the config property address
