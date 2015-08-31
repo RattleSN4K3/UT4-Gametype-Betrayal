@@ -32,7 +32,7 @@ void AUTBetrayalCharacterPostRenderer::InitializePawn()
 	{
 		bPawnInitialized = true;
 
-		// Actor referenced, set life spawn to infinite
+		// Actor referenced, set life span to infinite
 		SetLifeSpan(0.f);
 
 		// Bind OnDied event to this pawn to garbage collect this zombie actor
