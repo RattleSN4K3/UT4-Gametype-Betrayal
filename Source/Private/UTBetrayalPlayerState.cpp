@@ -152,8 +152,11 @@ float AUTBetrayalPlayerState::GetTrustWorthiness()
 
 void AUTBetrayalPlayerState::UpdateTeam(AUTBetrayalTeam* Team)
 {
-	// for listen server support, call notify team change locally
-	NotifyTeamChanged();
+	if (GetNetMode() != NM_DedicatedServer)
+	{
+		// for listen server support, call notify team change locally
+		NotifyTeamChanged();
+	}
 }
 
 void AUTBetrayalPlayerState::UpdateNemesis(AUTBetrayalPlayerState* PRI)
