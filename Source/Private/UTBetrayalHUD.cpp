@@ -34,11 +34,13 @@ AUTBetrayalHUD::AUTBetrayalHUD(const FObjectInitializer& ObjectInitializer)
 	RequiredHudWidgetClasses.Remove(TEXT("/Script/UnrealTournament.UTScoreboard"));
 
 	RequiredHudWidgetClasses.Remove(TEXT("/Game/RestrictedAssets/UI/HUDWidgets/bpHW_WeaponInfo.bpHW_WeaponInfo_C"));
+	RequiredHudWidgetClasses.Remove(TEXT("/Game/RestrictedAssets/UI/HUDWidgets/bpWH_KillIconMessages.bpWH_KillIconMessages_C"));
 
 	RequiredHudWidgetClasses.Add(TEXT("/Script/UTBetrayal.UTBetrayalHUDWidget_GameClock"));
 	RequiredHudWidgetClasses.Add(TEXT("/Script/UTBetrayal.UTBetrayalHUDWidget_Leaderboard"));
 	//RequiredHudWidgetClasses.Add(TEXT("/Script/UTBetrayal.UTBetrayalHUDWidget_Pot"));
 	RequiredHudWidgetClasses.Add(TEXT("/Script/UTBetrayal.UTBetrayalHUDWidget_TeamInfo"));
+	RequiredHudWidgetClasses.Add(TEXT("/Script/UTBetrayal.UTBetrayalHUDWidget_KillIconMessages"));
 	RequiredHudWidgetClasses.Add(TEXT("/Script/UTBetrayal.UTBetrayalHUDWidget_WeaponCrosshair"));
 	RequiredHudWidgetClasses.Add(TEXT("/Script/UTBetrayal.UTBetrayalScoreboard"));
 
