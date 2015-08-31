@@ -82,8 +82,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Game)
 	USoundCue* JoinTeamSound;
 
-	virtual void BeginPlay() override;
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+	virtual void BeginGame() override;
+	virtual void StartMatch() override;
 
 	/** checks whether the mutator is allowed in this gametype and doesn't conflict with any existing mutators */
 	virtual bool AllowMutator(TSubclassOf<AUTMutator> MutClass) override;
@@ -97,6 +98,7 @@ public:
 	virtual void ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AUTBetrayalPlayerState* HitPRI, APawn* ShotInstigator, APawn* HitPawn);
 	virtual void RemoveFromTeam(AUTBetrayalPlayerState* PRI);
 	virtual void RemoveTeam(AUTBetrayalTeam* Team);
+	virtual void ConditionallyStartTeamTimer();
 	virtual void MaybeStartTeam();
 
 	virtual void Logout(AController* Exiting) override;

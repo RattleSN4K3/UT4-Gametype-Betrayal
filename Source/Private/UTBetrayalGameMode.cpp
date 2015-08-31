@@ -90,10 +90,27 @@ void AUTBetrayalGameMode::InitGame(const FString& MapName, const FString& Option
 	}
 }
 
-void AUTBetrayalGameMode::BeginPlay()
+void AUTBetrayalGameMode::BeginGame()
 {
-	Super::BeginPlay();
+	Super::BeginGame();
+	ConditionallyStartTeamTimer();
+}
 
+void AUTBetrayalGameMode::StartMatch()
+{
+	Super::StartMatch();
+
+	// in general, BeginGame handles starting the timer (once the count down has ended)
+	// but the countdown in not existant in PIE sessions, therefore we reliably start the
+	// timer in here as well (checking if already running)
+	if (GetWorld()->IsPlayInEditor())
+	{
+		ConditionallyStartTeamTimer();
+	}
+}
+
+void AUTBetrayalGameMode::ConditionallyStartTeamTimer()
+{
 	if (!GetWorldTimerManager().IsTimerActive(TimerHandle_MaybeStartTeam))
 	{
 		GetWorldTimerManager().SetTimer(TimerHandle_MaybeStartTeam, this, &AUTBetrayalGameMode::MaybeStartTeam, 1.0f, true);
