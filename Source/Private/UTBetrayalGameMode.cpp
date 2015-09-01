@@ -465,6 +465,8 @@ void AUTBetrayalGameMode::ScoreKill_Implementation(AController* Killer, AControl
 	Super::ScoreKill_Implementation(Killer, Other, KilledPawn, DamageType);
 }
 
+#if !UE_SERVER
+
 void AUTBetrayalGameMode::CreateConfigWidgets(TSharedPtr<class SVerticalBox> MenuSpace, bool bCreateReadOnly, TArray< TSharedPtr<TAttributePropertyBase> >& ConfigProps)
 {
 	// TEMP: OVERRIDEN IN ORDER TO PREVENT CRASH
@@ -634,8 +636,6 @@ void AUTBetrayalGameMode::CreateConfigWidgets(TSharedPtr<class SVerticalBox> Men
 
 	// TODO: add menu widgets for changing additional game options
 }
-
-#if !UE_SERVER
 
 void AUTBetrayalGameMode::BuildPlayerInfo(AUTPlayerState* PlayerState, TSharedPtr<SUTTabWidget> TabWidget, TArray<TSharedPtr<TAttributeStat> >& StatList)
 {
