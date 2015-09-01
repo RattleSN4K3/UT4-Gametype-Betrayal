@@ -2,10 +2,10 @@
 	"FileVersion" : 3,
 	
 	"FriendlyName" : "Betrayal",
-	"Version" : 1,
-	"VersionName" : "1.0",
+	"Version" : 3,
+	"VersionName" : "0.1.2",
 	"CreatedBy" : "RattleSN4K3",
-	"CreatedByURL" : "",
+	"CreatedByURL" : "https://forums.unrealtournament.com/member.php?192-RattleSN4K3",
 	"EngineVersion" : "",
 	"Description" : "Cooperate to get bonus points.  Betray your team to keep them.",
 	"Category" : "UnrealTournament.GameMode",
