@@ -19,6 +19,13 @@ bool AUTBetrayalBot::IsTeammate(AActor* TestActor)
 		return false;
 	}
 
+	// fallback solution if bots are in team and only 2 players in the game, shoot at anyone
+	AUTGameMode* Game = GetWorld()->GetAuthGameMode<AUTGameMode>();
+	if (Game != NULL && Game->NumPlayers + Game->NumBots < 3)
+	{
+		return false;
+	}
+
 	return Super::IsTeammate(TestActor);
 }
 
