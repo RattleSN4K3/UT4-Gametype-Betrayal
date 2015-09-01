@@ -1,14 +1,14 @@
 =============================================================================
  Betrayal for UT4
- August 6, 2015
- Version: 0.1.1
+ September 1, 2015
+ Version: 0.1.2
  ----------------------------------------------------------------------------
  Cooperate to get bonus points. Betray your team to keep them.
 =============================================================================
  Game: Unreal Tournament (UE4)
  Size: ~ 1.25 - 7.88 MB
- Version: 0.1.1
- Compatibility: Build 2634754 (7/29/2015)
+ Version: 0.1.2
+ Compatibility: Build 2665501 (8/24/2015)
  Type: C++
  Credits: Epic Games
 -----------------------------------------------------------------------------
@@ -49,7 +49,9 @@ final betrayal to send them over the top.
 
 Features:
 --------------------------------------------------------
-- Ported sounds and textures
+- Instagib only gametype
+- Semi team play
+- Custom sounds and textures (ported from UT3)
 - Player beacons including player score
 - Bot AI betraying team mates
 - Scoreboard showing daggers (and other stats)
@@ -89,3 +91,21 @@ Method 2:
  - Start the game
 
 
+Changelog:
+--------------------------------------------------------
+v0.1.2:
+- Changed: Updated code for latest build
+- Changed: Removed Force-respawn option from game options
+- Changed: Betrayal tab in player cards removed and integrated into Score tab (temporarily)
+- Changed: Repositioned kill feed messages
+- Added: Stat counting for weapon alt kills, alt deaths, hits and shots
+- Fixed: Team color not set and replicated properly
+- Fixed: Team color is removed on damage (falling, etc.)
+- Fixed: PostRender beacon does not work reliable
+- Fixed: Muzzle flash for InstaGib rifle
+- Fixed: Missing hand animation for InstaGib rifle
+- Fixed: Possible memory leak in hub sessions
+
+v0.1.1
+- Added: Linux support
+- Fixed: Compiling for Linux using CLANG
