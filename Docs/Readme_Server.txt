@@ -1,5 +1,5 @@
 =============================================================================
- Betrayal for UT4
+ Betrayal for UT4 (Server)
  September 1, 2015
  Version: 0.1.2
  ----------------------------------------------------------------------------
@@ -62,33 +62,29 @@ Features:
 
 Installation:
 --------------------------------------------------------
-- Extract the zip file (copy the content) to your Unreal Tournament folder:  
-  UnrealTournamentDev\
+- Extract the zip file (copy the content) to your Unreal Tournament Server folder:  
+  Windows: WindowsServer\
+  Linux: LinuxServer/
+  Windows: MacServer/
+- Done
+
 
 Manually:
 - Copy files/folders from "Binaries\" to
-  UnrealTournamentDev\Binaries
+  \UnrealTournament\Binaries
 - Copy files/folders from "Content\" to
-  UnrealTournamentDev\Content
+  \UnrealTournament\Content
 
 
 
 Usage:
 --------------------------------------------------------
-Method 1:
- - Start the game
- - Choose a custom game
- - Select the game mode "Betrayal"
- - Choose any map you like and play the game
- - Enjoy
+- Add the following line to the command line arguments
+  (or your shortcut, server command line, ...):
 
-Method 2:
- - Add the following line to the command line arguments
-   (or your shortcut, server command line, ...):
+  ?game=UTBetrayal.UTBetrayalGameMode
 
-   ?game=UTBetrayal.UTBetrayalGameMode
-
- - Start the game
+- Start the game
 
 
 Changelog:
