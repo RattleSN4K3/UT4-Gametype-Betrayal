@@ -1,5 +1,6 @@
 #include "UTBetrayal.h"
 #include "UTBetrayalBot.h"
+#include "UTBetrayalGameMode.h"
 #include "UTBetrayalGameState.h"
 #include "UTBetrayalPlayerState.h"
 #include "UTBetrayalTeam.h"
@@ -20,8 +21,8 @@ bool AUTBetrayalBot::IsTeammate(AActor* TestActor)
 	}
 
 	// fallback solution if bots are in team and only 2 players in the game, shoot at anyone
-	AUTGameMode* Game = GetWorld()->GetAuthGameMode<AUTGameMode>();
-	if (Game != NULL && Game->NumPlayers + Game->NumBots < 3)
+	AUTBetrayalGameMode * Game = GetWorld()->GetAuthGameMode<AUTBetrayalGameMode>();
+	if (Game != NULL && Game->GetTotalPlayingPlayers() < 3)
 	{
 		return false;
 	}

@@ -104,6 +104,11 @@ public:
 	virtual void Logout(AController* Exiting) override;
 	virtual void ScoreKill_Implementation(AController* Killer, AController* Other, APawn* KilledPawn, TSubclassOf<UDamageType> DamageType) override;
 
+	virtual int32 GetTotalPlayingPlayers()
+	{
+		return NumBots + NumPlayers;
+	}
+
 #if !UE_SERVER
 	virtual void BuildPlayerInfo(AUTPlayerState* PlayerState, TSharedPtr<class SUTTabWidget> TabWidget, TArray<TSharedPtr<struct TAttributeStat> >& StatList) override;
 	virtual void BuildBetrayalInfo(AUTPlayerState* PlayerState, TSharedPtr<class SUTTabWidget> TabWidget, TArray<TSharedPtr<struct TAttributeStat> >& StatList);
@@ -133,5 +138,15 @@ public:
 	virtual void CreateGameURLOptions(TArray<TSharedPtr<TAttributePropertyBase>>& MenuProps) override;
 
 	virtual void GetGameURLOptions(const TArray<TSharedPtr<TAttributePropertyBase>>& MenuProps, TArray<FString>& OptionsList, int32& DesiredPlayerCount) override;
+
+	// TODO: Remove for shipped build
+#if WITH_EDITOR
+
+	UFUNCTION(Exec)
+	virtual void BETKillbot(const FString& NameOrUIDStr);
+	UFUNCTION(Server, Reliable, WithValidation)
+	virtual void BETServerKillbot(const FString& NameOrUIDStr);
+
+#endif
 
 };

@@ -14,6 +14,7 @@
 
 #include "Private/Slate/Widgets/SUTTabWidget.h"
 #include "SNumericEntryBox.h"
+#include "UTPlayerState.h"
 
 AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
@@ -307,9 +308,13 @@ void AUTBetrayalGameMode::MaybeStartTeam()
 		return;
 	}
 
+	int32 TotalPlayerCount = GetTotalPlayingPlayers();
+	if (TotalPlayerCount < 3)
+		return;
+
 	int32 Count = 0;
 	int32 TeamCount = 0;
-	int32 MaxTeamSize = (NumPlayers + NumBots > 6) ? 3 : 2;
+	int32 MaxTeamSize = (TotalPlayerCount > 6) ? 3 : 2;
 
 	for (APlayerState* PS : GameState->PlayerArray)
 	{
@@ -383,6 +388,30 @@ void AUTBetrayalGameMode::Logout(AController* Exiting)
 		if (PRI != NULL && PRI->CurrentTeam != NULL)
 		{
 			RemoveFromTeam(PRI);
+		}
+
+		// the current bot is still counted, check for 3 players or less
+		if (GetTotalPlayingPlayers() < 4 && Teams.Num() == 1)
+		{
+			//AUTBetrayalTeam* Team = Teams[0];
+			//if (Team != NULL)
+			//{
+
+			// TODO: what to do with the existing pot? Split pot to existing players?
+			//       what if adding these points would end the game? Ovetime with sudden death?
+
+			if (Teams.IsValidIndex(0) && Teams[0] != NULL)
+			{
+				auto Team = Teams[0];
+				Team->DisperseTeam();
+				RemoveTeam(Team);	
+				if (Team != NULL)
+				{
+					Team->Destroy();
+				}
+			}
+			
+			Teams.Reset();
 		}
 	}
 
@@ -970,3 +999,45 @@ void AUTBetrayalGameMode::GetGameURLOptions(const TArray<TSharedPtr<TAttributePr
 
 	// TODO: parameterize additional game options (like allowing Boots, Rogue value, Rogue penalty)
 }
+
+#if WITH_EDITOR
+
+void AUTBetrayalGameMode::BETKillbot(const FString& NameOrUIDStr)
+{
+	BETServerKillbot(NameOrUIDStr);
+}
+
+bool AUTBetrayalGameMode::BETServerKillbot_Validate(const FString& NameOrUIDStr) { return true; }
+void AUTBetrayalGameMode::BETServerKillbot_Implementation(const FString& NameOrUIDStr)
+{
+	AUTGameState* GS = GetWorld()->GetGameState<AUTGameState>();
+	AUTGameMode* GM = GetWorld()->GetAuthGameMode<AUTGameMode>();
+	if (GS != NULL && GM != NULL)
+	{
+		for (int32 i = 0; i < GS->PlayerArray.Num(); i++)
+		{
+			if (GS->PlayerArray[i] == NULL || GS->PlayerArray[i]->IsPendingKill())
+			{
+				// skip pending or already destroyed players
+				continue;
+			}
+
+			if ((GS->PlayerArray[i]->PlayerName.ToLower() == NameOrUIDStr.ToLower()) ||
+				(GS->PlayerArray[i]->UniqueId.ToString() == NameOrUIDStr))
+			{
+				if (AUTBot* Bot = Cast<AUTBot>(GS->PlayerArray[i]->GetOwner()))
+				{
+					uint8 BotCount = GM->NumBots;
+					Bot->Destroy();
+
+					if (AUTGameMode* UTGM = GetWorld()->GetAuthGameMode<AUTGameMode>())
+					{
+						UTGM->SetBotCount(FMath::Max<uint8>(0, BotCount - 1));
+					}
+				}
+			}
+		}
+	}
+}
+
+#endif

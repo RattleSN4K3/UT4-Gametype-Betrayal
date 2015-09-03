@@ -19,7 +19,17 @@ class AUTBetrayalTeam : public AActor
 	UPROPERTY(Replicated)
 	int32 TeamPot;
 
+	/**
+	 * Adds the given player to the team
+	 * @param NewTeammate the player to add
+	 * @param MaxTeamSize the new maximum team size
+	 */
 	virtual bool AddTeammate(AUTBetrayalPlayerState* NewTeammate, int32 MaxTeamSize);
+
+	/** Removes the given player from te team */
 	virtual int32 LoseTeammate(AUTBetrayalPlayerState* OldTeammate);
+
+	/** Removes any player from the team */
+	virtual void DisperseTeam();
 
 };

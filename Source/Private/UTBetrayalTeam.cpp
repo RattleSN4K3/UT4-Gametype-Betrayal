@@ -36,9 +36,8 @@ bool AUTBetrayalTeam::AddTeammate(AUTBetrayalPlayerState* NewTeammate, int32 Max
 		return false;
 	}
 
-	int32 NumTeammates = 0;
-
 	//Count current team size
+	int32 NumTeammates = 0;
 	for (int32 i = 0; i<ARRAY_COUNT(Teammates); i++)
 	{
 		if (Teammates[i] != NULL)
@@ -47,6 +46,7 @@ bool AUTBetrayalTeam::AddTeammate(AUTBetrayalPlayerState* NewTeammate, int32 Max
 		}
 	}
 
+	// abort adding player to the team if team already has the maximum amount of players
 	MaxTeamSize = FMath::Min(MaxTeamSize, MAX_TEAMMATES);
 	if (NumTeammates >= MaxTeamSize)
 	{
@@ -99,4 +99,15 @@ int32 AUTBetrayalTeam::LoseTeammate(AUTBetrayalPlayerState* OldTeammate)
 
 	//Returns number of teammates left after removing a player
 	return NumTeammates;
+}
+
+void AUTBetrayalTeam::DisperseTeam()
+{
+	for (int32 i = 0; i < ARRAY_COUNT(Teammates); i++)
+	{
+		if (Teammates[i] != NULL)
+		{
+			LoseTeammate(Teammates[i]);
+		}
+	}
 }
