@@ -57,6 +57,9 @@ bool AUTBetrayalTeam::AddTeammate(AUTBetrayalPlayerState* NewTeammate, int32 Max
 	{
 		if (Teammates[i] == NewTeammate)
 		{
+			// update team, just in case
+			NewTeammate->UpdateTeam(this);
+
 			// already added
 			return true;
 		}
@@ -65,6 +68,10 @@ bool AUTBetrayalTeam::AddTeammate(AUTBetrayalPlayerState* NewTeammate, int32 Max
 		{
 			NewTeammate->CurrentTeam = this;
 			Teammates[i] = NewTeammate;
+
+			// new team, call notify functions
+			NewTeammate->UpdateTeam(this);
+
 			return true;
 		}
 	}
@@ -74,9 +81,8 @@ bool AUTBetrayalTeam::AddTeammate(AUTBetrayalPlayerState* NewTeammate, int32 Max
 
 int32 AUTBetrayalTeam::LoseTeammate(AUTBetrayalPlayerState* OldTeammate)
 {
-	int32 NumTeammates = 0;
-
 	OldTeammate->CurrentTeam = NULL;
+	OldTeammate->UpdateTeam(NULL);
 
 	// TODO: store flag else where FIXME: do not use subclassed UTBot
 	if (AUTBetrayalBot* B = Cast<AUTBetrayalBot>(OldTeammate->GetOwner()))
@@ -85,6 +91,8 @@ int32 AUTBetrayalTeam::LoseTeammate(AUTBetrayalPlayerState* OldTeammate)
 	}
 
 	ForceNetUpdate();
+
+	int32 NumTeammates = 0;
 	for (int32 i = 0; i< ARRAY_COUNT(Teammates); i++)
 	{
 		if (Teammates[i] == NULL || Teammates[i] == OldTeammate || Teammates[i]->IsPendingKillPending())

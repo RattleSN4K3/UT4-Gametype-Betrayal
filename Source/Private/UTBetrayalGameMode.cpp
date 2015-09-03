@@ -221,8 +221,8 @@ void AUTBetrayalGameMode::ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AU
 
 	RemoveFromTeam(InstigatorPRI);
 
+	// increase betray count and update most killed player
 	InstigatorPRI->UpdateNemesis(HitPRI);
-	InstigatorPRI->UpdateTeam(NULL);
 
 	if (!Team->IsPendingKillPending())
 	{
@@ -328,8 +328,6 @@ void AUTBetrayalGameMode::MaybeStartTeam()
 				{
 					if (Teams[j]->AddTeammate(PRI, MaxTeamSize))
 					{
-						PRI->UpdateTeam(Teams[j]);
-
 						//Successfully added to a team
 						UUTGameplayStatics::UTPlaySound(GetWorld(), JoinTeamSound, PRI->GetOwner());
 						return;
@@ -357,8 +355,6 @@ void AUTBetrayalGameMode::MaybeStartTeam()
 				{
 					if (NewTeam->AddTeammate(PRI, MaxTeamSize))
 					{
-						PRI->UpdateTeam(NewTeam);
-
 						//Successfully added to a team
 						UUTGameplayStatics::UTPlaySound(GetWorld(), JoinTeamSound, PRI->GetOwner());
 
