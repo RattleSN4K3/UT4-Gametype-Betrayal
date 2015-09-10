@@ -1,14 +1,14 @@
 =============================================================================
  Betrayal for UT4 (Editor)
- September 1, 2015
- Version: 0.1.2
+ September 10, 2015
+ Version: 0.1.3
  ----------------------------------------------------------------------------
  Cooperate to get bonus points. Betray your team to keep them.
 =============================================================================
  Game: Unreal Tournament (UE4)
- Size: ~ 0.98 - 10.11 MB
- Version: 0.1.2
- Compatibility: Build 2665501 (8/24/2015)
+ Size: ~ 0.99 - 10.11 MB
+ Version: 0.1.3
+ Compatibility: Build 2681776 (9/8/2015)
  Type: C++
  Credits: Epic Games
 -----------------------------------------------------------------------------
@@ -85,6 +85,12 @@ Usage:
 
 Changelog:
 --------------------------------------------------------
+v0.1.3:
+- Changed: No teams with less players than 3
+- Changed: Don't apply team color on dedicated servers
+- Fixed: Bots not shooting at team mates if there are no other players
+- Fixed: Team color not changing when teams are dissolved
+
 v0.1.2:
 - Changed: Updated code for latest build
 - Changed: Removed Force-respawn option from game options

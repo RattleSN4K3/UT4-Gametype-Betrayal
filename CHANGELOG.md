@@ -1,3 +1,10 @@
+Version 0.1.3
+--------------------------------------
+- Changed: No teams with less players than 3
+- Changed: Don't apply team color on dedicated servers
+- Fixed: Bots not shooting at team mates if there are no other players
+- Fixed: Team color not changing when teams are dissolved
+
 Version 0.1.2
 --------------------------------------
 - Changed: Updated code for latest build
