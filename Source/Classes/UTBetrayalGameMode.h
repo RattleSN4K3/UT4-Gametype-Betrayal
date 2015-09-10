@@ -139,14 +139,10 @@ public:
 
 	virtual void GetGameURLOptions(const TArray<TSharedPtr<TAttributePropertyBase>>& MenuProps, TArray<FString>& OptionsList, int32& DesiredPlayerCount) override;
 
-	// TODO: Remove for shipped build
-#if WITH_EDITOR
-
+	// TODO: Check how to remove exec for shipped build
 	UFUNCTION(Exec)
 	virtual void BETKillbot(const FString& NameOrUIDStr);
 	UFUNCTION(Server, Reliable, WithValidation)
 	virtual void BETServerKillbot(const FString& NameOrUIDStr);
-
-#endif
 
 };

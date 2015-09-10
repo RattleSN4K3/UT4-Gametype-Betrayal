@@ -996,8 +996,6 @@ void AUTBetrayalGameMode::GetGameURLOptions(const TArray<TSharedPtr<TAttributePr
 	// TODO: parameterize additional game options (like allowing Boots, Rogue value, Rogue penalty)
 }
 
-#if WITH_EDITOR
-
 void AUTBetrayalGameMode::BETKillbot(const FString& NameOrUIDStr)
 {
 	BETServerKillbot(NameOrUIDStr);
@@ -1006,6 +1004,8 @@ void AUTBetrayalGameMode::BETKillbot(const FString& NameOrUIDStr)
 bool AUTBetrayalGameMode::BETServerKillbot_Validate(const FString& NameOrUIDStr) { return true; }
 void AUTBetrayalGameMode::BETServerKillbot_Implementation(const FString& NameOrUIDStr)
 {
+#if WITH_EDITOR
+
 	AUTGameState* GS = GetWorld()->GetGameState<AUTGameState>();
 	AUTGameMode* GM = GetWorld()->GetAuthGameMode<AUTGameMode>();
 	if (GS != NULL && GM != NULL)
@@ -1034,6 +1034,5 @@ void AUTBetrayalGameMode::BETServerKillbot_Implementation(const FString& NameOrU
 			}
 		}
 	}
-}
-
 #endif
+}
