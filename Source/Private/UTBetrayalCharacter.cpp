@@ -162,6 +162,13 @@ void AUTBetrayalCharacter::UpdateBodyColorFlash(float DeltaTime)
 
 void AUTBetrayalCharacter::ApplyCharacterData(TSubclassOf<AUTCharacterContent> CharType)
 {
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		// don't need to update team colors for ded servers, only apply character data
+		Super::ApplyCharacterData(CharType);
+		return;
+	}
+
 	// Try to hook a temp team to this character ...
 	AUTBetrayalGameState* GS = GetWorld()->GetGameState<AUTBetrayalGameState>();
 	AUTPlayerState* PS = Cast<AUTPlayerState>(PlayerState);
