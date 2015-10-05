@@ -3,7 +3,7 @@
 #include "UTBetrayal.h"
 #include "UTBetrayalMessage.generated.h"
 
-UCLASS(CustomConstructor)
+UCLASS(CustomConstructor, Abstract)
 class UUTBetrayalMessage : public UUTLocalMessage
 {
 	GENERATED_UCLASS_BODY()
