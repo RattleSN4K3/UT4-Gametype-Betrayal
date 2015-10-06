@@ -67,6 +67,7 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 
 	bForceRespawn = true;
 	ForceRespawnTime = RespawnWaitTime;
+	bPlayPlayerIntro = false;
 
 	RogueValue = 6;
 
@@ -89,6 +90,8 @@ void AUTBetrayalGameMode::InitGame(const FString& MapName, const FString& Option
 	{
 		DefaultInventory.Add(InstagibRifleClass);
 	}
+
+	bForcePlayerIntro = HasOption(Options, TEXT("PlayPlayerIntro"));
 }
 
 void AUTBetrayalGameMode::BeginGame()
@@ -99,7 +102,22 @@ void AUTBetrayalGameMode::BeginGame()
 
 void AUTBetrayalGameMode::StartMatch()
 {
+	uint8 bOldPlayPlayerIntro = 0;
+	if (!HasMatchStarted() && !bForcePlayerIntro)
+	{
+		// only play intro if enough real players are playing
+		// TODO: Check replication of bPlayPlayerIntro if it's working correctly
+		bOldPlayPlayerIntro = bPlayPlayerIntro ? 1 : 255;
+		bPlayPlayerIntro = NumPlayers > 2;
+	}
+
 	Super::StartMatch();
+
+	// revert play-intro flag
+	if (bOldPlayPlayerIntro > 0)
+	{
+		bPlayPlayerIntro = (bPlayPlayerIntro == 1);
+	}
 
 	// in general, BeginGame handles starting the timer (once the count down has ended)
 	// but the countdown in not existant in PIE sessions, therefore we reliably start the

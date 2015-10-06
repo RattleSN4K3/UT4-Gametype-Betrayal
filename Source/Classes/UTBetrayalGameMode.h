@@ -54,6 +54,8 @@ protected:
 
 	FTimerHandle TimerHandle_MaybeStartTeam;
 
+	bool bForcePlayerIntro;
+
 public:
 
 	UPROPERTY(Transient, BlueprintReadOnly)
