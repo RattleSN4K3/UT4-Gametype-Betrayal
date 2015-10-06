@@ -137,18 +137,18 @@ class UUTBetrayalMessage : public UUTLocalMessage
 
 	virtual USoundBase* GetAnnouncementSound_Implementation(int32 Switch, const UObject* OptionalObject) const override
 	{
-		auto default = GetDefault<UUTBetrayalMessage>(GetClass());
+		auto Default = GetDefault<UUTBetrayalMessage>(GetClass());
 
 		if (Switch == 1)
-			return default->JoinTeamSound;
+			return Default->JoinTeamSound;
 		else if (Switch == 2)
-			return default->RetributionSound;
+			return Default->RetributionSound;
 		else if (Switch == 3)
-			return default->PaybackSound;
+			return Default->PaybackSound;
 		else if (Switch == 5)
-			return default->PaybackAvoidedSound;
+			return Default->PaybackAvoidedSound;
 
-		return default->BetrayalKillSound;
+		return Default->BetrayalKillSound;
 	}
 	
 	virtual FLinearColor GetMessageColor_Implementation(int32 MessageIndex) const override
