@@ -128,9 +128,8 @@ void UUTBetrayalScoreboard::DrawDaggers(AUTBetrayalPlayerState* PRI, float Rende
 		DrawTexture(UT3GHudTexture, XOffset, YOffset, 32 * DaggerAspect, 32, DaggerTexCoords.U, DaggerTexCoords.V, DaggerTexCoords.UL, DaggerTexCoords.VL, BarOpacity, FLinearColor::White);
 		XOffset += 32 * DaggerAspect + (DaggerSpacing * RenderScale);
 
-		// TODO: use Localization?
-		FString DaggerString = FString::Printf(TEXT("x%i"), PRI->BetrayalCount);
-		DrawText(FText::FromString(DaggerString), XOffset, YOffset + ColumnY, UTHUDOwner->SmallFont, 1.0f, 1.0f, FLinearColor::Gray, ETextHorzPos::Left, ETextVertPos::Center);
+		FText DaggerString = FText::Format(NSLOCTEXT("UTBetrayalScoreboard", "DaggersShortString", "x {0}"), FText::AsNumber(PRI->BetrayalCount));
+		DrawText(DaggerString, XOffset, YOffset + ColumnY, UTHUDOwner->SmallFont, 1.0f, 1.0f, FLinearColor::Gray, ETextHorzPos::Left, ETextVertPos::Center);
 	}
 	else
 	{

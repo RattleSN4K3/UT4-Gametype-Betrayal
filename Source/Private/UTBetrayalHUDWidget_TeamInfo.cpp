@@ -69,6 +69,7 @@ UUTBetrayalHUDWidget_TeamInfo::UUTBetrayalHUDWidget_TeamInfo(const FObjectInitia
 	PotString = NSLOCTEXT("UTBetrayalHud", "PotString", "Pot {Pot}");
 	RogueString = NSLOCTEXT("UTBetrayalHud", "RogueString", "Rogue {Time}");
 	FreelanceString = NSLOCTEXT("UTBetrayalHud", "FreelanceString", "Freelance");
+	DaggersPlateString = NSLOCTEXT("UTBetrayalHud", "DaggersPlateString", "x {0}");
 }
 
 FVector2D UUTBetrayalHUDWidget_TeamInfo::ResolveHUDPosition(FVector2D Position, float Width, float Height)
@@ -215,10 +216,9 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 		// override drawing daggers, draw raw number instead
 		if (NumDaggersWidth >= DaggersPlateMaxWidth * Canvas->SizeX)
 		{
-			// TODO: use Localization?
-			FString DaggerString = FString::Printf(TEXT("x%i"), NumRawDaggers);
+			FText DaggerString = FText::Format(DaggersPlateString, FText::AsNumber(NumRawDaggers));
 			float TempXL, TempYL;
-			Canvas->TextSize(DrawFont, DaggerString, TempXL, TempYL);
+			Canvas->TextSize(DrawFont, DaggerString.ToString(), TempXL, TempYL);
 
 			NumDaggersWidth = TempXL + DaggerSpacing + DaggerWidth;
 			bDrawRaw = true;
@@ -264,8 +264,7 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 					DaggerWidth * RenderScale, DaggerHeight * RenderScale,
 					DaggerTexCoords.U, DaggerTexCoords.V, DaggerTexCoords.UL, DaggerTexCoords.VL);
 
-				// TODO: use Localization?
-				FString DaggerString = FString::Printf(TEXT("x%i"), NumRawDaggers);
+				FText DaggerString = FText::Format(DaggersPlateString, FText::AsNumber(NumRawDaggers));
 				Canvas->DrawColor = FLinearColor::Gray;
 				Canvas_DrawText(DrawFont, DaggerString, Pos.X + (DaggerWidth + DaggerSpacing) * RenderScale, Pos.Y + (NameYPadding * RenderScale));
 			}

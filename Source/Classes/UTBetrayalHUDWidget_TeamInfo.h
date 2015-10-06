@@ -62,6 +62,10 @@ class UUTBetrayalHUDWidget_TeamInfo : public UUTHUDWidget
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Render")
 	float DaggersPlateMinWidth;
 
+	/** Short string to draw instead when daggers amount is too high */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Message")
+	FText DaggersPlateString;
+
 	/** font size for teammates **/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Render", Meta = (EditCondition = "!bOverrideNameFont"))
 	int32 NameFontSize;
