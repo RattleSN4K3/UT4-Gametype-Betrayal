@@ -21,6 +21,9 @@ protected:
 
 public:
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Debug)
+	uint32 bDebug : 1;
+
 	/** Current Nemesis for this player  (for stats only) */
 	UPROPERTY(Replicated)
 	FString CurrentNemesis;
@@ -87,6 +90,7 @@ public:
 	/** Set when TrustWorthiness is already cached */
 	bool bHasSetTrust;
 
+	virtual void BeginPlay() override;
 	virtual void Reset() override;
 
 	/** Starts the rogue timer to update the roque remaining time and expired at the given time */

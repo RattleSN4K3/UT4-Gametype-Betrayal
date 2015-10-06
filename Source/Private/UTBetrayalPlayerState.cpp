@@ -25,6 +25,10 @@ AUTBetrayalPlayerState::AUTBetrayalPlayerState(const FObjectInitializer& ObjectI
 	RogueTimePenalty = 30;
 
 	RogueFadingSound = ConstructorStatics.RogueFadingSound.Object;
+
+#if WITH_EDITOR || UE_BUILD_DEBUG
+	bDebug = true;
+#endif
 }
 
 void AUTBetrayalPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const
@@ -68,6 +72,22 @@ void AUTBetrayalPlayerState::Reset()
 	RetributionCount = 0;
 	PaybackCount = 0;
 	HighestPot = 0;
+}
+
+void AUTBetrayalPlayerState::BeginPlay()
+{
+	Super::BeginPlay();
+
+#if WITH_EDITOR || UE_BUILD_DEBUG
+	if (bDebug)
+	{
+		// set the betrayal count to random values for HUD test
+		if (FMath::FRand() > 0.8)
+			BetrayalCount = FMath::RandRange(100, 99999);
+		else
+			BetrayalCount = FMath::RandRange(4, 99);
+	}
+#endif
 }
 
 void AUTBetrayalPlayerState::SetRogueTimer()
