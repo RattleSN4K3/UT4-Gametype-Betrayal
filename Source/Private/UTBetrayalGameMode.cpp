@@ -77,7 +77,7 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 
 void AUTBetrayalGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
-#if WITH_EDITOR || UE_BUILD_DEBUG
+#if WITH_EDITOR || UE_BUILD_DEBUG || BETRAYAL_DEBUG
 	// Rand is used for random values to the HUD which is only setup when compiled for the editor
 	double secs = FTimespan(FDateTime::Now().GetTicks()).GetTotalSeconds();
 	int32 seed = (int32)(((int64)secs) % INT_MAX);

@@ -13,6 +13,8 @@
 
 DECLARE_LOG_CATEGORY_EXTERN(Betrayal, Log, All);
 
+#define BETRAYAL_DEBUG 0
+
 UCLASS(CustomConstructor)
 class UUTBetrayal : public UObject
 {

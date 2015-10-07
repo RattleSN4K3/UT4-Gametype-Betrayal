@@ -26,7 +26,7 @@ AUTBetrayalPlayerState::AUTBetrayalPlayerState(const FObjectInitializer& ObjectI
 
 	RogueFadingSound = ConstructorStatics.RogueFadingSound.Object;
 
-#if WITH_EDITOR || UE_BUILD_DEBUG
+#if WITH_EDITOR || UE_BUILD_DEBUG || BETRAYAL_DEBUG
 	bDebug = true;
 #endif
 }
@@ -78,7 +78,7 @@ void AUTBetrayalPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
 
-#if WITH_EDITOR || UE_BUILD_DEBUG
+#if WITH_EDITOR || UE_BUILD_DEBUG || BETRAYAL_DEBUG
 	if (bDebug)
 	{
 		// set the betrayal count to random values for HUD test
