@@ -1,3 +1,7 @@
+Version 0.1.4
+--------------------------------------
+- Changed: Minor code improvements
+
 Version 0.1.3
 --------------------------------------
 - Changed: No teams with less players than 3
