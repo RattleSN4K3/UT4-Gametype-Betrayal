@@ -77,11 +77,15 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 
 void AUTBetrayalGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
+#if ENGINE_VERSION <= 2564698
+// COMPAT: Random number generator is fixed as of commit cc4dce6f27e80af481e5e4b087baf57ff6fe17ec
+
 #if WITH_EDITOR || UE_BUILD_DEBUG || BETRAYAL_DEBUG
 	// Rand is used for random values to the HUD which is only setup when compiled for the editor
 	double secs = FTimespan(FDateTime::Now().GetTicks()).GetTotalSeconds();
 	int32 seed = (int32)(((int64)secs) % INT_MAX);
 	FMath::RandInit(seed);
+#endif
 #endif
 
 	Super::InitGame(MapName, Options, ErrorMessage);
