@@ -3,7 +3,7 @@
 #include "UTBetrayalPlayerState.h"
 #include "UTBetrayalGameMode.h"
 #include "UTBetrayalBot.h"
-//#include "StatNames.h"
+#include "StatNames.h"
 
 AUTBetrayalWeapon::AUTBetrayalWeapon(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -14,12 +14,6 @@ AUTBetrayalWeapon::AUTBetrayalWeapon(const FObjectInitializer& ObjectInitializer
 	AmmoCost.SetNum(2);
 	AmmoCost[0] = 1;
 	AmmoCost[1] = 1;
-
-	//@TODO: use stat names from StatNames.h
-	static FName NAME_InstagibKills(TEXT("InstagibKills"));
-	static FName NAME_InstagibDeaths(TEXT("InstagibDeaths"));
-	static FName NAME_InstagibHits(TEXT("InstagibHits"));
-	static FName NAME_InstagibShots(TEXT("InstagibShots"));
 
 	KillStatsName = NAME_InstagibKills;
 	AltKillStatsName = NAME_InstagibKills;

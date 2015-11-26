@@ -15,6 +15,7 @@
 #include "Private/Slate/Widgets/SUTTabWidget.h"
 #include "SNumericEntryBox.h"
 #include "UTPlayerState.h"
+#include "StatNames.h"
 
 AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer)
@@ -701,141 +702,6 @@ void AUTBetrayalGameMode::BuildPlayerInfo(AUTPlayerState* PlayerState, TSharedPt
 
 void AUTBetrayalGameMode::BuildScoreInfo(AUTPlayerState* PlayerState, TSharedPtr<class SUTTabWidget> TabWidget, TArray<TSharedPtr<TAttributeStat> >& StatList)
 {
-	// COPIED from StatNames
-	// //*
-	static FName NAME_AttackerScore(TEXT("AttackerScore"));
-	static FName NAME_DefenderScore(TEXT("DefenderScore"));
-	static FName NAME_SupporterScore(TEXT("SupporterScore"));
-	static FName NAME_TeamKills(TEXT("TeamKills"));
-
-	static FName NAME_UDamageTime(TEXT("UDamageTime"));
-	static FName NAME_BerserkTime(TEXT("BerserkTime"));
-	static FName NAME_InvisibilityTime(TEXT("InvisibilityTime"));
-	static FName NAME_UDamageCount(TEXT("UDamageCount"));
-	static FName NAME_BerserkCount(TEXT("BerserkCount"));
-	static FName NAME_InvisibilityCount(TEXT("InvisibilityCount"));
-	static FName NAME_BootJumps(TEXT("BootJumps"));
-	static FName NAME_ShieldBeltCount(TEXT("ShieldBeltCount"));
-	static FName NAME_ArmorVestCount(TEXT("ArmorVestCount"));
-	static FName NAME_ArmorPadsCount(TEXT("ArmorPadsCount"));
-	static FName NAME_HelmetCount(TEXT("HelmetCount"));
-	static FName NAME_KegCount(TEXT("KegCount"));
-
-	static FName NAME_SkillRating(TEXT("SkillRating"));
-	static FName NAME_TDMSkillRating(TEXT("TDMSkillRating"));
-	static FName NAME_DMSkillRating(TEXT("DMSkillRating"));
-	static FName NAME_CTFSkillRating(TEXT("CTFSkillRating"));
-
-	static FName NAME_SkillRatingSamples(TEXT("SkillRatingSamples"));
-	static FName NAME_TDMSkillRatingSamples(TEXT("TDMSkillRatingSamples"));
-	static FName NAME_DMSkillRatingSamples(TEXT("DMSkillRatingSamples"));
-	static FName NAME_CTFSkillRatingSamples(TEXT("CTFSkillRatingSamples"));
-
-	static FName NAME_MatchesPlayed(TEXT("MatchesPlayed"));
-	static FName NAME_MatchesQuit(TEXT("MatchesQuit"));
-	static FName NAME_TimePlayed(TEXT("TimePlayed"));
-	static FName NAME_Wins(TEXT("Wins"));
-	static FName NAME_Losses(TEXT("Losses"));
-	static FName NAME_Kills(TEXT("Kills"));
-	static FName NAME_Deaths(TEXT("Deaths"));
-	static FName NAME_Suicides(TEXT("Suicides"));
-
-	static FName NAME_MultiKillLevel0(TEXT("MultiKillLevel0"));
-	static FName NAME_MultiKillLevel1(TEXT("MultiKillLevel1"));
-	static FName NAME_MultiKillLevel2(TEXT("MultiKillLevel2"));
-	static FName NAME_MultiKillLevel3(TEXT("MultiKillLevel3"));
-
-	static FName NAME_SpreeKillLevel0(TEXT("SpreeKillLevel0"));
-	static FName NAME_SpreeKillLevel1(TEXT("SpreeKillLevel1"));
-	static FName NAME_SpreeKillLevel2(TEXT("SpreeKillLevel2"));
-	static FName NAME_SpreeKillLevel3(TEXT("SpreeKillLevel3"));
-	static FName NAME_SpreeKillLevel4(TEXT("SpreeKillLevel4"));
-
-	static FName NAME_ImpactHammerKills(TEXT("ImpactHammerKills"));
-	static FName NAME_EnforcerKills(TEXT("EnforcerKills"));
-	static FName NAME_BioRifleKills(TEXT("BioRifleKills"));
-	static FName NAME_ShockBeamKills(TEXT("ShockBeamKills"));
-	static FName NAME_ShockCoreKills(TEXT("ShockCoreKills"));
-	static FName NAME_ShockComboKills(TEXT("ShockComboKills"));
-	static FName NAME_LinkKills(TEXT("LinkKills"));
-	static FName NAME_LinkBeamKills(TEXT("LinkBeamKills"));
-	static FName NAME_MinigunKills(TEXT("MinigunKills"));
-	static FName NAME_MinigunShardKills(TEXT("MinigunShardKills"));
-	static FName NAME_FlakShardKills(TEXT("FlakShardKills"));
-	static FName NAME_FlakShellKills(TEXT("FlakShellKills"));
-	static FName NAME_RocketKills(TEXT("RocketKills"));
-	static FName NAME_SniperKills(TEXT("SniperKills"));
-	static FName NAME_SniperHeadshotKills(TEXT("SniperHeadshotKills"));
-	static FName NAME_RedeemerKills(TEXT("RedeemerKills"));
-	static FName NAME_InstagibKills(TEXT("InstagibKills"));
-	static FName NAME_TelefragKills(TEXT("TelefragKills"));
-
-	static FName NAME_ImpactHammerDeaths(TEXT("ImpactHammerDeaths"));
-	static FName NAME_EnforcerDeaths(TEXT("EnforcerDeaths"));
-	static FName NAME_BioRifleDeaths(TEXT("BioRifleDeaths"));
-	static FName NAME_ShockBeamDeaths(TEXT("ShockBeamDeaths"));
-	static FName NAME_ShockCoreDeaths(TEXT("ShockCoreDeaths"));
-	static FName NAME_ShockComboDeaths(TEXT("ShockComboDeaths"));
-	static FName NAME_LinkDeaths(TEXT("LinkDeaths"));
-	static FName NAME_LinkBeamDeaths(TEXT("LinkBeamDeaths"));
-	static FName NAME_MinigunDeaths(TEXT("MinigunDeaths"));
-	static FName NAME_MinigunShardDeaths(TEXT("MinigunShardDeaths"));
-	static FName NAME_FlakShardDeaths(TEXT("FlakShardDeaths"));
-	static FName NAME_FlakShellDeaths(TEXT("FlakShellDeaths"));
-	static FName NAME_RocketDeaths(TEXT("RocketDeaths"));
-	static FName NAME_SniperDeaths(TEXT("SniperDeaths"));
-	static FName NAME_SniperHeadshotDeaths(TEXT("SniperHeadshotDeaths"));
-	static FName NAME_RedeemerDeaths(TEXT("RedeemerDeaths"));
-	static FName NAME_InstagibDeaths(TEXT("InstagibDeaths"));
-	static FName NAME_TelefragDeaths(TEXT("TelefragDeaths"));
-
-	static FName NAME_PlayerXP(TEXT("PlayerXP"));
-
-	static FName NAME_BestShockCombo(TEXT("BestShockCombo"));
-	static FName NAME_AmazingCombos(TEXT("AmazingCombos"));
-	static FName NAME_AirRox(TEXT("AirRox"));
-	static FName NAME_FlakShreds(TEXT("FlakShreds"));
-	static FName NAME_AirSnot(TEXT("AirSnot"));
-
-	static FName NAME_RunDist(TEXT("RunDist"));
-	static FName NAME_SprintDist(TEXT("SprintDist"));
-	static FName NAME_InAirDist(TEXT("InAirDist"));
-	static FName NAME_SwimDist(TEXT("SwimDist"));
-	static FName NAME_TranslocDist(TEXT("TranslocDist"));
-	static FName NAME_NumDodges(TEXT("NumDodges"));
-	static FName NAME_NumWallDodges(TEXT("NumWallDodges"));
-	static FName NAME_NumJumps(TEXT("NumJumps"));
-	static FName NAME_NumLiftJumps(TEXT("NumLiftJumps"));
-	static FName NAME_NumFloorSlides(TEXT("NumFloorSlides"));
-	static FName NAME_NumWallRuns(TEXT("NumWallRuns"));
-	static FName NAME_NumImpactJumps(TEXT("NumImpactJumps"));
-	static FName NAME_NumRocketJumps(TEXT("NumRocketJumps"));
-	static FName NAME_SlideDist(TEXT("SlideDist"));
-	static FName NAME_WallRunDist(TEXT("WallRunDist"));
-
-	static FName NAME_EnforcerShots(TEXT("EnforcerShots"));
-	static FName NAME_BioRifleShots(TEXT("BioRifleShots"));
-	static FName NAME_ShockRifleShots(TEXT("ShockRifleShots"));
-	static FName NAME_LinkShots(TEXT("LinkShots"));
-	static FName NAME_MinigunShots(TEXT("MinigunShots"));
-	static FName NAME_FlakShots(TEXT("FlakShots"));
-	static FName NAME_RocketShots(TEXT("RocketShots"));
-	static FName NAME_SniperShots(TEXT("SniperShots"));
-	static FName NAME_RedeemerShots(TEXT("RedeemerShots"));
-	static FName NAME_InstagibShots(TEXT("InstagibShots"));
-
-	static FName NAME_EnforcerHits(TEXT("EnforcerHits"));
-	static FName NAME_BioRifleHits(TEXT("BioRifleHits"));
-	static FName NAME_ShockRifleHits(TEXT("ShockRifleHits"));
-	static FName NAME_LinkHits(TEXT("LinkHits"));
-	static FName NAME_MinigunHits(TEXT("MinigunHits"));
-	static FName NAME_FlakHits(TEXT("FlakHits"));
-	static FName NAME_RocketHits(TEXT("RocketHits"));
-	static FName NAME_SniperHits(TEXT("SniperHits"));
-	static FName NAME_RedeemerHits(TEXT("RedeemerHits"));
-	static FName NAME_InstagibHits(TEXT("InstagibHits"));
-	// *//
-
 	// Copied from UTGameMode
 	// /**
 	TAttributeStat::StatValueTextFunc TwoDecimal = [](const AUTPlayerState* PS, const TAttributeStat* Stat) -> FText
