@@ -24,6 +24,8 @@ AUTBetrayalPlayerState::AUTBetrayalPlayerState(const FObjectInitializer& ObjectI
 	RemainingRogueTime = -1000;
 	RogueTimePenalty = 30;
 
+	LowestPot = -1;
+
 	RogueFadingSound = ConstructorStatics.RogueFadingSound.Object;
 
 #if WITH_EDITOR || UE_BUILD_DEBUG || BETRAYAL_DEBUG
@@ -47,6 +49,7 @@ void AUTBetrayalPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimePropert
 	DOREPLIFETIME(AUTBetrayalPlayerState, BetrayedPot);
 	DOREPLIFETIME(AUTBetrayalPlayerState, RetributionCount);
 	DOREPLIFETIME(AUTBetrayalPlayerState, PaybackCount);
+	DOREPLIFETIME(AUTBetrayalPlayerState, LowestPot);
 	DOREPLIFETIME(AUTBetrayalPlayerState, HighestPot);
 
 	// Only to owner as this info shouldn't be revealed to others
@@ -71,6 +74,7 @@ void AUTBetrayalPlayerState::Reset()
 	BetrayedPot = 0;
 	RetributionCount = 0;
 	PaybackCount = 0;
+	LowestPot = -1;
 	HighestPot = 0;
 }
 

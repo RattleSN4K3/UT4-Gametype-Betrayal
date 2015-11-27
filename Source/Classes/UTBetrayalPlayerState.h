@@ -80,6 +80,10 @@ public:
 	UPROPERTY(Replicated)
 	uint32 BetrayedPot;
 
+	/** Value of the lowest pot this player has scored (in team) (for stats only) */
+	UPROPERTY(Replicated)
+	int32 LowestPot;
+
 	/** Value of the highest pot this player has achieved (in team) (for stats only) */
 	UPROPERTY(Replicated)
 	uint32 HighestPot;
