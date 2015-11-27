@@ -71,9 +71,6 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 	bPlayPlayerIntro = false;
 
 	RogueValue = 6;
-
-	// TEMP: prevent spawning "No class"
-	bNoDefaultLeaderHat = true;
 }
 
 void AUTBetrayalGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
