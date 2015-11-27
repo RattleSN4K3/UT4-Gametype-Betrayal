@@ -105,16 +105,6 @@ void UUTBetrayalScoreboard::DrawPlayer(int32 Index, AUTPlayerState* PlayerState,
 	PosX += DaggerXPadding + XL; // add playername/dagger offset
 	if (PlayerState->bIsFriend) PosX += 30 + 5; // add friend icon offset
 	DrawDaggers(BPRI, RenderDelta, PosX, YOffset);
-
-	// Workaround for drawing team players in different color // FIXMESTEVE: add GetPlayerColor to get color by player
-	// draw player name with the specific ally color over the white one
-	if (AUTGameState* GS = GetWorld()->GetGameState<AUTGameState>())
-	{
-		if (UTHUDOwner != NULL && GS->OnSameTeam(BPRI, UTHUDOwner->PlayerOwner))
-		{
-			DrawText(PlayerName, XOffset + (Width * ColumnHeaderPlayerX), YOffset + ColumnY, UTHUDOwner->MediumFont, 1.0f, 1.0f, AllyColor, ETextHorzPos::Left, ETextVertPos::Center);
-		}
-	}
 }
 
 void UUTBetrayalScoreboard::DrawDaggers(AUTBetrayalPlayerState* PRI, float RenderDelta, float XOffset, float YOffset)
@@ -161,4 +151,17 @@ void UUTBetrayalScoreboard::DrawDaggers(AUTBetrayalPlayerState* PRI, float Rende
 			XOffset += (DaggerSpacing * RenderScale);
 		}
 	}
+}
+
+FLinearColor UUTBetrayalScoreboard::GetPlayerColorFor(AUTPlayerState* InPS) const
+{
+	if (AUTGameState* GS = GetWorld()->GetGameState<AUTGameState>())
+	{
+		if (UTHUDOwner != NULL && GS->OnSameTeam(InPS, UTHUDOwner->PlayerOwner))
+		{
+			return FLinearColor(AllyColor);
+		}
+	}
+
+	return Super::GetPlayerColorFor(InPS);
 }

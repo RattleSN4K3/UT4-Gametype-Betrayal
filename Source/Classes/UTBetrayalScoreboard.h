@@ -10,6 +10,18 @@ class UUTBetrayalScoreboard : public UUTScoreboard
 {
 	GENERATED_UCLASS_BODY()
 
+	virtual FLinearColor GetPlayerColorFor(AUTPlayerState* InPS) const override;
+
+protected:
+
+	virtual void DrawScoreHeaders(float RenderDelta, float& DrawY) override;
+	virtual void DrawPlayer(int32 Index, AUTPlayerState* PlayerState, float RenderDelta, float XOffset, float YOffset) override;
+
+
+	// Custom properties below
+
+public:
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Scoreboard")
 	float ColumnHeaderKillsX;
 
@@ -53,9 +65,6 @@ class UUTBetrayalScoreboard : public UUTScoreboard
 	UTexture* UT3GHudTexture;
 
 protected:
-
-	virtual void DrawScoreHeaders(float RenderDelta, float& DrawY) override;
-	virtual void DrawPlayer(int32 Index, AUTPlayerState* PlayerState, float RenderDelta, float XOffset, float YOffset) override;
 
 	virtual void DrawDaggers(AUTBetrayalPlayerState* PRI, float RenderDelta, float XOffset, float YOffset);
 
