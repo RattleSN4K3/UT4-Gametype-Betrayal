@@ -10,12 +10,17 @@ class UUTBetrayalScoreboard : public UUTScoreboard
 {
 	GENERATED_UCLASS_BODY()
 
+	// Begin UUTScoreboard Interface.
 	virtual FLinearColor GetPlayerColorFor(AUTPlayerState* InPS) const override;
-
 protected:
-
 	virtual void DrawScoreHeaders(float RenderDelta, float& DrawY) override;
 	virtual void DrawPlayer(int32 Index, AUTPlayerState* PlayerState, float RenderDelta, float XOffset, float YOffset) override;
+	// End UUTScoreboard Interface
+
+	// Begin UUTHUDWidget Interface.
+public:
+	virtual FString GetClampedName(AUTPlayerState* PS, UFont* NameFont, float NameScale, float MaxWidth);
+	// End UUTHUDWidget Interface
 
 
 	// Custom properties below
@@ -63,6 +68,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Render UT3 HUD")
 	UTexture* UT3GHudTexture;
+
+private:
+
+	/** Last drawn name used to calculate size for drawing diggers directly after the PlayerName */
+	FString LastPlayerName;
 
 protected:
 

@@ -94,11 +94,8 @@ void UUTBetrayalScoreboard::DrawPlayer(int32 Index, AUTPlayerState* PlayerState,
 		DrawText(PlayerKills, XOffset + (Width * ColumnHeaderKillsX), YOffset + ColumnY, UTHUDOwner->SmallFont, 1.0f, 1.0f, Canvas->DrawColor, ETextHorzPos::Center, ETextVertPos::Center);
 	}
 
-	// re-create player name
-	FText PlayerName = FText::FromString(GetClampedName(PlayerState, UTHUDOwner->MediumFont, 1.f, 0.475f*Width));
-
 	// retrieve the size of the previously drawn player name
-	Canvas->TextSize(UTHUDOwner->MediumFont, PlayerName.ToString(), XL, YL);
+	Canvas->TextSize(UTHUDOwner->MediumFont, LastPlayerName, XL, YL);
 
 	// Draw the daggers
 	float PosX = XOffset + (Width * ColumnHeaderPlayerX);
@@ -164,4 +161,11 @@ FLinearColor UUTBetrayalScoreboard::GetPlayerColorFor(AUTPlayerState* InPS) cons
 	}
 
 	return Super::GetPlayerColorFor(InPS);
+}
+
+FString UUTBetrayalScoreboard::GetClampedName(AUTPlayerState* PS, UFont* NameFont, float NameScale, float MaxWidth)
+{
+	// Workaround for GetPlayerNameFor not being used. Original code uses GetClampedName in UUTScoreboard::DrawPlayer. Store the last created name
+	LastPlayerName = Super::GetClampedName(PS, NameFont, NameScale, MaxWidth);
+	return LastPlayerName;
 }
