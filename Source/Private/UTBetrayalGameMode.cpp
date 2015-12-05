@@ -192,13 +192,7 @@ bool AUTBetrayalGameMode::CheckRelevance_Implementation(AActor* Other)
 	// TODO: Add Vehicle support
 	if (Other->IsA(AUTWeapon::StaticClass())/* && !Other->IsA(AUTVehicleWeapon::StaticClass())*/)
 	{
-		if (Other->GetClass() == InstagibRifleClass)
-		{
-			// TODO: Check for Instagib Rifle and set Instagib flag
-			//UTWeap_InstagibRifle(Other).bBetrayalMode = true;
-			return true;
-		}
-		return false;
+		return Other->GetClass() == InstagibRifleClass;
 	}
 	else if (Other->IsA(AUTPickup::StaticClass()))
 	{
