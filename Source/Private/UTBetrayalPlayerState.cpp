@@ -24,7 +24,8 @@ AUTBetrayalPlayerState::AUTBetrayalPlayerState(const FObjectInitializer& ObjectI
 	RemainingRogueTime = -1000;
 	RogueTimePenalty = 30;
 
-	LowestPot = -1;
+	BetrayalLowestPot = -1;
+	BetrayedLowestPot = -1;
 
 	RogueFadingSound = ConstructorStatics.RogueFadingSound.Object;
 
@@ -49,8 +50,10 @@ void AUTBetrayalPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimePropert
 	DOREPLIFETIME(AUTBetrayalPlayerState, BetrayedPot);
 	DOREPLIFETIME(AUTBetrayalPlayerState, RetributionCount);
 	DOREPLIFETIME(AUTBetrayalPlayerState, PaybackCount);
-	DOREPLIFETIME(AUTBetrayalPlayerState, LowestPot);
-	DOREPLIFETIME(AUTBetrayalPlayerState, HighestPot);
+	DOREPLIFETIME(AUTBetrayalPlayerState, BetrayalLowestPot);
+	DOREPLIFETIME(AUTBetrayalPlayerState, BetrayalHighestPot);
+	DOREPLIFETIME(AUTBetrayalPlayerState, BetrayedLowestPot);
+	DOREPLIFETIME(AUTBetrayalPlayerState, BetrayedHighestPot);
 
 	// Only to owner as this info shouldn't be revealed to others
 	// TODO: Replicate at end of the match to everyone?
@@ -74,8 +77,10 @@ void AUTBetrayalPlayerState::Reset()
 	BetrayedPot = 0;
 	RetributionCount = 0;
 	PaybackCount = 0;
-	LowestPot = -1;
-	HighestPot = 0;
+	BetrayalLowestPot = -1;
+	BetrayalHighestPot = 0;
+	BetrayedLowestPot = -1;
+	BetrayedHighestPot = 0;
 }
 
 void AUTBetrayalPlayerState::BeginPlay()

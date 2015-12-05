@@ -82,11 +82,19 @@ public:
 
 	/** Value of the lowest pot this player has scored (in team) (for stats only) */
 	UPROPERTY(Replicated)
-	int32 LowestPot;
+	int32 BetrayalLowestPot;
 
 	/** Value of the highest pot this player has achieved (in team) (for stats only) */
 	UPROPERTY(Replicated)
-	uint32 HighestPot;
+	uint32 BetrayalHighestPot;
+
+	/** Value of the lowest pot this player has been betrayed for (from team members) (for stats only) */
+	UPROPERTY(Replicated)
+	int32 BetrayedLowestPot;
+
+	/** Value of the highest pot this player has been betrayed for (from team members) (for stats only) */
+	UPROPERTY(Replicated)
+	uint32 BetrayedHighestPot;
 
 	/** How likely bot associated with this PRI is to betray teammates */
 	float TrustWorthiness;

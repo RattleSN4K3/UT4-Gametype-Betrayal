@@ -206,8 +206,12 @@ void AUTBetrayalGameMode::ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AU
 	HitPRI->BetrayedPot += Team->TeamPot;
 
 	// track highest/lowest pot for killing player
-	InstigatorPRI->LowestPot = InstigatorPRI->LowestPot < 0 ? Team->TeamPot : FMath::Min<int32>(InstigatorPRI->LowestPot, Team->TeamPot);
-	InstigatorPRI->HighestPot = FMath::Max<int32>(InstigatorPRI->HighestPot, Team->TeamPot);
+	InstigatorPRI->BetrayalLowestPot = InstigatorPRI->BetrayalLowestPot < 0 ? Team->TeamPot : FMath::Min<int32>(InstigatorPRI->BetrayalLowestPot, Team->TeamPot);
+	InstigatorPRI->BetrayalHighestPot = FMath::Max<int32>(InstigatorPRI->BetrayalHighestPot, Team->TeamPot);
+
+	// track highest/lowest pot for killed player
+	HitPRI->BetrayedLowestPot = HitPRI->BetrayedLowestPot < 0 ? Team->TeamPot : FMath::Min<int32>(HitPRI->BetrayedLowestPot, Team->TeamPot);
+	HitPRI->BetrayedHighestPot = FMath::Max<int32>(HitPRI->BetrayedHighestPot, Team->TeamPot);
 
 	// TODO: Add stats tracking
 	//Increment pot stat
@@ -636,10 +640,14 @@ void AUTBetrayalGameMode::AddBetrayalInfo(AUTPlayerState* PlayerState, TSharedPt
 			return FText::FromString(FString::Printf(TEXT("%8.2f"), Value));
 		};
 
-		TAttributeStatBetrayal::StatValueTextFuncBet CondInt = [](const AUTBetrayalPlayerState* PS, const float Value) -> FText
+		TAttributeStatBetrayal::StatValueTextFuncBet CondInt_Betrayal = [](const AUTBetrayalPlayerState* PS, const float Value) -> FText
 		{
 			return PS->BetrayalCount > 0 ? FText::FromString(FString::FromInt((int)Value)) : FText::FromString(FString(TEXT("-")));
-			//return FText::FromString(FString::FromInt((int)Value));
+		};
+
+		TAttributeStatBetrayal::StatValueTextFuncBet CondInt_Betrayed = [](const AUTBetrayalPlayerState* PS, const float Value) -> FText
+		{
+			return PS->BetrayedCount > 0 ? FText::FromString(FString::FromInt((int)Value)) : FText::FromString(FString(TEXT("-")));
 		};
 
 		// TODO: temporarily removed due to workaround of adding stats to score tab instead of creating custom one
@@ -666,8 +674,11 @@ void AUTBetrayalGameMode::AddBetrayalInfo(AUTPlayerState* PlayerState, TSharedPt
 			return PS->BetrayedCount > 0.f ? PS->BetrayedPot / PS->BetrayedCount : 0.f;
 		}, TwoDecimal)), StatList);
 
-		NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTBetrayalGameMode", "LowestPot", "Lowest Pot"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float { return PS->LowestPot; }, CondInt)), StatList);
-		NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTBetrayalGameMode", "HighestPot", "Highest Pot"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float { return PS->HighestPot; }, CondInt)), StatList);
+		NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTBetrayalGameMode", "BetrayalLowestPot", "Lowest Betrayal Pot"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float { return PS->BetrayalLowestPot; }, CondInt_Betrayal)), StatList);
+		NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTBetrayalGameMode", "BetrayalHighestPot", "Highest Betrayal Pot"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float { return PS->BetrayalHighestPot; }, CondInt_Betrayal)), StatList);
+
+		NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTBetrayalGameMode", "VictimLowestPot", "Lowest Victim Pot"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float { return PS->BetrayedLowestPot; }, CondInt_Betrayed)), StatList);
+		NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTBetrayalGameMode", "VictimHighestPot", "Highest Victim Pot"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float { return PS->BetrayedHighestPot; }, CondInt_Betrayed)), StatList);
 
 		APlayerController* PC = Cast<APlayerController>(PlayerState->GetOwner());
 		if (PC != NULL && PC->IsLocalPlayerController())
