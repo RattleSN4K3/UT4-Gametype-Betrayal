@@ -29,9 +29,21 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 		ConstructorHelpers::FObjectFinder<USoundCue> BetrayedSoundAsset;
 		ConstructorHelpers::FObjectFinder<USoundCue> JoinTeamSoundAsset;
 
+		ConstructorHelpers::FObjectFinder<UClass> Mutator_AddTrans;
+		ConstructorHelpers::FObjectFinder<UClass> Mutator_FriendlyFire;
+		ConstructorHelpers::FObjectFinder<UClass> Mutator_Instagib;
+		ConstructorHelpers::FObjectFinder<UClass> Mutator_WeaponArena;
+		ConstructorHelpers::FObjectFinder<UClass> Mutator_WeaponReplacement;
+
 		FConstructorStatics()
 			: PawnClass(TEXT("Class'/UTBetrayal/DefaultCharacter_Betrayal.DefaultCharacter_Betrayal_C'"))
 			, InstaGibRifleClass(TEXT("Class'/UTBetrayal/BP_InstagibRifle_Betrayal.BP_InstagibRifle_Betrayal_C'")) // Class'/Game/RestrictedAssets/Weapons/ShockRifle/BP_InstagibRifle.BP_InstagibRifle_C'
+
+			, Mutator_AddTrans(TEXT("Class'/Game/RestrictedAssets/Blueprints/Mutator_AddTrans.Mutator_AddTrans_C'"))
+			, Mutator_FriendlyFire(TEXT("Class'/Game/RestrictedAssets/Blueprints/Mutator_FriendlyFire.Mutator_FriendlyFire_C'"))
+			, Mutator_Instagib(TEXT("Class'/Game/RestrictedAssets/Blueprints/Mutator_Instagib.Mutator_Instagib_C'"))
+			, Mutator_WeaponArena(TEXT("Class'/Script/UnrealTournament.UTMutator_WeaponArena'"))
+			, Mutator_WeaponReplacement(TEXT("Class'/Script/UnrealTournament.UTMutator_WeaponReplacement'"))
 
 			, BetrayingSoundAsset(TEXT("SoundCue'/UTBetrayal/Sounds/A_Gameplay_CTF_EnemyFlagGrab_Cue.A_Gameplay_CTF_EnemyFlagGrab_Cue'"))
 			, BetrayedSoundAsset(TEXT("SoundCue'/UTBetrayal/Sounds/A_Gameplay_CTF_EnemyFlagReturn_Cue.A_Gameplay_CTF_EnemyFlagReturn_Cue'"))
@@ -60,6 +72,12 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 	// Workaround for bots to betray team members
 	// TODO: Option to have PickNewEnemy/IsTeammate as Squad/BotDecisionComponent (Pull request?)
 	BotClass = AUTBetrayalBot::StaticClass();
+
+	DisallowedMutators.Add(ConstructorStatics.Mutator_AddTrans.Object);
+	DisallowedMutators.Add(ConstructorStatics.Mutator_FriendlyFire.Object);
+	DisallowedMutators.Add(ConstructorStatics.Mutator_Instagib.Object);
+	DisallowedMutators.Add(ConstructorStatics.Mutator_WeaponArena.Object);
+	DisallowedMutators.Add(ConstructorStatics.Mutator_WeaponReplacement.Object);
 
 	BetrayingSound = ConstructorStatics.BetrayingSoundAsset.Object;
 	BetrayedSound = ConstructorStatics.BetrayedSoundAsset.Object;
@@ -148,21 +166,21 @@ bool AUTBetrayalGameMode::AllowMutator(TSubclassOf<AUTMutator> MutClass)
 {
 	if (MutClass != NULL)
 	{
-		// TODO: disallow some stock mutators
+		// Original/core mutators were:
+		// UTMutator_Handicap, UTMutator_NoPowerups, UTMutator_NoTranslocator, 
+		// UTMutator_NoOrbs, UTMutator_Survival, UTMutator_Instagib, 
+		// UTMutator_WeaponArena, UTMutator_WeaponReplacement, UTMutator_WeaponsRespawn,
+		// UTMutator_Hero
+
+		// TODO: disallow some more stock mutators
 		// TODO: disallow some custom/3rd-party mutators
 
-		if (/*(MutClass == AUTMutator_Handicap::StaticClass()) ||
-			(MutClass == AUTMutator_NoPowerups::StaticClass()) ||
-			(MutClass == AUTMutator_NoTranslocator::StaticClass()) ||
-			(MutClass == AUTMutator_NoOrbs::StaticClass()) ||
-			(MutClass == AUTMutator_Survival::StaticClass()) ||
-			(MutClass == AUTMutator_Instagib::StaticClass()) ||*/
-			(MutClass->IsChildOf<AUTMutator_WeaponArena>()) ||
-			(MutClass->IsChildOf<AUTMutator_WeaponReplacement>()) /*||
-			(MutClass == AUTMutator_WeaponsRespawn::StaticClass()) ||
-			(MutClass == AUTMutator_Hero::StaticClass()) */)
+		for (auto Mutator : DisallowedMutators)
 		{
-			return false;
+			if (MutClass->IsChildOf(Mutator))
+			{
+				return false;
+			}
 		}
 	}
 

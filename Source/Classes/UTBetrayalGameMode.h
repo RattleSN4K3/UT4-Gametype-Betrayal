@@ -58,6 +58,10 @@ protected:
 
 public:
 
+	/** mutators which are disallowed */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Game)
+	TArray< TSubclassOf<AUTMutator> > DisallowedMutators;
+
 	UPROPERTY(Transient, BlueprintReadOnly)
 	TArray<AUTBetrayalTeam*> Teams;
 
