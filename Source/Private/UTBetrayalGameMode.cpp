@@ -432,20 +432,17 @@ void AUTBetrayalGameMode::Logout(AController* Exiting)
 			RemoveFromTeam(PRI);
 		}
 
-		// the current bot is still counted, check for 3 players or less
-		if (GetTotalPlayingPlayers() < 4 && Teams.Num() == 1)
+		// no need for teams if there are only 3 player left. un-team all players
+		// Note: the current bot is still counted, check for 3 players or less
+		if (GetTotalPlayingPlayers() < 4 && Teams.Num() == 1 && !Teams[0]->IsPendingKillPending())
 		{
-			//AUTBetrayalTeam* Team = Teams[0];
-			//if (Team != NULL)
-			//{
-
 			// TODO: what to do with the existing pot? Split pot to existing players?
-			//       what if adding these points would end the game? Ovetime with sudden death?
+			//       what if adding these points would end the game? Overtime with sudden death?
 
 			if (Teams.IsValidIndex(0) && Teams[0] != NULL)
 			{
 				auto Team = Teams[0];
-				Team->DisperseTeam();
+				Team->DissolveTeam();
 				RemoveTeam(Team);	
 				if (Team != NULL)
 				{
