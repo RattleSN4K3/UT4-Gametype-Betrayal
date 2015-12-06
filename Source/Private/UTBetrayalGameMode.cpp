@@ -279,10 +279,18 @@ void AUTBetrayalGameMode::ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AU
 			if (Team->Teammates[i] != NULL)
 			{
 				Team->Teammates[i]->Betrayer = InstigatorPRI;
-				AUTPlayerController* OtherPC = Cast<AUTPlayerController>(Team->Teammates[i]->GetOwner());
-				if (OtherPC != NULL)
+				if (auto OtherOwner = Team->Teammates[i]->GetOwner())
 				{
-					OtherPC->ClientPlaySound(BetrayedSound);
+					if (auto OtherPC = Cast<AUTPlayerController>(OtherOwner))
+					{
+						OtherPC->ClientPlaySound(BetrayedSound);
+					}
+					else if (auto OtherBot = Cast<AUTBetrayalBot>(OtherOwner))
+					{
+						// clear betray flag otherwise, teams with more players remaining would
+						// still try to betray each other even if the Pot is now empty
+						OtherBot->bBetrayTeam = false;
+					}
 				}
 			}
 		}
@@ -505,16 +513,14 @@ void AUTBetrayalGameMode::ScoreKill_Implementation(AController* Killer, AControl
 				{
 					for (int32 i = 0; i< ARRAY_COUNT(KillerPRI->CurrentTeam->Teammates); i++)
 					{
-						if (KillerPRI->CurrentTeam->Teammates[i] != NULL)
+						if (AUTBetrayalPlayerState* TeamMatePRI = KillerPRI->CurrentTeam->Teammates[i])
 						{
-							AUTBetrayalPlayerState* BotPRI = KillerPRI->CurrentTeam->Teammates[i];
-
 							// TODO: store flag else where FIXME: do not use subclassed UTBot
-							AUTBetrayalBot* B = Cast<AUTBetrayalBot>(KillerPRI->CurrentTeam->Teammates[i]->GetOwner());
-							if ((B != NULL) && !B->bBetrayTeam)
+							AUTBetrayalBot* B = Cast<AUTBetrayalBot>(TeamMatePRI->GetOwner());
+							if (B != NULL && !B->bBetrayTeam)
 							{
-								float BetrayalValue = (float)(KillerPRI->CurrentTeam->TeamPot) + 0.3f*(float)BotPRI->ScoreValueFor(KillerPRI);
-								float BetrayalRandomness = 1.5 + RogueValue - B->CurrentAggression + BotPRI->GetTrustWorthiness();
+								float BetrayalValue = (float)(KillerPRI->CurrentTeam->TeamPot) + 0.3f*(float)TeamMatePRI->ScoreValueFor(KillerPRI);
+								float BetrayalRandomness = 1.5 + RogueValue - B->CurrentAggression + TeamMatePRI->GetTrustWorthiness();
 
 								UE_LOG(Betrayal, Verbose, TEXT("%s betrayal value %d vs. %d"), *KillerPRI->PlayerName, BetrayalValue, BetrayalRandomness);
 								if ((BetrayalValue > BetrayalRandomness) && (FMath::FRand() < 0.2))
