@@ -451,7 +451,7 @@ void AUTBetrayalGameMode::Logout(AController* Exiting)
 			if (Teams.IsValidIndex(0) && Teams[0] != NULL)
 			{
 				auto Team = Teams[0];
-				Team->DissolveTeam();
+				Team->DisbandTeam();
 				RemoveTeam(Team);	
 				if (Team != NULL)
 				{

@@ -30,6 +30,6 @@ class AUTBetrayalTeam : public AActor
 	virtual int32 LoseTeammate(AUTBetrayalPlayerState* OldTeammate);
 
 	/** Removes any player from the team */
-	virtual void DissolveTeam();
+	virtual void DisbandTeam();
 
 };

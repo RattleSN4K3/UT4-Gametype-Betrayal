@@ -109,7 +109,7 @@ int32 AUTBetrayalTeam::LoseTeammate(AUTBetrayalPlayerState* OldTeammate)
 	return NumTeammates;
 }
 
-void AUTBetrayalTeam::DissolveTeam()
+void AUTBetrayalTeam::DisbandTeam()
 {
 	for (int32 i = 0; i < ARRAY_COUNT(Teammates); i++)
 	{
