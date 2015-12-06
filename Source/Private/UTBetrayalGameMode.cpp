@@ -204,13 +204,13 @@ bool AUTBetrayalGameMode::CheckRelevance_Implementation(AActor* Other)
 void AUTBetrayalGameMode::ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AUTBetrayalPlayerState* HitPRI, APawn* ShotInstigator, APawn* HitPawn)
 {
 	AUTCharacter* HitChar = Cast<AUTCharacter>(HitPawn);
-	if (HitChar != NULL && HitChar->IsSpawnProtected())
+	if (InstigatorPRI == NULL || HitChar == NULL || HitChar->IsSpawnProtected())
 	{
 		return;
 	}
 
 	AUTBetrayalTeam* Team = InstigatorPRI->CurrentTeam;
-	if (Team == NULL)
+	if (Team == NULL || HitPRI == NULL)
 		return;
 
 	InstigatorPRI->Score += Team->TeamPot;
