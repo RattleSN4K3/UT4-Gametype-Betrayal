@@ -268,6 +268,7 @@ void AUTBetrayalGameMode::ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AU
 	RemoveFromTeam(InstigatorPRI);
 
 	// increase betray count and update player killed by the most
+	InstigatorPRI->UpdateNemesis(HitPRI);
 	HitPRI->UpdateNemesis(InstigatorPRI);
 
 	if (!Team->IsPendingKillPending())
