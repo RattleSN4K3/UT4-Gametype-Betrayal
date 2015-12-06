@@ -10,6 +10,10 @@ class AUTBetrayalPlayerState : public AUTPlayerState
 {
 	GENERATED_UCLASS_BODY()
 
+	// Begin AActor Interface.
+	virtual void PreReplication(IRepChangedPropertyTracker& ChangedPropertyTracker) override;
+	// End AActor Interface
+
 protected:
 
 	FTimerHandle TimerHandle_RogueTimer;

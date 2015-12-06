@@ -56,8 +56,19 @@ void AUTBetrayalPlayerState::GetLifetimeReplicatedProps(TArray< FLifetimePropert
 	DOREPLIFETIME(AUTBetrayalPlayerState, BetrayedHighestPot);
 
 	// Only to owner as this info shouldn't be revealed to others
-	// TODO: Replicate at end of the match to everyone?
 	DOREPLIFETIME_CONDITION(AUTBetrayalPlayerState, CurrentNemesis, COND_OwnerOnly);
+}
+
+void AUTBetrayalPlayerState::PreReplication(IRepChangedPropertyTracker & ChangedPropertyTracker)
+{
+	Super::PreReplication(ChangedPropertyTracker);
+
+	// Replicate the nemesis at end of the match to everyone
+	AUTGameMode* GM = GetWorld()->GetAuthGameMode<AUTGameMode>();
+	if (GM && GM->bGameEnded)
+	{
+		DOREPLIFETIME_ACTIVE_OVERRIDE(AUTBetrayalPlayerState, CurrentNemesis, true);
+	}
 }
 
 void AUTBetrayalPlayerState::Reset()

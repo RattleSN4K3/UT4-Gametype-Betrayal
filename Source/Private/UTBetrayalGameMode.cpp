@@ -689,8 +689,11 @@ void AUTBetrayalGameMode::AddBetrayalInfo(AUTPlayerState* PlayerState, TSharedPt
 		NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTBetrayalGameMode", "VictimLowestPot", "Lowest Victim Pot"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float { return PS->BetrayedLowestPot; }, CondInt_Betrayed)), StatList);
 		NewPlayerInfoLine(RightPane, NSLOCTEXT("AUTBetrayalGameMode", "VictimHighestPot", "Highest Victim Pot"), MakeShareable(new TAttributeStatBetrayal(BPRI, [](const AUTBetrayalPlayerState* PS) -> float { return PS->BetrayedHighestPot; }, CondInt_Betrayed)), StatList);
 
+		// this method is called from default object context, can't rely on instanced properties
+		// check GameState whether the Game has ended, or rely on the owner of the PlayerState
 		APlayerController* PC = Cast<APlayerController>(PlayerState->GetOwner());
-		if (PC != NULL && PC->IsLocalPlayerController())
+		AUTGameState* GS = PlayerState->GetWorld() ? PlayerState->GetWorld()->GetGameState<AUTGameState>() : NULL;
+		if ((PC != NULL && PC->IsLocalPlayerController()) || (GS && (GS->WinnerPlayerState || GS->WinningTeam)))
 		{
 			LeftPane->AddSlot()[SNew(SSpacer).Size(FVector2D(0.0f, 20.0f))];
 			NewPlayerInfoLine(LeftPane, NSLOCTEXT("AUTBetrayalGameMode", "Nemesis", "Nemesis"), MakeShareable(new TAttributeStatBetrayal(BPRI, nullptr, [](const AUTBetrayalPlayerState* PS, const float Value) -> FText
