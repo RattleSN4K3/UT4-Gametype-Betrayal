@@ -168,7 +168,14 @@ int32 AUTBetrayalPlayerState::ScoreValueFor(AUTBetrayalPlayerState* OtherPRI)
 	int32 ScoreValue = 1 + FMath::Clamp<int32>((Score - OtherPRI->Score) / 4, 0, 9);
 	if (bIsRogue && (OtherPRI->Betrayer == this))
 	{
-		ScoreValue += AUTBetrayalGameMode::StaticClass()->GetDefaultObject<AUTBetrayalGameMode>()->RogueValue;
+		if (AUTBetrayalGameMode* GM = GetWorld()->GetAuthGameMode<AUTBetrayalGameMode>())
+		{
+			ScoreValue += GM->RogueValue;
+		}
+		else
+		{
+			ScoreValue += AUTBetrayalGameMode::StaticClass()->GetDefaultObject<AUTBetrayalGameMode>()->RogueValue;
+		}
 	}
 	return ScoreValue;
 }
