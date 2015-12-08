@@ -12,8 +12,10 @@
 #include "UTMutator_WeaponArena.h"
 #include "UTMutator_WeaponReplacement.h"
 
-#include "Private/Slate/Widgets/SUTTabWidget.h"
 #include "UTPlayerState.h"
+
+#include "SNumericEntryBox.h"
+#include "Private/Slate/Widgets/SUTTabWidget.h"
 #include "StatNames.h"
 
 AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitializer)
@@ -118,6 +120,8 @@ void AUTBetrayalGameMode::InitGame(const FString& MapName, const FString& Option
 	}
 
 	bForcePlayerIntro = HasOption(Options, TEXT("PlayPlayerIntro"));
+
+	RogueValue = FMath::Max(1, GetIntOption(Options, TEXT("RogueValue"), RogueValue));
 }
 
 void AUTBetrayalGameMode::BeginGame()
@@ -545,6 +549,58 @@ void AUTBetrayalGameMode::CreateConfigWidgets(TSharedPtr<class SVerticalBox> Men
 {
 	Super::CreateConfigWidgets(MenuSpace, bCreateReadOnly, ConfigProps);
 
+	TSharedPtr< TAttributeProperty<int32> > RogueValueAttr = StaticCastSharedPtr<TAttributeProperty<int32>>(FindGameURLOption(ConfigProps, TEXT("RogueValue")));
+
+	if (RogueValueAttr.IsValid())
+	{
+		MenuSpace->AddSlot()
+		.Padding(0.0f, 0.0f, 0.0f, 5.0f)
+		.AutoHeight()
+		.VAlign(VAlign_Top)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.VAlign(VAlign_Center)
+			[
+				SNew(SBox)
+				.WidthOverride(350)
+				[
+					SNew(STextBlock)
+					.TextStyle(SUWindowsStyle::Get(), "UT.Common.NormalText")
+					.Text(NSLOCTEXT("AUTBetrayalGameMode", "RogueValue", "Rogue Value"))
+				]
+			]
+			+ SHorizontalBox::Slot()
+			.Padding(20.0f, 0.0f, 0.0f, 0.0f)
+			.AutoWidth()
+			[
+				SNew(SBox)
+				.WidthOverride(300)
+				[
+					bCreateReadOnly ?
+						StaticCastSharedRef<SWidget>(
+							SNew(STextBlock)
+							.TextStyle(SUWindowsStyle::Get(), "UT.Common.ButtonText.White")
+							.Text(RogueValueAttr.ToSharedRef(), &TAttributeProperty<int32>::GetAsText)
+					) :
+						StaticCastSharedRef<SWidget>(
+							SNew(SNumericEntryBox<int32>)
+							.Value(RogueValueAttr.ToSharedRef(), &TAttributeProperty<int32>::GetOptional)
+							.OnValueChanged(RogueValueAttr.ToSharedRef(), &TAttributeProperty<int32>::Set)
+							.AllowSpin(true)
+							.Delta(1)
+							.MinValue(1)
+							.MaxValue(999)
+							.MinSliderValue(1)
+							.MaxSliderValue(99)
+							.EditableTextBoxStyle(SUWindowsStyle::Get(), "UT.Common.NumEditbox.White")
+					)
+				]
+			]
+		];
+	}
+
 	// TODO: add menu widgets for changing additional game options
 }
 
@@ -744,6 +800,8 @@ void AUTBetrayalGameMode::CreateGameURLOptions(TArray<TSharedPtr<TAttributePrope
 			MenuProps.RemoveAt(i);
 		}
 	}
+
+	MenuProps.Add(MakeShareable(new TAttributeProperty<int32>(this, &RogueValue, TEXT("RogueValue"))));
 }
 
 void AUTBetrayalGameMode::GetGameURLOptions(const TArray<TSharedPtr<TAttributePropertyBase>>& MenuProps, TArray<FString>& OptionsList, int32& DesiredPlayerCount)
