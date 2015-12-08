@@ -72,6 +72,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Game)
 	TSubclassOf<AUTBetrayalTeam> TeamClass;
 
+	/** Whether to allow non-timed pickup */
+	UPROPERTY(EditDefaultsOnly, Category = Betrayal)
+	bool bAllowPickups;
+
 	/** Score bonus for killing Rogue that betrayed you */
 	UPROPERTY(EditDefaultsOnly, Category = Betrayal)
 	int32 RogueValue;
@@ -155,4 +159,27 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	virtual void BETServerKillbot(const FString& NameOrUIDStr);
 
+};
+
+// extras for bools to convert to check box type
+struct TAttributePropertyBool_TEMP : public TAttributePropertyBool
+{
+	TAttributePropertyBool_TEMP(UObject* InObj, bool* InData, const TCHAR* InURLKey = NULL)
+	: TAttributePropertyBool(InObj, InData, InURLKey)
+	{}
+	ECheckBoxState GetAsCheckBox() const
+	{
+		return Get() ? ECheckBoxState::Checked : ECheckBoxState::Unchecked;
+	}
+	void SetFromCheckBox(ECheckBoxState CheckedState)
+	{
+		if (CheckedState == ECheckBoxState::Checked)
+		{
+			Set(true);
+		}
+		else if (CheckedState == ECheckBoxState::Unchecked)
+		{
+			Set(false);
+		}
+	}
 };

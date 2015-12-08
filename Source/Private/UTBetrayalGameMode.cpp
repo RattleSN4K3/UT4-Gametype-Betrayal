@@ -91,6 +91,7 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 
 	RogueValue = 6;
 	RogueTimePenalty = 30.0;
+	bAllowPickups = false;
 }
 
 void AUTBetrayalGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -124,6 +125,9 @@ void AUTBetrayalGameMode::InitGame(const FString& MapName, const FString& Option
 
 	RogueValue = FMath::Max(1, GetIntOption(Options, TEXT("RogueValue"), RogueValue));
 	RogueTimePenalty = FMath::Max(0, GetIntOption(Options, TEXT("RogueTimePenalty"), RogueTimePenalty));
+
+	FString InOpt = ParseOption(Options, TEXT("AllowPickups"));
+	bAllowPickups = EvalBoolOptions(InOpt, bAllowPickups);
 }
 
 void AUTBetrayalGameMode::BeginGame()
@@ -553,6 +557,7 @@ void AUTBetrayalGameMode::CreateConfigWidgets(TSharedPtr<class SVerticalBox> Men
 
 	TSharedPtr< TAttributeProperty<int32> > RogueValueAttr = StaticCastSharedPtr<TAttributeProperty<int32>>(FindGameURLOption(ConfigProps, TEXT("RogueValue")));
 	TSharedPtr< TAttributeProperty<int32> > RogueTimePenaltyAttr = StaticCastSharedPtr<TAttributeProperty<int32>>(FindGameURLOption(ConfigProps, TEXT("RogueTimePenalty")));
+	TSharedPtr< TAttributePropertyBool_TEMP > AllowPickupsAttr = StaticCastSharedPtr<TAttributePropertyBool_TEMP>(FindGameURLOption(ConfigProps, TEXT("AllowPickups")));
 
 	if (RogueValueAttr.IsValid())
 	{
@@ -653,6 +658,55 @@ void AUTBetrayalGameMode::CreateConfigWidgets(TSharedPtr<class SVerticalBox> Men
 			]
 		];
 	}
+	
+	if (AllowPickupsAttr.IsValid())
+	{
+		MenuSpace->AddSlot()
+		.AutoHeight()
+		.VAlign(VAlign_Top)
+		.Padding(0.0f, 0.0f, 0.0f, 5.0f)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.VAlign(VAlign_Center)
+			[
+				SNew(SBox)
+				.WidthOverride(350)
+				[
+					SNew(STextBlock)
+					.TextStyle(SUWindowsStyle::Get(), "UT.Common.NormalText")
+					.Text(NSLOCTEXT("AUTBetrayalGameMode", "AllowPickups", "Allow Pickups"))
+				]
+			]
+			+ SHorizontalBox::Slot()
+			.Padding(20.0f, 0.0f, 0.0f, 10.0f)
+			.AutoWidth()
+			[
+				SNew(SBox)
+				.WidthOverride(300)
+				[
+					bCreateReadOnly ?
+					StaticCastSharedRef<SWidget>(
+						SNew(SCheckBox)
+						.IsChecked(AllowPickupsAttr.ToSharedRef(), &TAttributePropertyBool_TEMP::GetAsCheckBox)
+						.Style(SUWindowsStyle::Get(), "UT.Common.CheckBox")
+						.ForegroundColor(FLinearColor::White)
+						.Type(ESlateCheckBoxType::CheckBox)
+					) :
+					StaticCastSharedRef<SWidget>(
+						SNew(SCheckBox)
+						.IsChecked(AllowPickupsAttr.ToSharedRef(), &TAttributePropertyBool_TEMP::GetAsCheckBox)
+						.OnCheckStateChanged(AllowPickupsAttr.ToSharedRef(), &TAttributePropertyBool_TEMP::SetFromCheckBox)
+						.Style(SUWindowsStyle::Get(), "UT.Common.CheckBox")
+						.ForegroundColor(FLinearColor::White)
+						.Type(ESlateCheckBoxType::CheckBox)
+					)
+				]
+			]
+		];
+	}
+	
 
 	// TODO: add menu widgets for changing additional game options
 }
@@ -828,8 +882,9 @@ FText AUTBetrayalGameMode::BuildServerRules(AUTGameState* GameState)
 	Args.Add("Rules", Super::BuildServerRules(GameState));
 	Args.Add("RogueValue", FText::AsNumber(RogueValue));
 	Args.Add("RogueTimePenalty", FText::AsNumber(AUTBetrayalPlayerState::StaticClass()->GetDefaultObject<AUTBetrayalPlayerState>()->RogueTimePenalty));
+	Args.Add("AllowPickups", bAllowPickups ? NSLOCTEXT("AUTBetrayalGameMode", "General", "True") : NSLOCTEXT("AUTBetrayalGameMode", "General", "False"));
 
-	return FText::Format(NSLOCTEXT("UTBetrayalGameMode", "GameRules", "{Rules}  Rogue Value: {RogueValue}  Rogue time penalty: {RogueTimePenalty} s"), Args);
+	return FText::Format(NSLOCTEXT("UTBetrayalGameMode", "GameRules", "{Rules}  Rogue Value: {RogueValue}  Rogue time penalty: {RogueTimePenalty}s  Allow Pickups: {AllowPickups}"), Args);
 }
 
 void AUTBetrayalGameMode::BuildServerResponseRules(FString& OutRules)
@@ -837,6 +892,7 @@ void AUTBetrayalGameMode::BuildServerResponseRules(FString& OutRules)
 	// TODO: proper order
 	OutRules += FString::Printf(TEXT("Rogue Value\t%i\t"), RogueValue);
 	OutRules += FString::Printf(TEXT("Rogue time penalty\t%i\t"), AUTBetrayalPlayerState::StaticClass()->GetDefaultObject<AUTBetrayalPlayerState>()->RogueTimePenalty);
+	OutRules += FString::Printf(TEXT("Allow Pickups\t%s\t"), bAllowPickups ? TEXT("True") : TEXT("False"));
 
 	Super::BuildServerResponseRules(OutRules);
 }
@@ -856,6 +912,7 @@ void AUTBetrayalGameMode::CreateGameURLOptions(TArray<TSharedPtr<TAttributePrope
 
 	MenuProps.Add(MakeShareable(new TAttributeProperty<int32>(this, &RogueValue, TEXT("RogueValue"))));
 	MenuProps.Add(MakeShareable(new TAttributeProperty<int32>(this, &RogueTimePenalty, TEXT("RogueTimePenalty"))));
+	MenuProps.Add(MakeShareable(new TAttributePropertyBool_TEMP(this, &bAllowPickups, TEXT("AllowPickups"))));
 }
 
 void AUTBetrayalGameMode::GetGameURLOptions(const TArray<TSharedPtr<TAttributePropertyBase>>& MenuProps, TArray<FString>& OptionsList, int32& DesiredPlayerCount)
@@ -873,7 +930,7 @@ void AUTBetrayalGameMode::GetGameURLOptions(const TArray<TSharedPtr<TAttributePr
 	//	}
 	//}
 
-	// TODO: parameterize additional game options (like allowing Boots, Rogue value, Rogue penalty)
+	// TODO: parameterize additional game options (like allowing Boots)
 }
 
 void AUTBetrayalGameMode::BETKillbot(const FString& NameOrUIDStr)
