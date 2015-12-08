@@ -90,6 +90,7 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 	bPlayPlayerIntro = false;
 
 	RogueValue = 6;
+	RogueTimePenalty = 30.0;
 }
 
 void AUTBetrayalGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -122,6 +123,7 @@ void AUTBetrayalGameMode::InitGame(const FString& MapName, const FString& Option
 	bForcePlayerIntro = HasOption(Options, TEXT("PlayPlayerIntro"));
 
 	RogueValue = FMath::Max(1, GetIntOption(Options, TEXT("RogueValue"), RogueValue));
+	RogueTimePenalty = FMath::Max(0, GetIntOption(Options, TEXT("RogueTimePenalty"), RogueTimePenalty));
 }
 
 void AUTBetrayalGameMode::BeginGame()
@@ -550,6 +552,7 @@ void AUTBetrayalGameMode::CreateConfigWidgets(TSharedPtr<class SVerticalBox> Men
 	Super::CreateConfigWidgets(MenuSpace, bCreateReadOnly, ConfigProps);
 
 	TSharedPtr< TAttributeProperty<int32> > RogueValueAttr = StaticCastSharedPtr<TAttributeProperty<int32>>(FindGameURLOption(ConfigProps, TEXT("RogueValue")));
+	TSharedPtr< TAttributeProperty<int32> > RogueTimePenaltyAttr = StaticCastSharedPtr<TAttributeProperty<int32>>(FindGameURLOption(ConfigProps, TEXT("RogueTimePenalty")));
 
 	if (RogueValueAttr.IsValid())
 	{
@@ -593,6 +596,56 @@ void AUTBetrayalGameMode::CreateConfigWidgets(TSharedPtr<class SVerticalBox> Men
 							.MinValue(1)
 							.MaxValue(999)
 							.MinSliderValue(1)
+							.MaxSliderValue(99)
+							.EditableTextBoxStyle(SUWindowsStyle::Get(), "UT.Common.NumEditbox.White")
+					)
+				]
+			]
+		];
+	}
+
+	if (RogueTimePenaltyAttr.IsValid())
+	{
+		MenuSpace->AddSlot()
+		.AutoHeight()
+		.VAlign(VAlign_Top)
+		.Padding(0.0f, 0.0f, 0.0f, 5.0f)
+		[
+			SNew(SHorizontalBox)
+			+ SHorizontalBox::Slot()
+			.AutoWidth()
+			.VAlign(VAlign_Center)
+			[
+				SNew(SBox)
+				.WidthOverride(350)
+				[
+					SNew(STextBlock)
+					.TextStyle(SUWindowsStyle::Get(), "UT.Common.NormalText")
+					.Text(NSLOCTEXT("AUTBetrayalGameMode", "RogueTimePenalty", "Rogue Time Penalty"))
+				]
+			]
+			+ SHorizontalBox::Slot()
+			.Padding(20.0f, 0.0f, 0.0f, 0.0f)
+			.AutoWidth()
+			[
+				SNew(SBox)
+				.WidthOverride(300)
+				[
+					bCreateReadOnly ?
+						StaticCastSharedRef<SWidget>(
+							SNew(STextBlock)
+							.TextStyle(SUWindowsStyle::Get(), "UT.Common.ButtonText.White")
+							.Text(RogueTimePenaltyAttr.ToSharedRef(), &TAttributeProperty<int32>::GetAsText)
+					) :
+						StaticCastSharedRef<SWidget>(
+							SNew(SNumericEntryBox<int32>)
+							.Value(RogueTimePenaltyAttr.ToSharedRef(), &TAttributeProperty<int32>::GetOptional)
+							.OnValueChanged(RogueTimePenaltyAttr.ToSharedRef(), &TAttributeProperty<int32>::Set)
+							.AllowSpin(true)
+							.Delta(1)
+							.MinValue(0)
+							.MaxValue(999)
+							.MinSliderValue(0)
 							.MaxSliderValue(99)
 							.EditableTextBoxStyle(SUWindowsStyle::Get(), "UT.Common.NumEditbox.White")
 					)
@@ -802,6 +855,7 @@ void AUTBetrayalGameMode::CreateGameURLOptions(TArray<TSharedPtr<TAttributePrope
 	}
 
 	MenuProps.Add(MakeShareable(new TAttributeProperty<int32>(this, &RogueValue, TEXT("RogueValue"))));
+	MenuProps.Add(MakeShareable(new TAttributeProperty<int32>(this, &RogueTimePenalty, TEXT("RogueTimePenalty"))));
 }
 
 void AUTBetrayalGameMode::GetGameURLOptions(const TArray<TSharedPtr<TAttributePropertyBase>>& MenuProps, TArray<FString>& OptionsList, int32& DesiredPlayerCount)

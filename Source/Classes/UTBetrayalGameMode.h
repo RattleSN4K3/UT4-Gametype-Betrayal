@@ -76,6 +76,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Betrayal)
 	int32 RogueValue;
 
+	/** Rogue time penalty **/
+	UPROPERTY(EditDefaultsOnly, Category = Betrayal)
+	int32 RogueTimePenalty;
+
 	/** Class for announcement messages related to Betrayal */
 	UPROPERTY(EditDefaultsOnly, Category = Game)
 	TSubclassOf<class UUTLocalMessage> AnnouncerMessageClass;

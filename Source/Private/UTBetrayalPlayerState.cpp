@@ -22,7 +22,6 @@ AUTBetrayalPlayerState::AUTBetrayalPlayerState(const FObjectInitializer& ObjectI
 	static FConstructorStatics ConstructorStatics;
 
 	RemainingRogueTime = -1000;
-	RogueTimePenalty = 30;
 
 	BetrayalLowestPot = -1;
 	BetrayedLowestPot = -1;
@@ -112,7 +111,9 @@ void AUTBetrayalPlayerState::BeginPlay()
 
 void AUTBetrayalPlayerState::SetRogueTimer()
 {
-	RemainingRogueTime = RogueTimePenalty;
+	AUTBetrayalGameMode* GM = GetWorld()->GetAuthGameMode<AUTBetrayalGameMode>();
+	RogueTimePenalty = GM ? GM->RogueTimePenalty : AUTBetrayalGameMode::StaticClass()->GetDefaultObject<AUTBetrayalGameMode>()->RogueTimePenalty;
+	
 	ForceNetUpdate();
 	bIsRogue = true;
 	GetWorldTimerManager().SetTimer(TimerHandle_RogueTimer, this, &AUTBetrayalPlayerState::RogueTimer, 1.0f, true);

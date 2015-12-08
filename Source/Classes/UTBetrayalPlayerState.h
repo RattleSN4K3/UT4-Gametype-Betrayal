@@ -37,7 +37,7 @@ public:
 	int32 RemainingRogueTime;
 
 	/** Rogue time penalty **/
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(BlueprintReadOnly, Category = Game)
 	int32 RogueTimePenalty;
 
 	/** sound played when rogue time is running out */
