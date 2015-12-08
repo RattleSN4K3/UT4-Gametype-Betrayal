@@ -156,7 +156,7 @@ void AUTBetrayalGameMode::StartMatch()
 	}
 
 	// in general, BeginGame handles starting the timer (once the count down has ended)
-	// but the countdown in not existant in PIE sessions, therefore we reliably start the
+	// but the countdown in not existent in PIE sessions, therefore we reliably start the
 	// timer in here as well (checking if already running)
 	if (GetWorld()->IsPlayInEditor())
 	{
@@ -881,7 +881,7 @@ FText AUTBetrayalGameMode::BuildServerRules(AUTGameState* GameState)
 	FFormatNamedArguments Args;
 	Args.Add("Rules", Super::BuildServerRules(GameState));
 	Args.Add("RogueValue", FText::AsNumber(RogueValue));
-	Args.Add("RogueTimePenalty", FText::AsNumber(AUTBetrayalPlayerState::StaticClass()->GetDefaultObject<AUTBetrayalPlayerState>()->RogueTimePenalty));
+	Args.Add("RogueTimePenalty", FText::AsNumber(RogueTimePenalty));
 	Args.Add("AllowPickups", bAllowPickups ? NSLOCTEXT("AUTBetrayalGameMode", "General", "True") : NSLOCTEXT("AUTBetrayalGameMode", "General", "False"));
 
 	return FText::Format(NSLOCTEXT("UTBetrayalGameMode", "GameRules", "{Rules}  Rogue Value: {RogueValue}  Rogue time penalty: {RogueTimePenalty}s  Allow Pickups: {AllowPickups}"), Args);
@@ -891,7 +891,7 @@ void AUTBetrayalGameMode::BuildServerResponseRules(FString& OutRules)
 {
 	// TODO: proper order
 	OutRules += FString::Printf(TEXT("Rogue Value\t%i\t"), RogueValue);
-	OutRules += FString::Printf(TEXT("Rogue time penalty\t%i\t"), AUTBetrayalPlayerState::StaticClass()->GetDefaultObject<AUTBetrayalPlayerState>()->RogueTimePenalty);
+	OutRules += FString::Printf(TEXT("Rogue time penalty\t%i\t"), RogueTimePenalty);
 	OutRules += FString::Printf(TEXT("Allow Pickups\t%s\t"), bAllowPickups ? TEXT("True") : TEXT("False"));
 
 	Super::BuildServerResponseRules(OutRules);
