@@ -212,11 +212,20 @@ bool AUTBetrayalGameMode::CheckRelevance_Implementation(AActor* Other)
 	{
 		return Other->GetClass() == InstagibRifleClass;
 	}
-	else if (Other->IsA(AUTPickup::StaticClass()))
+
+	// whether to remove the actor. true for keeping it
+	bool bAllowed;
+	// allow mutators to replace pickups first
+	bAllowed = Super::CheckRelevance_Implementation(Other);
+
+	if (bAllowed && Other->IsA(AUTPickup::StaticClass()))
 	{
-		if (bAllowPickups)
+		// assume Pickup factories should stay (bAllowPickups is set),
+		// unless a disallowed pickup is found
+		bAllowed = bAllowPickups;
+
+		if (bAllowed)
 		{
-			bool bAllowed = true;
 			for (auto DisallowdFac : DisallowedPickupFactories)
 			{
 				if (Other->GetClass()->IsChildOf(DisallowdFac))
@@ -225,33 +234,27 @@ bool AUTBetrayalGameMode::CheckRelevance_Implementation(AActor* Other)
 					break;
 				}
 			}
+		}
 
-			if (bAllowed)
+		if (bAllowed)
+		{
+			AUTPickupInventory* InvFac = Cast<AUTPickupInventory>(Other);
+			if (InvFac && InvFac->GetInventoryType())
 			{
-				AUTPickupInventory* InvFac = Cast<AUTPickupInventory>(Other);
-				if (InvFac && InvFac->GetInventoryType())
+				auto InvClass = InvFac->GetInventoryType();
+				for (auto DisallowdInv : DisallowedInventories)
 				{
-					auto InvClass = InvFac->GetInventoryType();
-					for (auto DisallowdInv : DisallowedInventories)
+					if (InvClass->IsChildOf(DisallowdInv))
 					{
-						if (InvClass->IsChildOf(DisallowdInv))
-						{
-							bAllowed = false;
-							break;
-						}
+						bAllowed = false;
+						break;
 					}
 				}
 			}
-
-			if (bAllowed)
-			{
-				return true;
-			}
 		}
-
-		return false;
 	}
-	return Super::CheckRelevance_Implementation(Other);
+	
+	return bAllowed;
 }
 
 void AUTBetrayalGameMode::ShotTeammate(AUTBetrayalPlayerState* InstigatorPRI, AUTBetrayalPlayerState* HitPRI, APawn* ShotInstigator, APawn* HitPawn)
@@ -972,8 +975,6 @@ void AUTBetrayalGameMode::GetGameURLOptions(const TArray<TSharedPtr<TAttributePr
 	//		i--;
 	//	}
 	//}
-
-	// TODO: parameterize additional game options (like allowing Boots)
 }
 
 void AUTBetrayalGameMode::BETKillbot(const FString& NameOrUIDStr)
