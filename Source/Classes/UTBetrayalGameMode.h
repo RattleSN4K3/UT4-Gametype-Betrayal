@@ -62,6 +62,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Game)
 	TArray< TSubclassOf<AUTMutator> > DisallowedMutators;
 
+	/** Inventory items which are disallowed when AllowPickups is set*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Game)
+	TArray< TSubclassOf<AUTInventory> > DisallowedInventories;
+
+	/** Pickup factories which are disallowed when AllowPickups is set*/
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Game)
+	TArray< TSubclassOf<AUTPickupInventory> > DisallowedPickupFactories;
+
 	UPROPERTY(Transient, BlueprintReadOnly)
 	TArray<AUTBetrayalTeam*> Teams;
 
@@ -161,7 +169,8 @@ public:
 
 };
 
-// extras for bools to convert to check box type
+
+// TODO: Remove once TAttributePropertyBool is properly exported
 struct TAttributePropertyBool_TEMP : public TAttributePropertyBool
 {
 	TAttributePropertyBool_TEMP(UObject* InObj, bool* InData, const TCHAR* InURLKey = NULL)

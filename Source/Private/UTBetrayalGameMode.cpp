@@ -13,6 +13,8 @@
 #include "UTMutator_WeaponReplacement.h"
 
 #include "UTPlayerState.h"
+#include "UTArmor.h"
+#include "UTTimedPowerup.h"
 
 #include "SNumericEntryBox.h"
 #include "Private/Slate/Widgets/SUTTabWidget.h"
@@ -80,6 +82,12 @@ AUTBetrayalGameMode::AUTBetrayalGameMode(const FObjectInitializer& ObjectInitial
 	DisallowedMutators.Add(ConstructorStatics.Mutator_Instagib.Object);
 	DisallowedMutators.Add(ConstructorStatics.Mutator_WeaponArena.Object);
 	DisallowedMutators.Add(ConstructorStatics.Mutator_WeaponReplacement.Object);
+
+	DisallowedPickupFactories.Add(AUTPickupWeapon::StaticClass());
+
+	DisallowedInventories.Add(AUTTimedPowerup::StaticClass());
+	DisallowedInventories.Add(AUTArmor::StaticClass());
+	DisallowedInventories.Add(AUTWeapon::StaticClass()); // just in case
 
 	BetrayingSound = ConstructorStatics.BetrayingSoundAsset.Object;
 	BetrayedSound = ConstructorStatics.BetrayedSoundAsset.Object;
@@ -206,6 +214,41 @@ bool AUTBetrayalGameMode::CheckRelevance_Implementation(AActor* Other)
 	}
 	else if (Other->IsA(AUTPickup::StaticClass()))
 	{
+		if (bAllowPickups)
+		{
+			bool bAllowed = true;
+			for (auto DisallowdFac : DisallowedPickupFactories)
+			{
+				if (Other->GetClass()->IsChildOf(DisallowdFac))
+				{
+					bAllowed = false;
+					break;
+				}
+			}
+
+			if (bAllowed)
+			{
+				AUTPickupInventory* InvFac = Cast<AUTPickupInventory>(Other);
+				if (InvFac && InvFac->GetInventoryType())
+				{
+					auto InvClass = InvFac->GetInventoryType();
+					for (auto DisallowdInv : DisallowedInventories)
+					{
+						if (InvClass->IsChildOf(DisallowdInv))
+						{
+							bAllowed = false;
+							break;
+						}
+					}
+				}
+			}
+
+			if (bAllowed)
+			{
+				return true;
+			}
+		}
+
 		return false;
 	}
 	return Super::CheckRelevance_Implementation(Other);
