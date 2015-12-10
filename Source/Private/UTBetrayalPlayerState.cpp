@@ -113,6 +113,7 @@ void AUTBetrayalPlayerState::SetRogueTimer()
 {
 	AUTBetrayalGameMode* GM = GetWorld()->GetAuthGameMode<AUTBetrayalGameMode>();
 	RogueTimePenalty = GM ? GM->RogueTimePenalty : AUTBetrayalGameMode::StaticClass()->GetDefaultObject<AUTBetrayalGameMode>()->RogueTimePenalty;
+	RemainingRogueTime = RogueTimePenalty;
 	
 	ForceNetUpdate();
 	bIsRogue = true;
