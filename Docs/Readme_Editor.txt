@@ -1,14 +1,14 @@
 =============================================================================
- Betrayal for UT4 (Editor)
- October 7, 2015
- Version: 0.1.4
+ Betrayal for UT4
+ December 10, 2015
+ Version: 0.2.0
  ----------------------------------------------------------------------------
  Cooperate to get bonus points. Betray your team to keep them.
 =============================================================================
  Game: Unreal Tournament (UE4)
- Size: ~ 0.496 - 9.55 MB
- Version: 0.1.4
- Compatibility: Build 2710036 (10/1/2015)
+ Size: ~ 0.513 - 9.72 MB
+ Version: 0.2.0
+ Compatibility: Build 2771652 (11/19/2015)
  Type: C++
  Credits: Epic Games
 -----------------------------------------------------------------------------
@@ -85,6 +85,17 @@ Usage:
 
 Changelog:
 --------------------------------------------------------
+v0.2.0
+- Fixed: Bots still betray after their team has betrayed
+- Fixed: Nemesis updated correctly for betrayed player
+- Fixed: Tracking highest pot for the instigator player
+- Added: Tracking lowest and highest pots for each player
+- Added: Mutator support for CheckRelevance
+- Added: Additional rogue score, penalty exposed as game option
+- Added: Allowing pickups (non-timed) as game option
+- Changed: Updated code for latest build
+- Changed: Re-enabled leader hat
+
 v0.1.4
 - Changed: Minor code improvements
 

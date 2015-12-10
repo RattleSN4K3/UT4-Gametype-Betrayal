@@ -1,3 +1,17 @@
+Version 0.2.0
+--------------------------------------
+- Fixed: Bots still betray after their team has betrayed
+- Fixed: Nemesis updated correctly for betrayed player
+- Fixed: Tracking highest pot for the instigator player
+- Added: Tracking lowest and highest pots for each player
+- Added: Mutator support for CheckRelevance
+- Added: Additional rogue score, penalty exposed as game option
+- Added: Allowing pickups (non-timed) as game option
+- Changed: Updated code for latest build
+- Changed: Re-enabled leader hat
+
+
+
 Version 0.1.4
 --------------------------------------
 - Changed: Minor code improvements
