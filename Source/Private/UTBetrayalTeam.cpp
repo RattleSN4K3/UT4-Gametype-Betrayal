@@ -13,9 +13,6 @@ AUTBetrayalTeam::AUTBetrayalTeam(const FObjectInitializer& ObjectInitializer)
 	bReplicateMovement = false;
 
 	NetUpdateFrequency = 2.0f;
-
-	// FIX: Not sure about this. It is set in PlayerState as well
-	// TODO: Test Seamless travel
 	bNetLoadOnClient = false;
 }
 
