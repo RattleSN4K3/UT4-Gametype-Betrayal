@@ -129,12 +129,12 @@ void AUTBetrayalGameMode::InitGame(const FString& MapName, const FString& Option
 		DefaultInventory.Add(InstagibRifleClass);
 	}
 
-	bForcePlayerIntro = HasOption(Options, TEXT("PlayPlayerIntro"));
+	bForcePlayerIntro = UGameplayStatics::HasOption(Options, TEXT("PlayPlayerIntro"));
 
-	RogueValue = FMath::Max(1, GetIntOption(Options, TEXT("RogueValue"), RogueValue));
-	RogueTimePenalty = FMath::Max(0, GetIntOption(Options, TEXT("RogueTimePenalty"), RogueTimePenalty));
+	RogueValue = FMath::Max(1, UGameplayStatics::GetIntOption(Options, TEXT("RogueValue"), RogueValue));
+	RogueTimePenalty = FMath::Max(0, UGameplayStatics::GetIntOption(Options, TEXT("RogueTimePenalty"), RogueTimePenalty));
 
-	FString InOpt = ParseOption(Options, TEXT("AllowPickups"));
+	FString InOpt = UGameplayStatics::ParseOption(Options, TEXT("AllowPickups"));
 	bAllowPickups = EvalBoolOptions(InOpt, bAllowPickups);
 }
 

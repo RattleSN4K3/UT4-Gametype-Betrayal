@@ -259,13 +259,13 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 			if (bDrawRaw)
 			{
 				//Draw simple format "x NUM"
-				Canvas->DrawColor = FLinearColor::White;
+				Canvas->DrawColor = FLinearColor::White.ToFColor(false);
 				Canvas->DrawTile(UT3GHudTexture, Pos.X, Pos.Y + (DaggerYPadding * RenderScale),
 					DaggerWidth * RenderScale, DaggerHeight * RenderScale,
 					DaggerTexCoords.U, DaggerTexCoords.V, DaggerTexCoords.UL, DaggerTexCoords.VL);
 
 				FText DaggerString = FText::Format(DaggersPlateString, FText::AsNumber(NumRawDaggers));
-				Canvas->DrawColor = FLinearColor::Gray;
+				Canvas->DrawColor = FLinearColor::Gray.ToFColor(false);
 				Canvas_DrawText(DrawFont, DaggerString, Pos.X + (DaggerWidth + DaggerSpacing) * RenderScale, Pos.Y + (NameYPadding * RenderScale));
 			}
 			else
@@ -274,7 +274,7 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 				Pos.X = DaggerStartPos + (0.5 * NameplateBubbleWidth * RenderScale);
 				for (int32 j = 0; j < NumGoldDaggers; j++)
 				{
-					Canvas->DrawColor = GoldLinearColor;
+					Canvas->DrawColor = GoldLinearColor.ToFColor(false);
 					Canvas->DrawTile(UT3GHudTexture, Pos.X, Pos.Y + (DaggerYPadding * RenderScale),
 						DaggerWidth * RenderScale, DaggerHeight * RenderScale,
 						DaggerTexCoords.U, DaggerTexCoords.V, DaggerTexCoords.UL, DaggerTexCoords.VL);
@@ -294,7 +294,7 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeamInfo(float DeltaTime, FVector2D Pos)
 
 				for (int32 j = 0; j < NumSilverDaggers; j++)
 				{
-					Canvas->DrawColor = SilverLinearColor;
+					Canvas->DrawColor = SilverLinearColor.ToFColor(false);
 					Canvas->DrawTile(UT3GHudTexture, Pos.X, Pos.Y + (DaggerYPadding * RenderScale),
 						DaggerWidth * RenderScale, DaggerHeight * RenderScale, DaggerTexCoords.U, DaggerTexCoords.V, DaggerTexCoords.UL, DaggerTexCoords.VL);
 
@@ -363,7 +363,7 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawNameplateBackground(FVector2D Pos, float
 	//Start to the lft half the length of the text
 	float DrawPosX = Pos.X - (0.5 * WordWidth) - EndCapWidth;
 
-	Canvas->DrawColor = NameplateColor;
+	Canvas->DrawColor = NameplateColor.ToFColor(false);
 	Canvas->DrawTile(UT3GHudTexture, DrawPosX, Pos.Y, EndCapWidth, NameplateHeight, NameplateLeft.U, NameplateLeft.V, NameplateLeft.UL, NameplateLeft.VL);
 	DrawPosX += EndCapWidth;
 	Canvas->DrawTile(UT3GHudTexture, DrawPosX, Pos.Y, WordWidth, NameplateHeight, NameplateCenter.U, NameplateCenter.V, NameplateCenter.UL, NameplateCenter.VL);
@@ -378,7 +378,7 @@ void UUTBetrayalHUDWidget_TeamInfo::DrawTeammateBackground(FVector2D Pos, float 
 	//Start to the left with the player name
 	float DrawPosX = Pos.X - TeammateNameWidth - ((NameplateWidth + 0.5 * NameplateBubbleWidth) * RenderScale);
 
-	Canvas->DrawColor = BlackBackgroundColor;
+	Canvas->DrawColor = BlackBackgroundColor.ToFColor(false);
 
 	Canvas->DrawTile(UT3GHudTexture, DrawPosX, Pos.Y, NameplateWidth * RenderScale, NameplateHeight, NameplateLeft.U, NameplateLeft.V, NameplateLeft.UL, NameplateLeft.VL);
 	DrawPosX += NameplateWidth * RenderScale;

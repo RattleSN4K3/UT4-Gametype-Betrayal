@@ -4,7 +4,7 @@
 #include "UTBetrayalTeam.h"
 #include "UTBetrayalPlayerState.h"
 
-#include "Private/Slate/SUWPlayerInfoDialog.h"
+#include "Private/Slate/Dialogs/SUTPlayerInfoDialog.h"
 
 #include "UTBetrayalGameMode.generated.h"
 
